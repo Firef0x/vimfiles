@@ -1,3 +1,4 @@
 bundle
 !bundle/neobundle.vim
 .cache
+.flagged
