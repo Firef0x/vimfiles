@@ -27,6 +27,13 @@ else
 	let g:isColor=0
 endif
 " ]]]
+"  判定当前终端是否tmux [[[2
+if exists('$TMUX')
+	let g:isTmux=1
+else
+	let g:isTmux=0
+endif
+" ]]]
 "  设置AuGroup [[[2
 augroup MyAutoCmd
 	autocmd!
@@ -150,7 +157,7 @@ set formatoptions=tcqroj  " 使得注释换行时自动加上前导的空格和�
 " ]]]
 " Writes to the unnamed register also writes to the * and + registers. This
 " makes it easy to interact with the system clipboard [[[2
-if exists('$TMUX')
+if g:isTmux
 	set clipboard=
 elseif has ('unnamedplus')
 	set clipboard=unnamedplus
@@ -408,10 +415,6 @@ nmap <silent> <C-c> :call CloseWindowOrKillBuffer()<CR>
 " 自动居中 [[[2
 nnoremap <silent> n nzz
 nnoremap <silent> N Nzz
-augroup MyAutoCmd
-	autocmd VimEnter * nmap <silent> * *zz
-	autocmd VimEnter * nmap <silent> # #zz
-augroup END
 nnoremap <silent> g* g*zz
 nnoremap <silent> g# g#zz
 nnoremap <silent> <C-o> <C-o>zz
@@ -437,7 +440,7 @@ autocmd! MyAutoCmd BufWritePost .vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc
 nmap <leader>nh :nohlsearch<CR>
 " ]]]
 "  切换绝对/相对行号 [[[2
-nnoremap <Leader>nu :call s:toggle_number()<CR>
+nnoremap <Leader>nu :call <SID>toggle_number()<CR>
 " ]]]
 "  切换自动换行 [[[2
 nnoremap <Leader>wr :execute &wrap==1 ? 'set nowrap' : 'set wrap'<CR>
@@ -500,6 +503,9 @@ call add(s:plugin_groups, 'indent')
 call add(s:plugin_groups, 'javascript')
 if !g:isWindows
 	call add(s:plugin_groups, 'linux')
+	if g:isTmux
+		call add(s:plugin_groups, 'tmux')
+	endif
 endif
 call add(s:plugin_groups, 'misc')
 call add(s:plugin_groups, 'navigation')
@@ -521,7 +527,7 @@ call neobundle#rc(expand("$VIMFILES/bundle/"))
 NeoBundleFetch 'Shougo/neobundle.vim'
 " ]]]
 " my bundles here:
-"NeoBundle 'vimim/vimim'
+"  核心 [[[2
 if count(s:plugin_groups, 'core')
 	NeoBundle 'matchit.zip'
 	" NeoBundle 'Lokaltog/vim-powerline'
@@ -538,7 +544,8 @@ if count(s:plugin_groups, 'core')
 	NeoBundle 'tpope/vim-surround'
 	NeoBundle 'tpope/vim-dispatch'
 endif
-
+" ]]]
+"  自动完成 [[[2
 if count(s:plugin_groups, 'autocomplete')
 	NeoBundleLazy 'Shougo/neocomplcache.vim',
 				\ {'autoload':{'insert':1}}
@@ -554,39 +561,47 @@ if count(s:plugin_groups, 'autocomplete')
 	"NeoBundle 'spf13/snipmate-snippets'
 	NeoBundle 'honza/vim-snippets'
 endif
-
+" ]]]
+"  文本编辑 [[[2
 if count(s:plugin_groups, 'editing')
 	" NeoBundle 'AutoClose'
+	NeoBundle 'Lokaltog/vim-easymotion'
 	NeoBundle 'dimasg/vim-mark'
 	NeoBundleLazy 'godlygeek/tabular',
 				\ {'autoload':{'commands':'Tabularize'}}
 	NeoBundle 'jiangmiao/auto-pairs'
 	NeoBundle 'kien/rainbow_parentheses.vim'
+	NeoBundle 'rhysd/clever-f.vim'
 	NeoBundle 'terryma/vim-multiple-cursors'
 	NeoBundle 'tomtom/tcomment_vim'
-	NeoBundle 'Lokaltog/vim-easymotion'
 endif
-
+" ]]]
+"  代码缩进 [[[2
 if count(s:plugin_groups, 'indent')
 	NeoBundle 'nathanaelkane/vim-indent-guides'
 endif
-
+" ]]]
+"  JavaScript [[[2
 if count(s:plugin_groups, 'javascript')
-	NeoBundleLazy 'JavaScript-syntax',
-				\ {'autoload':{'filetypes':['javascript']}}
+	NeoBundleLazy 'JavaScript-Indent',
+				\ { 'autoload' : {'filetypes':['javascript']} }
 	NeoBundleLazy 'jQuery',
 				\ { 'autoload' : {'filetypes':['javascript']} }
+	NeoBundleLazy 'jelera/vim-javascript-syntax',
+				\ {'autoload':{'filetypes':['javascript']}}
 	NeoBundleLazy 'maksimr/vim-jsbeautify',
 				\ { 'autoload' : {'filetypes':['javascript']} }
 endif
-
+" ]]]
+"  Linux [[[2
 if count(s:plugin_groups, 'linux')
 	NeoBundle 'sudo.vim'
 	if has('python')
 		NeoBundle 'fcitx.vim'
 	endif
 endif
-
+" ]]]
+"  文本定位/纵览 [[[2
 if count(s:plugin_groups, 'navigation')
 	NeoBundle 'CCTree'
 	NeoBundleLazy 'a.vim',
@@ -601,21 +616,26 @@ if count(s:plugin_groups, 'navigation')
 	NeoBundle 'scrooloose/nerdtree'
 	NeoBundle 'wesleyche/SrcExpl'
 endif
-
-" PHP [[[2
+" ]]]
+"  PHP [[[2
 if count(s:plugin_groups, 'php')
 	"press K on a function for full php manual
 	NeoBundle 'spf13/PIV'
 endif
 " ]]]
-
+"  代码管理 [[[2
 if count(s:plugin_groups, 'scm')
+	NeoBundle 'airblade/vim-gitgutter'
 	NeoBundleLazy 'gregsexton/gitv',
 				\ {'depends':['tpope/vim-fugitive'], 'autoload':{'commands':'Gitv'}}
 	NeoBundle 'tpope/vim-fugitive'
 endif
-
-" Unite Groups [[[2
+" ]]]
+"  TMux [[[2
+if count(s:plugin_groups, 'tmux')
+	NeoBundle 'christoomey/vim-tmux-navigtor'
+endif
+"  Unite Groups [[[2
 if count(s:plugin_groups, 'unite')
 NeoBundle 'Shougo/unite.vim'
 NeoBundleLazy 'Shougo/unite-help',
@@ -626,7 +646,7 @@ NeoBundleLazy 'tsukkee/unite-tag',
 			\ {'autoload':{'unite_sources':['tag','tag/file']}}
 endif
 " ]]]
-
+"  Web开发 [[[2
 if count(s:plugin_groups, 'web')
 	NeoBundleLazy 'amirh/HTML-AutoCloseTag',
 				\ {'autoload':{'filetypes':['html', 'xml']}}
@@ -639,7 +659,8 @@ if count(s:plugin_groups, 'web')
 	NeoBundleLazy 'othree/html5.vim',
 				\ {'autoload':{'filetypes':['html']}}
 endif
-
+" ]]]
+"  杂项 [[[2
 if count(s:plugin_groups, 'misc')
 	" NeoBundle 'Conque-Shell'
 	NeoBundleLazy 'Shougo/vimshell.vim', 
@@ -673,19 +694,15 @@ if count(s:plugin_groups, 'misc')
 	" Ctrl-V选择区域，然后按:B执行命令，或按:S查找匹配字符串
 	NeoBundle 'vis'
 endif
-
-" plugins than needs python
-
-
-" syntax highlight
-
+" ]]]
+"  使用NeoBundle关闭，结束时开始 [[[2
+filetype plugin indent on     " required!
+" ]]]
+"  NeoBundle帮助 [[[2
 " non github repos
 " NeoBundle 'git://git.wincent.com/command-t.git'
 " ...
 
-" 使用NeoBundle关闭，结束时开始
-filetype plugin indent on     " required!
-"
 " brief help
 " :NeoBundleList          - list configured bundles
 " :NeoBundleInstall(!)    - install(update) bundles
@@ -696,7 +713,8 @@ NeoBundleCheck
 "
 " see :h neobundle for more details or wiki for faq
 " note: comments after bundle command are not allowed..
-"]]]
+" ]]]
+" ]]]
 "  以下为Lilydjwg的设置  [[[1
 " 图形与终端  [[[2
 let colorscheme = 'molokai'
@@ -756,7 +774,7 @@ elseif has("unix")
 			let &t_EI="\e]12;" . color_normal . "\007"
 			exe 'autocmd VimLeave * :silent !echo -ne "\e]12;"' . shellescape(color_exit, 1) . '"\007"'
 		elseif &term =~ "screen"
-			if exists('$TMUX')
+			if g:isTmux
 				if &ttymouse == 'xterm'
 					set ttymouse=xterm2
 				endif
@@ -787,6 +805,7 @@ function! s:toggle_number()
 			setl nonu
 		else
 			setl rnu
+		endif
 	else
 		setl nu
 		setl nornu
@@ -811,7 +830,7 @@ endfunction
 
 "  以下为插件的设置 [[[1
 "-------------------------AutoClose------------------------------"  [[[2
-let g:AutoClosePairs = {'(': ')', '{': '}', '[': ']', '"': '"', "'": "'", '`': '`'} 
+" let g:AutoClosePairs = {'(': ')', '{': '}', '[': ']', '"': '"', "'": "'", '`': '`'} 
 " ]]]
 "-------------------------Auto-Pairs------------------------------"  [[[2
 let g:AutoPairsFlyMode=1
@@ -870,6 +889,11 @@ nmap <silent> <leader>hh <plug>MarkClear
 vmap <silent> <leader>hh <plug>MarkClear
 nmap <silent> <leader>hr <plug>MarkRegex
 vmap <silent> <leader>hr <plug>MarkRegex
+" 自动居中
+augroup MyAutoCmd
+	autocmd VimEnter * nmap <silent> * <Plug>MarkSearchNext<Esc>zz
+	autocmd VimEnter * nmap <silent> # <Plug>MarkSearchNext<Esc>zz
+augroup END
 " 你可以在高亮文本上使用“,#”或“,*”来上下搜索高亮文本。在使用了“,#”或“,*”后，就可以直接输入“#”或“*”来继续查找该高亮文本，直到你又用“#”或“*”查找了其它文本。
 " <silent>* 当前MarkWord的下一个     <silent># 当前MarkWord的上一个
 " <silent>/ 所有MarkWords的下一个    <silent>? 所有MarkWords的上一个
@@ -882,95 +906,95 @@ highlight def MarkWord5  ctermbg=Magenta  ctermfg=Black  guibg=#FFB3FF    guifg=
 highlight def MarkWord6  ctermbg=Blue     ctermfg=Black  guibg=#9999FF    guifg=Black
 " ]]]
 "-------------------------NeoComplcache---------------------------" [[[2
-" Disable AutoComplPop.
-let g:acp_enableAtStartup = 0
-" Use neocomplcachd.
-let g:neocomplcache_enable_at_startup = 1
-" Use smartcase.
-let g:neocomplcache_enable_smart_case = 1
-" Use camel case completion.
-let g:neocomplcache_enable_camel_case_completion = 1
-" Use underbar completion.
-let g:neocomplcache_enable_underbar_completion = 1
-" 设置缓存目录
-let g:neocomplcache_temporary_dir=$VIMFILES.'/.cache/neocon'
-let g:neocomplcache_enable_fuzzy_completion=1
-" Set minimum syntax keyword length.
-let g:neocomplcache_min_syntax_length = 3
-let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
-let g:neocomplcache_enable_quick_match = 1 " 每次补全菜单弹出时，可以再按一个”-“键，这是补全菜单中的每个候选词会被标上一个字母，只要再输入对应字母就可以马上完成选择。
-let g:neocomplcache_dictionary_filetype_lists = {
-			\ 'default'    : '',
-			\ 'bash'       : $HOME.'/.bash_history',
-			\ 'scheme'     : $HOME.'/.gosh_completions',
-			\ 'css'        : $VIMFILES.'/dict/css.txt',
-			\ 'php'        : $VIMFILES.'/dict/php.txt',
-			\ 'javascript' : $VIMFILES.'/dict/javascript.txt',
-			\ }
-
-" Define keyword.
-if !exists('g:neocomplcache_keyword_patterns')
-	let g:neocomplcache_keyword_patterns = {}
-endif
-let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
-
-" Plugin key-mappings.
-"imap <C-k>     <Plug>(neocomplcache_snippets_expand)
-"smap <C-k>     <Plug>(neocomplcache_snippets_expand)
-inoremap <expr><C-g>     neocomplcache#undo_completion()
-inoremap <expr><C-l>     neocomplcache#complete_common_string()
-"<CR>: close popup and save indent.
-"inoremap <expr><CR> neocomplcache#smart_close_popup() . "\<CR>"
-"<TAB>: completion. NO USE with snipmate
-"<C-h>, <BS>: close popup and delete backword char.
-inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
-inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
-inoremap <expr><C-Y> neocomplcache#close_popup()
-inoremap <expr><C-e> neocomplcache#cancel_popup()
-"inoremap <expr><Enter> pumvisible() ? neocomplcache#close_popup()."\<C-n>" : "\<Enter>"
-"inoremap <expr><Enter> pumvisible() ? "\<C-Y>" : "\<Enter>" 
-
-"下面的 暂时不会，等会了再慢慢搞,暂时先用默认的
-"imap <expr><TAB> neocomplcache#sources#snippets_complete#expandable() ? "\<Plug>(neocomplcache_snippets_expand)" : pumvisible() ? "\<C-n>" : "\<TAB>"
-
-" Recommended key-mappings.
-" <CR>: close popup and save indent.
-"inoremap <expr><CR>  neocomplcache#smart_close_popup()."\<CR>"
-" <TAB>: completion. 下面的貌似冲突了
-"inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-" <C-h>, <BS>: close popup and delete backword char.
-inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
-inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
-inoremap <expr><C-y> neocomplcache#close_popup()
-inoremap <expr><C-e> neocomplcache#cancel_popup()
-" 类似于AutoComplPop用法
-let g:neocomplcache_enable_auto_select = 1
-
-" Shell like behavior(not recommended).
-set completeopt+=longest
-"let g:neocomplcache_disable_auto_complete = 1
-"inoremap <expr><Tab>  pumvisible() ? "\<Down>" : "\<TAB>"
-"inoremap <expr><CR>  neocomplcache#smart_close_popup() . "\<CR>"
-
-
-" Enable omni completion.
-augroup Filetype Specific
-	autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-	autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-	autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-	autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-	autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-	autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
-augroup END
-
-" Enable heavy omni completion.
-if !exists('g:neocomplcache_omni_patterns')
-	let g:neocomplcache_omni_patterns = {}
-endif
-let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
-let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
-let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
-let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
+" " Disable AutoComplPop.
+" let g:acp_enableAtStartup = 0
+" " Use neocomplcachd.
+" let g:neocomplcache_enable_at_startup = 1
+" " Use smartcase.
+" let g:neocomplcache_enable_smart_case = 1
+" " Use camel case completion.
+" let g:neocomplcache_enable_camel_case_completion = 1
+" " Use underbar completion.
+" let g:neocomplcache_enable_underbar_completion = 1
+" " 设置缓存目录
+" let g:neocomplcache_temporary_dir=$VIMFILES.'/.cache/neocon'
+" let g:neocomplcache_enable_fuzzy_completion=1
+" " Set minimum syntax keyword length.
+" let g:neocomplcache_min_syntax_length = 3
+" let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
+" let g:neocomplcache_enable_quick_match = 1 " 每次补全菜单弹出时，可以再按一个”-“键，这是补全菜单中的每个候选词会被标上一个字母，只要再输入对应字母就可以马上完成选择。
+" let g:neocomplcache_dictionary_filetype_lists = {
+" 			\ 'default'    : '',
+" 			\ 'bash'       : $HOME.'/.bash_history',
+" 			\ 'scheme'     : $HOME.'/.gosh_completions',
+" 			\ 'css'        : $VIMFILES.'/dict/css.txt',
+" 			\ 'php'        : $VIMFILES.'/dict/php.txt',
+" 			\ 'javascript' : $VIMFILES.'/dict/javascript.txt',
+" 			\ }
+" 
+" " Define keyword.
+" if !exists('g:neocomplcache_keyword_patterns')
+" 	let g:neocomplcache_keyword_patterns = {}
+" endif
+" let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
+" 
+" " Plugin key-mappings.
+" "imap <C-k>     <Plug>(neocomplcache_snippets_expand)
+" "smap <C-k>     <Plug>(neocomplcache_snippets_expand)
+" inoremap <expr><C-g>     neocomplcache#undo_completion()
+" inoremap <expr><C-l>     neocomplcache#complete_common_string()
+" "<CR>: close popup and save indent.
+" "inoremap <expr><CR> neocomplcache#smart_close_popup() . "\<CR>"
+" "<TAB>: completion. NO USE with snipmate
+" "<C-h>, <BS>: close popup and delete backword char.
+" inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
+" inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
+" inoremap <expr><C-Y> neocomplcache#close_popup()
+" inoremap <expr><C-e> neocomplcache#cancel_popup()
+" "inoremap <expr><Enter> pumvisible() ? neocomplcache#close_popup()."\<C-n>" : "\<Enter>"
+" "inoremap <expr><Enter> pumvisible() ? "\<C-Y>" : "\<Enter>" 
+" 
+" "下面的 暂时不会，等会了再慢慢搞,暂时先用默认的
+" "imap <expr><TAB> neocomplcache#sources#snippets_complete#expandable() ? "\<Plug>(neocomplcache_snippets_expand)" : pumvisible() ? "\<C-n>" : "\<TAB>"
+" 
+" " Recommended key-mappings.
+" " <CR>: close popup and save indent.
+" "inoremap <expr><CR>  neocomplcache#smart_close_popup()."\<CR>"
+" " <TAB>: completion. 下面的貌似冲突了
+" "inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+" " <C-h>, <BS>: close popup and delete backword char.
+" inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
+" inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
+" inoremap <expr><C-y> neocomplcache#close_popup()
+" inoremap <expr><C-e> neocomplcache#cancel_popup()
+" " 类似于AutoComplPop用法
+" let g:neocomplcache_enable_auto_select = 1
+" 
+" " Shell like behavior(not recommended).
+" set completeopt+=longest
+" "let g:neocomplcache_disable_auto_complete = 1
+" "inoremap <expr><Tab>  pumvisible() ? "\<Down>" : "\<TAB>"
+" "inoremap <expr><CR>  neocomplcache#smart_close_popup() . "\<CR>"
+" 
+" 
+" " Enable omni completion.
+" augroup Filetype Specific
+" 	autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+" 	autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+" 	autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+" 	autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+" 	autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+" 	autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
+" augroup END
+" 
+" " Enable heavy omni completion.
+" if !exists('g:neocomplcache_omni_patterns')
+" 	let g:neocomplcache_omni_patterns = {}
+" endif
+" let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
+" let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
+" let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
+" let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
 "------------------neocomplcache---------------------------------  ]]]
 "  NeoComplete [[[2
 " Disable AutoComplPop.
@@ -1112,6 +1136,10 @@ function! bundle.hooks.on_source(bundle)
 	call unite#filters#sorter_default#use(['sorter_rank'])
 	call unite#set_profile('files', 'smartcase', 1)
 	call unite#custom#source('line,outline','matchers','matcher_fuzzy')
+	call unite#custom#source('file_rec/async,file_mru,file_rec,buffer',
+				\ 'matchers',['converter_tail', 'matcher_fuzzy'])
+	call unite#custom#source('file_rec/async,file_mru',
+				\ 'converters',['converter_file_directory'])
 	call unite#custom_source('file_rec,file_rec/async,file_mru,file,buffer,grep',
 				\ 'ignore_pattern', join([
 				\ '\.git/',
@@ -1125,6 +1153,8 @@ endfunction
 let g:unite_data_directory=$VIMFILES.'/.cache/unite'
 " Start in insert mode
 let g:unite_enable_start_insert=1
+let g:unite_enable_short_source_names = 1
+let g:unite_cursor_line_highlight = 'TabLineSel'
 " Enable history yank source
 let g:unite_source_history_yank_enable=1
 " Open in bottom right
@@ -1134,6 +1164,7 @@ if g:isWindows
 	let g:unite_prompt =  ''
 else
 	let g:unite_prompt =  '▶'
+	let g:unite_marked_icon = '✗ '
 endif
 " For ack.
 if executable('ag')
@@ -1156,6 +1187,8 @@ let g:unite_source_file_mru_time_format = ''
 function! s:unite_settings()
 	nmap <buffer> <esc> <plug>(unite_exit)
 	imap <buffer> <Esc><Esc> <plug>(unite_exit)
+	imap <buffer> <BS> <Plug>(unite_delete_backward_path)
+	imap <buffer><expr> j unite#smart_map('j', '')
 	nmap <buffer><expr><silent> <2-leftmouse>   unite#smart_map('l', unite#do_action(unite#get_current_unite().context.default_action))
 	nmap <buffer> <c-j> <Plug>(unite_loop_cursor_down)
 	nmap <buffer> <c-k> <Plug>(unite_loop_cursor_up)
@@ -1163,37 +1196,45 @@ function! s:unite_settings()
 endfunction
 autocmd MyAutoCmd FileType unite call s:unite_settings()
 
+" The prefix key
 nmap ; [unite]
+xmap ; [unite]
 nnoremap [unite] <Nop>
+xnoremap [unite] <Nop>
 
 if g:isWindows
 	nnoremap <silent> [unite]<space>
-		\ :<C-u>Unite -toggle -auto-resize -buffer-name=mixed file_rec buffer file_mru bookmark<cr><c-u>
-	nnoremap <silent> [unite]f :<C-u>Unite -toggle -auto-resize -buffer-name=files file_rec<cr><c-u>
+		\ :<C-u>Unite -buffer-name=mixed -no-split -multi-line
+		\ jump_point file_point file_rec:! file file/new buffer file_mru bookmark<cr><c-u>
+	nnoremap <silent> [unite]f :<C-u>Unite -toggle -buffer-name=files file_rec<cr><c-u>
 else
 	nnoremap <silent> [unite]<space>
-		\ :<C-u>Unite -toggle -auto-resize -buffer-name=mixed file_rec/async buffer file_mru bookmark<cr><c-u>
-	nnoremap <silent> [unite]f :<C-u>Unite -toggle -auto-resize -buffer-name=files file_rec/async<cr><c-u>
+		\ :<C-u>Unite -buffer-name=mixed -no-split -multi-line
+		\ jump_point file_point file_rec/async:! file file/new buffer file_mru bookmark<cr><c-u>
+	nnoremap <silent> [unite]f :<C-u>Unite -toggle -buffer-name=files file_rec/async<cr><c-u>
 endif
 nnoremap <silent> [unite]n :<C-u>Unite -buffer-name=bundle neobundle<cr>
-nnoremap <silent> [unite]y :<C-u>Unite -buffer-name=yanks history/yank<cr>
-nnoremap <silent> [unite]l :<C-u>UniteWithCursorWord -auto-resize -buffer-name=line line<cr>
+nnoremap <silent> [unite]* :<C-u>UniteWithCursorWord -no-split -buffer-name=line line<cr>
 " Quick buffer and mru
-nnoremap <silent> [unite]b :<C-u>Unite -auto-resize -buffer-name=buffers buffer file_mru<cr>
+nnoremap <silent> [unite]b :<C-u>Unite -buffer-name=buffers buffer file_mru<cr>
 " Quick grep from cwd
-nnoremap <silent> [unite]/ :<C-u>Unite -no-quit -buffer-name=search grep:.<cr>
+nnoremap <silent> [unite]/ 
+			\ :<C-u>Unite -auto-preview -no-empty -no-quit -resume -buffer-name=search grep:.<cr>
 nnoremap <silent> [unite]m :<C-u>Unite -auto-resize -buffer-name=mappings mapping<cr>
 " Quickly switch lcd
 nnoremap <silent> [unite]d
-	\ :<C-u>Unite -auto-resize -buffer-name=change-cwd -default-action=lcd directory_mru<CR>
+	\ :<C-u>Unite -buffer-name=change-cwd -default-action=lcd directory_mru<CR>
 " Quick registers
-nnoremap <silent> [unite]r :<C-u>Unite -buffer-name=register register<CR>
+nnoremap <silent> [unite]y 
+			\ :<C-u>Unite -buffer-name=register register history/yank<CR>
+xnoremap <silent> [unite]r 
+			\ d:<C-u>Unite -buffer-name=register register history/yank<CR>
 " unite-tag
-nnoremap <silent> [unite]t :<C-u>Unite -auto-resize -buffer-name=tag tag tag/file<cr>
+nnoremap <silent> [unite]t :<C-u>Unite -buffer-name=tag tag tag/file<cr>
 " unite-outline
-nnoremap <silent> [unite]o :<C-u>Unite -auto-resize -buffer-name=outline -vertical outline<cr>
+nnoremap <silent> [unite]o :<C-u>Unite -start-insert -resume -buffer-name=outline -vertical outline<cr>
 " unite-help
-nnoremap <silent> [unite]h :<C-u>Unite -auto-resize -buffer-name=help help<cr>
+nnoremap <silent> [unite]h :<C-u>Unite -buffer-name=help help<cr>
 " ]]]
 "  plugin - NERD_commenter.vim 注释代码用的，以下映射已写在插件中 [[[2
 " <leader>ca 在可选的注释方式之间切换，比如C/C++ 的块注释/* */和行注释//
@@ -1361,14 +1402,14 @@ let g:user_emmet_settings = {'lang': "zh-cn"}
 " 设置显示字体和大小。guifontwide为等宽汉字字体。
 if g:isWindows
 	" set guifont=Consolas\ for\ Powerline\ FixedD:h12
-	set guifont=YaHei_Consolas_Hybrid:h12
+	set guifont=YaHei_Consolas_Hybrid:h13
 	" set guifontwide=XHei-Mono:h12,黑体:h12
 	set laststatus=2 
 	" set t_Co=256
 	" let g:Powerline_symbols = 'fancy'
 elseif (g:isGUI || g:isColor)
-	set guifont=Inconsolata\ for\ Powerline\ Medium\ 12
-	set guifontwide=WenQuanYi\ ZenHei\ Mono\ 12
+	set guifont=Inconsolata\ for\ Powerline\ Medium\ 13
+	" set guifontwide=WenQuanYi\ ZenHei\ Mono\ 12
 	set laststatus=2 
 	" set t_Co=256
 	" let g:Powerline_symbols = 'fancy'
@@ -1381,12 +1422,12 @@ if (g:isWindows || g:isGUI || g:isColor)
 	let g:airline_theme='light'
 	let g:airline#extensions#tabline#enabled=1
 	let g:airline#extensions#tabline#tab_nr_type=1
-	if !exists('g:airline_symbols')
-		let g:airline_symbols = {}
-	endif
-	let g:airline_symbols.space = "\ua0"
+	" if !exists('g:airline_symbols')
+	" 	let g:airline_symbols = {}
+	" endif
+	" let g:airline_symbols.space = "\ua0"
 endif
-if g:isWindows
+" if g:isWindows
 	" powerline symbols
 	" let g:airline_left_sep                         = ''
 	" let g:airline_left_alt_sep                     = ''
@@ -1399,27 +1440,27 @@ if g:isWindows
 	" let g:airline_symbols.branch                   = ''
 	" let g:airline_symbols.readonly                 = ''
 	" let g:airline_symbols.linenr                   = ''
-elseif g:isGUI
-	" unicode symbols
-	let g:airline_left_sep                     = '»'
-	let g:airline_left_sep                     = '▶'
-	let g:airline#extensions#tabline#left_sep  = '▶'
-	let g:airline_right_sep                    = '«'
-	let g:airline_right_sep                    = '◀'
-	let g:airline#extensions#tabline#right_sep = '◀'
-	let g:airline_symbols.linenr               = '␊ '
-	" let g:airline_symbols.linenr             = '␤ '
-	" let g:airline_symbols.linenr             = '¶'
-	let g:airline_linecolumn_prefix            = '␊ '
-	" let g:airline_linecolumn_prefix          = '␤ '
-	" let g:airline_linecolumn_prefix          = '¶'
-	let g:airline_symbols.branch               = '⎇ '
-	let g:airline_fugitive_prefix              = '⎇ '
-	let g:airline_paste_symbol                 = 'ρ'
-	let g:airline_paste_symbol                 = 'Þ'
-	let g:airline_paste_symbol                 = '∥'
-	let g:airline_symbols.whitespace           = 'Ξ'
-endif
+" elseif g:isGUI
+" 	" unicode symbols
+" 	let g:airline_left_sep                     = '»'
+" 	let g:airline_left_sep                     = '▶'
+" let g:airline#extensions#tabline#left_sep  = '▶'
+" 	let g:airline_right_sep                    = '«'
+" 	let g:airline_right_sep                    = '◀'
+" 	let g:airline#extensions#tabline#right_sep = '◀'
+" 	let g:airline_symbols.linenr               = '␊ '
+" 	" let g:airline_symbols.linenr             = '␤ '
+" 	" let g:airline_symbols.linenr             = '¶'
+" 	let g:airline_linecolumn_prefix            = '␊ '
+" 	" let g:airline_linecolumn_prefix          = '␤ '
+" 	" let g:airline_linecolumn_prefix          = '¶'
+" 	let g:airline_symbols.branch               = '⎇ '
+" 	let g:airline_fugitive_prefix              = '⎇ '
+" 	let g:airline_paste_symbol                 = 'ρ'
+" 	let g:airline_paste_symbol                 = 'Þ'
+" 	let g:airline_paste_symbol                 = '∥'
+"	let g:airline_symbols.whitespace           = 'Ξ'
+" endif
 " ]]]
 " FuzzyFinder [[[2
 "let g:fuf_modesDisable = ['mrucmd']
@@ -1523,7 +1564,7 @@ vmap <Leader>a,, :Tabularize /,\zs<CR>
 nmap <Leader>a<Bar> :Tabularize /<Bar><CR>
 vmap <Leader>a<Bar> :Tabularize /<Bar><CR>
 "  ]]]
-"  Vim Indent Guide
+"  Vim Indent Guide [[[2
 let g:indent_guides_start_level=1
 let g:indent_guides_guide_size=1
 let g:indent_guides_enable_on_vim_startup=1
@@ -1536,12 +1577,22 @@ if g:isGUI==0
 	endfunction
 	autocmd MyAutoCmd VimEnter,Colorscheme * call s:indent_set_console_colors()
 endif
+"  ]]]
 " vimperator.vim [[[2
 autocmd MyAutoCmd SwapExists vimperator*.tmp
 			\ :runtime plugin/vimperator.vim | call VimperatorEditorRecover(1)
 " ]]]
-
-
+"  Fugitive/GitGutter  [[[2
+autocmd MyAutoCmd BufReadPost fugitive://* setlocal bufhidden=delete
+" SignColumn should match background for
+" things like vim-gitgutter
+highlight clear SignColumn
+" Current line number row will have same background color in relative mode.
+" Things like vim-gitgutter will match LineNr highlight
+highlight clear LineNr
+let g:gitgutter_realtime = 0
+nnoremap <silent> <Leader>gg :GitGutterToggle<CR>
+"  ]]]
 "   插件调出快捷键  [[[2
 " 开关NERDTree  [[[3
 function! ShowNerdTree()
@@ -1560,8 +1611,11 @@ nmap <F3> :call ShowTags()<CR>
 nnoremap <silent> <Leader>gv :Gitv<CR>
 nnoremap <silent> <Leader>gV :Gitv!<CR>
 "  ]]]
-"  Grep  F4 查找光标下词语  [[[3 
-nnoremap <silent> <F4> :Rgrep<CR>
+"  开关SrcExpl F4 [[[3 
+nnoremap <silent> <F4> :SrcExplToggle<CR>
+"  ]]]
+"  Grep  Ctrl-F4 查找光标下词语  [[[3 
+nnoremap <silent> <C-F4> :Rgrep<CR>
 "  ]]]
 "  开关CCTree [[[3
 nmap <C-F12> :call LoadCCTree()<CR>
@@ -1593,6 +1647,12 @@ augroup Filetype Specific
 	autocmd FileType html nnoremap <buffer> <C-f> :call HtmlBeautify()<CR>
 	autocmd FileType css nnoremap <buffer> <C-f> :call CSSBeautify()<CR>
 augroup END
+"  ]]]
+"  Fugitive  [[[3
+nnoremap <silent> <Leader>gc :Gcommit<CR>
+nnoremap <silent> <Leader>gd :Gdiff<CR>
+nnoremap <silent> <Leader>gr :Gread<CR>:GitGutter<CR>
+nnoremap <silent> <Leader>gw :Gwrite<CR>:GitGutter<CR>
 "  ]]]
 " NeoBundle [[[3
 " nnoremap <leader>nbu :Unite neobundle/update -vertical -no-start-insert<cr>
