@@ -114,9 +114,11 @@ endif
 set scrolloff=3  " 设置光标之下的最少行数
 " ]]]
 " Display unprintable chars [[[2
-set list
-set listchars=tab:▸\ ,extends:❯,precedes:❮,nbsp:␣
-set showbreak=↪ 
+if !g:isWindows
+	set list
+	set listchars=tab:▸\ ,extends:❯,precedes:❮,nbsp:␣
+	set showbreak=↪ 
+endif
 
 " listchar=trail is not as flexible, use the below to highlight trailing
 " whitespace. Don't do it for unite windows or readonly files
@@ -155,8 +157,7 @@ set tags+=$VIMFILES/tags/perl/cpan.tags  " 增加Perl CPAN Tags
 source $VIMRUNTIME/ftplugin/man.vim
 set formatoptions=tcqroj  " 使得注释换行时自动加上前导的空格和星号
 " ]]]
-" Writes to the unnamed register also writes to the * and + registers. This
-" makes it easy to interact with the system clipboard [[[2
+" 自动关联系统剪贴板(即+、*寄存器) [[[2
 if g:isTmux
 	set clipboard=
 elseif has ('unnamedplus')
@@ -188,8 +189,8 @@ augroup Filetype Specific
 	autocmd Filetype vim setlocal fdm=indent keywordprg=:help
 	" }}}
 	" Arch Linux {{{
-	autocmd BufNewFile,BufRead PKGBUILD setl syntax=PKGBUILD ft=PKGBUILD
-	autocmd BufNewFile,BufRead *.install setl syntax=sh ft=sh
+	autocmd BufNewFile,BufRead PKGBUILD setlocal syntax=PKGBUILD ft=PKGBUILD
+	autocmd BufNewFile,BufRead *.install setlocal syntax=sh ft=sh
 	" }}}
 	" dict {{{
 	autocmd filetype javascript set dictionary=$VIMFILES/dict/javascript.txt
@@ -199,7 +200,7 @@ augroup Filetype Specific
 	" CSS {{{
 	autocmd FileType css setlocal smartindent foldmethod=indent
 	autocmd FileType css setlocal noexpandtab "tabstop=2 shiftwidth=2
-	autocmd BufNewFile,BufRead *.scss setl ft=scss
+	autocmd BufNewFile,BufRead *.scss setlocal ft=scss
 	" 删除一条CSS中无用空格
 	autocmd filetype css vnoremap <leader>co J:s/\s*\([{:;,]\)\s*/\1/g<CR>:let @/=''<cr>
 	autocmd filetype css nnoremap <leader>co :s/\s*\([{:;,]\)\s*/\1/g<CR>:let @/=''<cr>
@@ -226,6 +227,32 @@ augroup END
 " 当打开一个新缓冲区时，自动切换目录为当前编辑文件所在目录 [[[2
 autocmd MyAutoCmd BufRead,BufNewFile,BufEnter * if bufname("") !~ "^\[A-Za-z0-9\]*://" && expand("%:p") !~ "^sudo:" 
 			\ | silent! lcd %:p:h |endif
+" ]]]
+" GREP/ACK/AG Settings [[[2
+if executable('ack')
+	set grepprg=ack\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow\ $*
+	set grepformat=%f:%l:%c:%m
+endif
+if executable('ag')
+	set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow
+	set grepformat=%f:%l:%c:%m
+endif
+" ]]]
+" 能够漂亮地显示.NFO文件  [[[2
+function! s:SetFileEncodings(encodings)
+	let b:myfileencodingsbak=&fileencodings
+	let &fileencodings=a:encodings
+endfunction
+function! s:RestoreFileEncodings()
+	let &fileencodings=b:myfileencodingsbak
+	unlet b:myfileencodingsbak
+endfunction
+autocmd MyAutoCmd BufReadPre *.nfo 
+			\ call s:SetFileEncodings('cp437') | 
+			\ set ambiwidth=single autocmd MyAutoCmd BufReadPost *.nfo call s:RestoreFileEncodings()
+" ]]]
+" source时让一些设置不再执行 [[[2
+let g:VimrcIsLoad=1 
 " ]]]
 " ]]]
 "  快捷键设置  [[[1
@@ -492,6 +519,26 @@ cmap Tabe tabe
 "	endif
 "endfunc
 " ]]]
+"  回车时前字符为{时自动换行补全  [[[2
+function! <SID>OpenSpecial(ochar,cchar)
+	let line = getline('.')
+	let col = col('.') - 2
+	if(line[col] != a:ochar)
+		if(col > 0)
+			return "\<esc>a\<CR>"
+		else
+			return "\<CR>"
+		endif
+	endif
+	if(line[col+1] != a:cchar)
+		call setline('.',line[:(col)].a:cchar.line[(col+1):])
+	else
+		call setline('.',line[:(col)].line[(col+1):])
+	endif
+	return "\<esc>a\<CR>;\<CR>".a:cchar."\<esc>\"_xk$\"_xa"
+endfunction
+inoremap <silent> <CR> <C-R>=<SID>OpenSpecial('{','}')<CR>
+" ]]]
 " ]]]
 "  NeoBundle 插件管理器 [[[1
 "  初始化插件组设置 [[[2
@@ -557,8 +604,6 @@ if count(s:plugin_groups, 'autocomplete')
 		NeoBundleDisable 'Shougo/neocomplcache.vim'
 	endif
 	NeoBundle 'Shougo/neosnippet.vim'
-	"NeoBundle 'garbas/vim-snipmate'
-	"NeoBundle 'spf13/snipmate-snippets'
 	NeoBundle 'honza/vim-snippets'
 endif
 " ]]]
@@ -613,6 +658,7 @@ if count(s:plugin_groups, 'navigation')
 				\ {'autoload':{'commands':'TagbarToggle'}}
 	NeoBundleLazy 'mbbill/undotree',
 				\ {'autoload':{'commands':'UndotreeToggle'}}
+	NeoBundle 'mileszs/ack.vim'
 	NeoBundle 'scrooloose/nerdtree'
 	NeoBundle 'wesleyche/SrcExpl'
 endif
@@ -658,21 +704,24 @@ if count(s:plugin_groups, 'web')
 				\ {'autoload':{'filetypes':['html','xml','xsl','xslt','xsd','css','sass','scss','less','mustache']}}
 	NeoBundleLazy 'othree/html5.vim',
 				\ {'autoload':{'filetypes':['html']}}
+	NeoBundleLazy 'othree/html5-syntax.vim',
+				\ {'autoload':{'filetypes':['html']}}
+	NeoBundleLazy 'othree/xml.vim',
+				\ {'autoload':{'filetypes':['html', 'xml']}}
 endif
 " ]]]
 "  杂项 [[[2
 if count(s:plugin_groups, 'misc')
 	" NeoBundle 'Conque-Shell'
+	NeoBundleLazy 'git@github.com:Firef0x/PKGBUILD.vim'
 	NeoBundleLazy 'Shougo/vimshell.vim', 
 				\ {'autoload':{'commands':[ 'VimShell', 'VimShellInteractive' ]}}
-	" NeoBundle 'MarcWeber/vim-addon-mw-utils'
 	NeoBundle 'asins/vimcdoc'
 	" NeoBundle 'scrooloose/nerdcommenter'
 	NeoBundle 'scrooloose/syntastic'
 	NeoBundle 'superbrothers/vim-vimperator'
 	" NeoBundle 'techlivezheng/vim-plugin-minibufexpl'
 	NeoBundle 'tomasr/molokai'
-	" NeoBundle 'tomtom/tlib_vim'
 	NeoBundleLazy 'tpope/vim-markdown',
 				\ { 'autoload' : {'filetypes':['markdown']} }
 	NeoBundle 'xieyu/vim-assist'
@@ -680,17 +729,19 @@ if count(s:plugin_groups, 'misc')
 	" vim-scripts repos
 	"NeoBundle 'mru.vim'
 	" NeoBundle 'Align'
+	" 在单独的窗口管理缓冲区
 	NeoBundle 'bufexplorer.zip'
 	NeoBundle 'FencView.vim'
 	" STL语法高亮
 	NeoBundle 'STL-improved'
+	" CTags语法高亮
 	NeoBundle 'TagHighlight'
 	" Make a column of increasing or decreasing numbers
 	NeoBundle 'VisIncr'
 	" 保存时自动创建空文件夹
 	NeoBundle 'auto_mkdir'
 	NeoBundle 'cscope-wrapper'
-	NeoBundle 'grep.vim'
+	" NeoBundle 'grep.vim'
 	" Ctrl-V选择区域，然后按:B执行命令，或按:S查找匹配字符串
 	NeoBundle 'vis'
 endif
@@ -724,7 +775,8 @@ if g:isGUI
 	set lines=32
 	set number
 	set cursorline
-	set ambiwidth=double
+	" 原为double，为了更好地显示airline
+	set ambiwidth=single
 	exe 'colorscheme' colorscheme
 elseif has("unix")
 	set ambiwidth=single
@@ -801,14 +853,14 @@ unlet colorscheme
 function! s:toggle_number()
 	if &nu 
 		if &rnu
-			setl nornu
-			setl nonu
+			setlocal nornu
+			setlocal nonu
 		else
-			setl rnu
+			setlocal rnu
 		endif
 	else
-		setl nu
-		setl nornu
+		setlocal nu
+		setlocal nornu
 	endif
 endfunction
 
@@ -827,8 +879,14 @@ function! Lilydjwg_checklist_bs(pat)
 		return "\<BS>"
 	endif
 endfunction
-
+" ]]]
+" ]]]
 "  以下为插件的设置 [[[1
+"  Ack.vim [[[2
+if executable('ag')
+	let g:ackprg = "ag --nocolor --column --hidden --nogroup --smart-case"
+endif
+"  ]]]
 "-------------------------AutoClose------------------------------"  [[[2
 " let g:AutoClosePairs = {'(': ')', '{': '}', '[': ']', '"': '"', "'": "'", '`': '`'} 
 " ]]]
@@ -841,7 +899,7 @@ let g:AutoPairsFlyMode=1
 " <Leader>bs 水平分割窗口显示缓存列表，并在缓存列表窗口中打开选定文件
 " <Leader>bv 垂直分割窗口显示缓存列表，并在缓存列表窗口中打开选定文件
 let g:bufExplorerFindActive = 0
-autocmd MyAutoCmd BufWinEnter \[Buf\ List\] setl nonumber
+autocmd MyAutoCmd BufWinEnter \[Buf\ List\] setlocal nonumber
 let g:bufExplorerDefaultHelp = 0  " 不显示默认帮助信息
 let g:bufExplorerSortBy = 'mru' " 使用最近使用的排列方式 
 " ]]]
@@ -850,32 +908,32 @@ if g:isWindows
 	set csprg=cswrapper.exe
 endif
 " ]]] 
-"  MiniBufExpl  [[[2
-" let g:miniBufExplMapWindowNavVim = 1
-" let g:miniBufExplMapWindowNavArrows = 1   
-" let g:miniBufExplMapCTabSwitchBufs = 1   
-" let g:miniBufExplModSelTarget = 1
-"let g:miniBufExplForceSyntaxEnable=1
-
-"  Taglist  [[[2
-"let Tlist_Show_One_File = 1
-"let tlist_vimwiki_settings = 'wiki;h:headers'
-"let tlist_tex_settings = 'latex;h:headers'
-"let tlist_wiki_settings = 'wiki;h:headers'
-"let tlist_diff_settings = 'diff;f:file'
-"let tlist_git_settings = 'diff;f:file'
-"let tlist_gitcommit_settings = 'gitcommit;f:file'
-"let tlist_privoxy_settings = 'privoxy;s:sections'
-""  来源 http://gist.github.com/476387
-"let tlist_html_settings = 'html;h:Headers;o:IDs;c:Classes'
-"hi link MyTagListFileName Type
-
-"  Tagbar [[[2
-"let tagbar_left=1
-let tagbar_width=30
-let tagbar_singleclick=1 
-autocmd MyAutoCmd BufReadPost *.cpp,*.c,*.h,*.hpp,*.cc,*.cxx call tagbar#autoopen()
-" ]]] 
+"   easymotion  [[[2
+let EasyMotion_leader_key = '<Leader><Leader>'
+let EasyMotion_keys = 'abcdefghijklmnopqrstuvwxyz'
+augroup MyAutoCmd
+	autocmd ColorScheme * highlight EasyMotionTarget ctermfg=32 guifg=#0087df
+	autocmd ColorScheme * highlight EasyMotionShade ctermfg=237 guifg=#3a3a3a
+augroup END
+" ]]]
+" Emmet [[[2
+let g:user_emmet_mode='a'
+let g:use_emmet_complete_tag=1
+let g:user_emmet_settings = {'lang': "zh-cn"}
+" ]]]
+"  Fugitive/GitGutter  [[[2
+autocmd MyAutoCmd BufReadPost fugitive://* setlocal bufhidden=delete
+" SignColumn should match background for
+" things like vim-gitgutter
+highlight clear SignColumn
+" Current line number row will have same background color in relative mode.
+" Things like vim-gitgutter will match LineNr highlight
+highlight clear LineNr
+let g:gitgutter_realtime = 0
+nnoremap <silent> <Leader>gg :GitGutterToggle<CR>
+"  ]]]
+"   grep.vim[[[2
+" let g:Grep_Default_Options = '--binary-files=without-match'
 "  plugin - matchit.vim 对%命令进行扩展使得能在嵌套标签和语句之间跳转  [[[2
 " % 正向匹配      g% 反向匹配
 " [% 定位块首     ]% 定位块尾
@@ -904,6 +962,59 @@ highlight def MarkWord3  ctermbg=Yellow   ctermfg=Black  guibg=#FFDB72    guifg=
 highlight def MarkWord4  ctermbg=Red      ctermfg=Black  guibg=#FF7272    guifg=Black
 highlight def MarkWord5  ctermbg=Magenta  ctermfg=Black  guibg=#FFB3FF    guifg=Black
 highlight def MarkWord6  ctermbg=Blue     ctermfg=Black  guibg=#9999FF    guifg=Black
+" ]]]
+"  MiniBufExpl  [[[2
+" let g:miniBufExplMapWindowNavVim = 1
+" let g:miniBufExplMapWindowNavArrows = 1   
+" let g:miniBufExplMapCTabSwitchBufs = 1   
+" let g:miniBufExplModSelTarget = 1
+"let g:miniBufExplForceSyntaxEnable=1
+" ]]] 
+"  plugin - NERD_commenter.vim 注释代码用的，以下映射已写在插件中 [[[2
+" <leader>ca 在可选的注释方式之间切换，比如C/C++ 的块注释/* */和行注释//
+" <leader>cc 注释当前行
+" <leader>cs 以”性感”的方式注释
+" <leader>cA 在当前行尾添加注释符，并进入Insert模式
+" <leader>cu 取消注释
+" <leader>cm 添加块注释
+" let NERD_c_alt_style = 1
+" let NERDSpaceDelims = 1
+" ]]]
+"  plugin - NERD_tree.vim 文件管理器  [[[2
+" 让Tree把自己给装饰得多姿多彩漂亮点
+let NERDChristmasTree=1
+" 控制当光标移动超过一定距离时，是否自动将焦点调整到屏中心
+let NERDTreeAutoCenter=1
+" 指定书签文件
+let NERDTreeBookmarksFile=$VIMFILES.'/.cache/NERDTree_bookmarks'
+" 排除 . .. 文件
+let NERDTreeIgnore=['^\.$', '^\.\.$', '\.pyc', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
+" 指定鼠标模式(1.双击打开 2.单目录双文件 3.单击打开)
+let NERDTreeMouseMode=2
+let NERDTreeQuitOnOpen=1
+" 是否默认显示书签列表
+let NERDTreeShowBookmarks=1
+" 是否默认显示文件
+let NERDTreeShowFiles=1
+" 是否默认显示隐藏文件
+let NERDTreeShowHidden=1
+" 是否默认显示行号
+let NERDTreeShowLineNumbers=0
+" 窗口位置（'left' or 'right'）
+let NERDTreeWinPos='left'
+" 窗口宽度
+let NERDTreeWinSize=31
+" 启动时不默认打开NERDTreeTabs
+let g:nerdtree_tabs_open_on_gui_startup=0
+" ]]]
+"  Tagbar [[[2
+"let tagbar_left=1
+let tagbar_width=30
+let tagbar_singleclick=1 
+autocmd MyAutoCmd BufReadPost *.cpp,*.c,*.h,*.hpp,*.cc,*.cxx call tagbar#autoopen()
+" ]]] 
+"  xml.vim，使所有的标签都关闭[[[2
+let xml_use_xhtml = 1
 " ]]]
 "-------------------------NeoComplcache---------------------------" [[[2
 " " Disable AutoComplPop.
@@ -1160,16 +1271,15 @@ let g:unite_source_history_yank_enable=1
 " Open in bottom right
 let g:unite_split_rule = "botright"
 let g:unite_source_rec_max_cache_files=5000
-if g:isWindows
-	let g:unite_prompt =  ''
-else
+if !g:isWindows
 	let g:unite_prompt =  '▶'
 	let g:unite_marked_icon = '✗ '
 endif
 " For ack.
 if executable('ag')
 	let g:unite_source_grep_command='ag'
-	let g:unite_source_grep_default_opts='--nocolor --nogroup -S -C4'
+	let g:unite_source_grep_default_opts=
+				\ '--line-numbers --nocolor --nogroup --hidden --smart-case -C4'
 	let g:unite_source_grep_recursive_opt=''
 elseif executable('ack')
 	let g:unite_source_grep_command='ack'
@@ -1236,19 +1346,9 @@ nnoremap <silent> [unite]o :<C-u>Unite -start-insert -resume -buffer-name=outlin
 " unite-help
 nnoremap <silent> [unite]h :<C-u>Unite -buffer-name=help help<cr>
 " ]]]
-"  plugin - NERD_commenter.vim 注释代码用的，以下映射已写在插件中 [[[2
-" <leader>ca 在可选的注释方式之间切换，比如C/C++ 的块注释/* */和行注释//
-" <leader>cc 注释当前行
-" <leader>cs 以”性感”的方式注释
-" <leader>cA 在当前行尾添加注释符，并进入Insert模式
-" <leader>cu 取消注释
-" <leader>cm 添加块注释
-let NERD_c_alt_style = 1
-let NERDSpaceDelims = 1
-" ]]]
 " VimShell [[[2
 if g:isWindows
-	let g:vimshell_prompt =  ''
+	let g:vimshell_prompt =  '$'
 else
 	let g:vimshell_prompt =  '▶'
 endif
@@ -1257,34 +1357,7 @@ nmap <Leader>sh :VimShell -split<CR>
 let g:vimshell_temporary_directory=$VIMFILES.'/.cache/vimshell'
 let g:vimshell_vimshrc_path=$VIMFILES.'/vimshrc'
 " ]]]
-"  plugin - NERD_tree.vim 文件管理器  [[[2
-" 让Tree把自己给装饰得多姿多彩漂亮点
-let NERDChristmasTree=1
-" 控制当光标移动超过一定距离时，是否自动将焦点调整到屏中心
-let NERDTreeAutoCenter=1
-" 指定书签文件
-let NERDTreeBookmarksFile=$VIMFILES.'/.cache/NERDTree_bookmarks'
-" 排除 . .. 文件
-let NERDTreeIgnore=['^\.$', '^\.\.$', '\.pyc', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
-" 指定鼠标模式(1.双击打开 2.单目录双文件 3.单击打开)
-let NERDTreeMouseMode=2
-let NERDTreeQuitOnOpen=1
-" 是否默认显示书签列表
-let NERDTreeShowBookmarks=1
-" 是否默认显示文件
-let NERDTreeShowFiles=1
-" 是否默认显示隐藏文件
-let NERDTreeShowHidden=1
-" 是否默认显示行号
-let NERDTreeShowLineNumbers=0
-" 窗口位置（'left' or 'right'）
-let NERDTreeWinPos='left'
-" 窗口宽度
-let NERDTreeWinSize=31
-" 启动时不默认打开NERDTreeTabs
-let g:nerdtree_tabs_open_on_gui_startup=0
-" ]]]
-"--------------------Align------------------------  [[[2
+"--------------------------Align--------------------------- [[[2
 " let g:Align_xstrlen = 3
 " "   Lilydjwg_Align
 " let g:Myalign_def = {
@@ -1318,32 +1391,18 @@ let g:nerdtree_tabs_open_on_gui_startup=0
 " endfunction
 " command -nargs=1 -range -complete=customlist,Lilydjwg_Align_complete
 "       \ LA <line1>,<line2>call Lilydjwg_Align("<args>")
-"   grep.vim[[[2
-let g:Grep_Default_Options = '--binary-files=without-match'
-"   easymotion  [[[2
-let EasyMotion_leader_key = '<Leader><Leader>'
-let EasyMotion_keys = 'abcdefghijklmnopqrstuvwxyz'
-augroup MyAutoCmd
-	autocmd ColorScheme * highlight EasyMotionTarget ctermfg=32 guifg=#0087df
-	autocmd ColorScheme * highlight EasyMotionShade ctermfg=237 guifg=#3a3a3a
-augroup END
-" ]]]
 "   syntastic [[[2
-let g:syntastic_error_symbol         = '✗ '
-let g:syntastic_style_error_symbol   = '✠ '
-let g:syntastic_warning_symbol       = '∆ '
-let g:syntastic_style_warning_symbol = '≈'
+if !g:isWindows
+	let g:syntastic_error_symbol         = '✗ '
+	let g:syntastic_style_error_symbol   = '✠ '
+	let g:syntastic_warning_symbol       = '∆ '
+	let g:syntastic_style_warning_symbol = '≈'
+endif
 let g:syntastic_mode_map = { 'mode': 'passive',
 			\ 'active_filetypes': ['lua', 'php'],
 			\ 'passive_filetypes': ['puppet'] }
 
 "   ]]]
-"  a.vim  F9 切换.c/.h  [[[2
-" :A  ---切换头文件并独占整个窗口
-" :AV ---切换头文件并垂直分割窗口
-" :AS ---切换头文件并水平分割窗口
-nnoremap <silent> <F9> :A<CR>
-" ]]]
 " PIV [[[2 
 let g:DisableAutoPHPFolding = 0
 let g:PIVAutoClose = 0
@@ -1352,8 +1411,6 @@ let g:PIVAutoClose = 0
 let g:undotree_SplitLocation='botright'
 " If undotree is opened, it is likely one wants to interact with it.
 let g:undotree_SetFocusWhenToggle=1
-" F8 调出撤销树
-nmap <silent> <F8> :UndotreeToggle<CR>
 " ]]]
 "   indent/html.vim[[[2
 let g:html_indent_inctags = "html,body,head,tbody,p,li,dd,marquee,header,nav,article,section"
@@ -1386,23 +1443,11 @@ nmap cS <Plug>Csurround
 "let g:vimwiki_dir_link = 'index'
 "let g:vimwiki_html_header_numbering = 2
 "let g:vimwiki_conceallevel = 2
-"   xml.vim，使所有的标签都关闭[[[2
-let xml_use_xhtml = 1
-" ]]]
-" Emmet [[[2
-let g:user_emmet_mode='a'
-let g:use_emmet_complete_tag=1
-let g:user_emmet_settings = {'lang': "zh-cn"}
-" ]]]
-" Zen Coding  [[[2
-" let g:user_zen_settings = {'lang': "zh-cn"}
-" let g:user_zen_expandabbr_key='<C-u>'
-" ]]]
 " PowerLine/AirLine  [[[2
-" 设置显示字体和大小。guifontwide为等宽汉字字体。
+" 设置显示字体和大小。guifontwide为等宽汉字字体。(干扰Airline，暂不设置)
 if g:isWindows
 	" set guifont=Consolas\ for\ Powerline\ FixedD:h12
-	set guifont=YaHei_Consolas_Hybrid:h13
+	set guifont=YaHei_Consolas_Hybrid:h12
 	" set guifontwide=XHei-Mono:h12,黑体:h12
 	set laststatus=2 
 	" set t_Co=256
@@ -1422,12 +1467,13 @@ if (g:isWindows || g:isGUI || g:isColor)
 	let g:airline_theme='light'
 	let g:airline#extensions#tabline#enabled=1
 	let g:airline#extensions#tabline#tab_nr_type=1
-	" if !exists('g:airline_symbols')
-	" 	let g:airline_symbols = {}
-	" endif
+	if !exists('g:airline_symbols')
+		let g:airline_symbols = {}
+	endif
 	" let g:airline_symbols.space = "\ua0"
 endif
-" if g:isWindows
+if g:isWindows
+	let g:airline_symbols.whitespace = ""
 	" powerline symbols
 	" let g:airline_left_sep                         = ''
 	" let g:airline_left_alt_sep                     = ''
@@ -1460,11 +1506,7 @@ endif
 " 	let g:airline_paste_symbol                 = 'Þ'
 " 	let g:airline_paste_symbol                 = '∥'
 "	let g:airline_symbols.whitespace           = 'Ξ'
-" endif
-" ]]]
-" FuzzyFinder [[[2
-"let g:fuf_modesDisable = ['mrucmd']
-"let g:fuf_mrufile_maxItem = 400
+endif
 " ]]]
 "  CtrlP  [[[2
 " let g:ctrlp_working_path_mode='ra'
@@ -1578,59 +1620,60 @@ if g:isGUI==0
 	autocmd MyAutoCmd VimEnter,Colorscheme * call s:indent_set_console_colors()
 endif
 "  ]]]
-" vimperator.vim [[[2
+"  vimperator.vim [[[2
 autocmd MyAutoCmd SwapExists vimperator*.tmp
 			\ :runtime plugin/vimperator.vim | call VimperatorEditorRecover(1)
 " ]]]
-"  Fugitive/GitGutter  [[[2
-autocmd MyAutoCmd BufReadPost fugitive://* setlocal bufhidden=delete
-" SignColumn should match background for
-" things like vim-gitgutter
-highlight clear SignColumn
-" Current line number row will have same background color in relative mode.
-" Things like vim-gitgutter will match LineNr highlight
-highlight clear LineNr
-let g:gitgutter_realtime = 0
-nnoremap <silent> <Leader>gg :GitGutterToggle<CR>
-"  ]]]
 "   插件调出快捷键  [[[2
-" 开关NERDTree  [[[3
+"  a.vim  F9 切换.c/.h  [[[3
+" :A  ---切换头文件并独占整个窗口
+" :AV ---切换头文件并垂直分割窗口
+" :AS ---切换头文件并水平分割窗口
+nnoremap <silent> <F9> :A<CR>
+" ]]]
+"  Ack  Ctrl-F4 查找光标下词语  [[[3 
+nnoremap <silent> <C-F4> :Ack<CR>
+"  ]]]
+"  开关CCTree Ctrl-F12 [[[3
+nmap <C-F12> :call LoadCCTree()<CR>
+function! LoadCCTree()
+	if filereadable('cctree.out') 
+		execute "CCTreeLoadXRefDBFromDisk cctree.out"
+	elseif filereadable('cscope.out')
+		execute "CCTreeLoadDB cscope.out"
+	endif
+endfunction
+"  ]]]
+"  开关Fugitive ,g{c,d,r,w} [[[3
+nnoremap <silent> <Leader>gc :Gcommit<CR>
+nnoremap <silent> <Leader>gd :Gdiff<CR>
+nnoremap <silent> <Leader>gr :Gread<CR>:GitGutter<CR>
+nnoremap <silent> <Leader>gw :Gwrite<CR>:GitGutter<CR>
+"  ]]]
+"  开关Gitv ,g{v,V} [[[3
+nnoremap <silent> <Leader>gv :Gitv<CR>
+nnoremap <silent> <Leader>gV :Gitv!<CR>
+"  ]]]
+"  开关NERDTree F2 [[[3
 function! ShowNerdTree()
 	execute "TagbarClose"
 	execute "NERDTreeTabsToggle"
 endfunction
 nmap <F2> :call ShowNerdTree()<CR>
 " ]]]
-" 开关Tagbar  [[[3
-func! ShowTags()
-	execute "TagbarToggle"
-endfunc
-nmap <F3> :call ShowTags()<CR>
+"  开关Tagbar F3 [[[3
+nmap <F3> :TagbarToggle<CR>
 " ]]]
-"  开关Gitv [[[3
-nnoremap <silent> <Leader>gv :Gitv<CR>
-nnoremap <silent> <Leader>gV :Gitv!<CR>
-"  ]]]
 "  开关SrcExpl F4 [[[3 
 nnoremap <silent> <F4> :SrcExplToggle<CR>
 "  ]]]
-"  Grep  Ctrl-F4 查找光标下词语  [[[3 
-nnoremap <silent> <C-F4> :Rgrep<CR>
-"  ]]]
-"  开关CCTree [[[3
-nmap <C-F12> :call LoadCCTree()<CR>
-func! LoadCCTree()
-	if filereadable('cctree.out') 
-		execute "CCTreeLoadXRefDBFromDisk cctree.out"
-	elseif filereadable('cscope.out')
-		execute "CCTreeLoadDB cscope.out"
-	endif
-endfunc
-"  ]]]
+"  开关撤销树 F8 [[[3
+nmap <silent> <F8> :UndotreeToggle<CR>
+" ]]]
 "  开关CtrlP [[[3
 " nmap <M-m> :CtrlPMRU<CR>
 " nmap <M-n> :CtrlPBuffer<CR>
-" <Leader>sh 调出命令行界面
+"  <Leader>sh 调出命令行界面 [[[3
 " if g:isWindows
 " 	nmap <Leader>sh :ConqueTermVSplit cmd.exe<CR> 
 " elseif executable('zsh')
@@ -1641,57 +1684,16 @@ endfunc
 " 	echo "Fail to invoke shell!"
 " endif
 "  ]]]
-" vim-jsbeautify 格式化javascript [[[3
+"  vim-jsbeautify 格式化javascript Ctrl-F [[[3
 augroup Filetype Specific
 	autocmd FileType javascript nnoremap <buffer> <C-f> :call JsBeautify()<CR>
 	autocmd FileType html nnoremap <buffer> <C-f> :call HtmlBeautify()<CR>
 	autocmd FileType css nnoremap <buffer> <C-f> :call CSSBeautify()<CR>
 augroup END
 "  ]]]
-"  Fugitive  [[[3
-nnoremap <silent> <Leader>gc :Gcommit<CR>
-nnoremap <silent> <Leader>gd :Gdiff<CR>
-nnoremap <silent> <Leader>gr :Gread<CR>:GitGutter<CR>
-nnoremap <silent> <Leader>gw :Gwrite<CR>:GitGutter<CR>
-"  ]]]
 " NeoBundle [[[3
 " nnoremap <leader>nbu :Unite neobundle/update -vertical -no-start-insert<cr>
 "  ]]]
-" 其它技巧性命令  [[[1
-" 能够漂亮地显示.NFO文件  [[[2
-set encoding=utf-8
-function! s:SetFileEncodings(encodings)
-	let b:myfileencodingsbak=&fileencodings
-	let &fileencodings=a:encodings
-endfunction
-function! s:RestoreFileEncodings()
-	let &fileencodings=b:myfileencodingsbak
-	unlet b:myfileencodingsbak
-endfunction
-autocmd MyAutoCmd BufReadPre *.nfo 
-			\ call s:SetFileEncodings('cp437') | 
-			\ set ambiwidth=single autocmd MyAutoCmd BufReadPost *.nfo call s:RestoreFileEncodings()
-" ]]]
-"  回车时前字符为{时自动换行补全  [[[2
-function! <SID>OpenSpecial(ochar,cchar)
-	let line = getline('.')
-	let col = col('.') - 2
-	if(line[col] != a:ochar)
-		if(col > 0)
-			return "\<esc>a\<CR>"
-		else
-			return "\<CR>"
-		endif
-	endif
-	if(line[col+1] != a:cchar)
-		call setline('.',line[:(col)].a:cchar.line[(col+1):])
-	else
-		call setline('.',line[:(col)].line[(col+1):])
-	endif
-	return "\<esc>a\<CR>;\<CR>".a:cchar."\<esc>\"_xk$\"_xa"
-endfunction
-inoremap <silent> <CR> <C-R>=<SID>OpenSpecial('{','}')<CR>
-" ]]]
 "  Vim辅助工具配置  [[[1
 "  cscope setting [[[2
 if has("cscope") && executable("cscope")
@@ -1747,12 +1749,51 @@ if has("cscope") && executable("cscope")
 	nmap cs<Space> :cs find 
 endif
 " ]]]
-" < gvimfullscreen 工具配置 > 请确保已安装了工具  [[[2
+"  Win平台下窗口全屏组件 gvimfullscreen.dll [[[2
 " 用于 Windows Gvim 全屏窗口，可用 F11 切换
 " 全屏后再隐藏菜单栏、工具栏、滚动条效果更好
-if (g:isWindows && g:isGUI)
-	let g:MyVimLib='gvimfullscreen.dll'
+" Shift + t 降低窗口透明度
+" Shift + y 加大窗口透明度
+" Shift + r 切换Vim是否总在最前面显示
+" Vim启动的时候自动使用当前颜色的背景色以去除Vim的白色边框
+if has('gui_running') && has('gui_win32') && has('libcall')
+	let g:MyVimLib = 'gvimfullscreen.dll'
+	function! ToggleFullScreen()
+		call libcall(g:MyVimLib, 'ToggleFullScreen', 1)
+	endfunction
+
+	let g:VimAlpha = 245
+	function! SetAlpha(alpha)
+		let g:VimAlpha = g:VimAlpha + a:alpha
+		if g:VimAlpha < 180
+			let g:VimAlpha = 180
+		endif
+		if g:VimAlpha > 255
+			let g:VimAlpha = 255
+		endif
+		call libcall(g:MyVimLib, 'SetAlpha', g:VimAlpha)
+	endfunction
+
+	let g:VimTopMost = 0
+	function! SwitchVimTopMostMode()
+		if g:VimTopMost == 0
+			let g:VimTopMost = 1
+		else
+			let g:VimTopMost = 0
+		endif
+		call libcall(g:MyVimLib, 'EnableTopMost', g:VimTopMost)
+	endfunction
+	"映射 F11 切换全屏vim
+	noremap <F11> :call ToggleFullScreen()<cr>
+	"切换Vim是否在最前面显示
+	nmap <M-r> :call SwitchVimTopMostMode()<cr>
+	"增加Vim窗体的不透明度
+	" nmap <s-t> :call SetAlpha(10)<cr>
+	"增加Vim窗体的透明度
+	" nmap <s-y> :call SetAlpha(-10)<cr>
+	" 默认设置透明
+	autocmd GUIEnter * call libcallnr(g:MyVimLib, 'SetAlpha', g:VimAlpha)
 endif
 " ]]]
-let g:VimrcIsLoad=1 " source时让一些设置不再执行
+"  Vim Modeline [[[1
 " vim:fdm=marker:fmr=[[[,]]]
