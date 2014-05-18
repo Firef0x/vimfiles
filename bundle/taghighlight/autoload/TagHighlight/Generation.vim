@@ -140,15 +140,6 @@ function! s:UpdateTypesFile()
 		exe 'call' preupdate_hook . '()'
 	endfor
 	
-	call TagHLDebug("Running generator with options:", "Information")
-	for var in ["g:TagHighlightSettings","b:TagHighlightConfigFileOptions","b:TagHighlightSettings"]
-		if exists(var)
-			call TagHLDebug(" - " . var . ": " . string(eval(var)), "Information")
-		else
-			call TagHLDebug(" - " . var . ": UNSET", "Information")
-		endif
-	endfor
-
 	if TagHighlight#Option#GetOption('EnableCscope')
 		call TagHighlight#Cscope#PauseCscope()
 		if ! has_key(b:TagHighlightPrivate, 'CscopeFileInfo')
@@ -159,7 +150,9 @@ function! s:UpdateTypesFile()
 		endif
 	endif
 
+
 	let RunOptions = TagHighlight#Option#CopyOptions()
+	let RunOptions['TagRelative'] = &tagrelative
 	if TagHighlight#Option#GetOption('EnableCscope')
 		if TagHighlight#Option#GetOption('CscopeOnlyIfPresent')
 			if ! b:TagHighlightPrivate['CscopeFileInfo']['Exists']
@@ -169,14 +162,13 @@ function! s:UpdateTypesFile()
 	endif
 
 	call TagHLDebug("Running generator with options:", "Information")
-	for var in ["g:TagHighlightSettings","b:TagHighlightConfigFileOptions","b:TagHighlightSettings"]
+	for var in ["g:TagHighlightSettings","b:TagHighlightConfigFileOptions","b:TagHighlightSettings", "RunOptions"]
 		if exists(var)
 			call TagHLDebug(" - " . var . ": " . string(eval(var)), "Information")
 		else
 			call TagHLDebug(" - " . var . ": UNSET", "Information")
 		endif
 	endfor
-
 
 	call TagHighlight#RunPythonScript#RunGenerator(RunOptions)
 
