@@ -97,6 +97,13 @@ call add(s:plugin_groups, 'scm')
 call add(s:plugin_groups, 'unite')
 call add(s:plugin_groups, 'web')
 "  ]]]
+" 设置自动完成使用的插件 [[[2
+let s:autocomplete_method = 'neocomplcache'
+" Neocomplete 要求支持 Lua
+if g:hasLua
+	let s:autocomplete_method = 'neocomplete'
+endif
+"  ]]]
 "  设置NeoBundle [[[2
 filetype off
 set runtimepath+=$VIMFILES/bundle/neobundle.vim/
@@ -109,12 +116,11 @@ call neobundle#rc(expand("$VIMFILES/bundle/"))
 " required!
 NeoBundleFetch 'Shougo/neobundle.vim'
 " ]]]
-" my bundles here:
+" My bundles here:
 "  核心 [[[2
 if count(s:plugin_groups, 'core')
 	NeoBundle 'matchit.zip'
-	" NeoBundle 'Lokaltog/vim-powerline'
-	NeoBundleDepends 'Shougo/vimproc.vim', {
+	NeoBundle 'Shougo/vimproc.vim', {
 				\ 'build' : {
 				\     'windows' : 'make -f make_mingw32.mak',
 				\     'cygwin'  : 'make -f make_cygwin.mak',
@@ -122,7 +128,9 @@ if count(s:plugin_groups, 'core')
 				\     'unix'    : 'make -f make_unix.mak',
 				\    },
 				\ }
+	" vim-airline 是更轻巧的 powerline 代替品
 	NeoBundle 'bling/vim-airline'
+	" NeoBundle 'Lokaltog/vim-powerline'
 	NeoBundle 'tpope/vim-repeat'
 	NeoBundle 'tpope/vim-surround'
 	NeoBundle 'tpope/vim-dispatch'
@@ -130,23 +138,28 @@ endif
 " ]]]
 "  自动完成 [[[2
 if count(s:plugin_groups, 'autocomplete')
-	NeoBundleLazy 'Shougo/neocomplcache.vim',
-				\ {'autoload':{'insert':1}}
-	" Plugins that needs lua
-	if g:hasLua
+	if s:autocomplete_method == 'neocomplcache'
+		NeoBundleLazy 'Shougo/neocomplcache.vim',
+					\ {'autoload':{'insert':1}}
+	endif
+	if s:autocomplete_method == 'neocomplete'
 		NeoBundleLazy 'Shougo/neocomplete.vim',
 					\ {'autoload':{'insert':1},
 					\ 'vim_version':'7.3.885'}
-		NeoBundleDisable 'Shougo/neocomplcache.vim'
 	endif
 	NeoBundle 'Shougo/neosnippet.vim'
+	" neosnippet.vim 依赖 neosnippet-snippets
+	NeoBundle 'Shougo/neosnippet-snippets'
 	NeoBundle 'honza/vim-snippets'
 endif
 " ]]]
 "  文本编辑 [[[2
 if count(s:plugin_groups, 'editing')
+	" auto-pairs 比 AutoClose 更好用
 	" NeoBundle 'AutoClose'
 	NeoBundle 'Lokaltog/vim-easymotion'
+	" vim-sneak 是 vim-easymotion 的代替品
+	" NeoBundle 'justinmk/vim-sneak'
 	NeoBundle 'chrisbra/NrrwRgn'
 	NeoBundle 'dimasg/vim-mark'
 	NeoBundleLazy 'godlygeek/tabular',
@@ -156,6 +169,8 @@ if count(s:plugin_groups, 'editing')
 	NeoBundle 'rhysd/clever-f.vim'
 	NeoBundle 'terryma/vim-multiple-cursors'
 	NeoBundle 'tomtom/tcomment_vim'
+	" tcomment_vim 比 nerdcommenter 更智能
+	" NeoBundle 'scrooloose/nerdcommenter'
 endif
 " ]]]
 "  代码缩进 [[[2
@@ -244,6 +259,8 @@ endif
 "  Unite 插件组 [[[2
 if count(s:plugin_groups, 'unite')
 	NeoBundle 'Shougo/unite.vim'
+	NeoBundleLazy 'Shougo/neomru.vim',
+				\ {'autoload':{'unite_sources':'file_mru'}}
 	NeoBundleLazy 'Shougo/unite-help',
 				\ {'autoload':{'unite_sources':'help'}}
 	NeoBundleLazy 'Shougo/unite-outline',
@@ -282,7 +299,8 @@ if count(s:plugin_groups, 'misc')
 	NeoBundleLazy 'Shougo/vimshell.vim',
 				\ {'autoload':{'commands':[ 'VimShell', 'VimShellInteractive' ]}}
 	NeoBundle 'asins/vimcdoc'
-	" NeoBundle 'scrooloose/nerdcommenter'
+	NeoBundle 'lilydjwg/colorizer'
+	NeoBundle 'mhinz/vim-startify'
 	NeoBundle 'scrooloose/syntastic'
 	NeoBundleLazy 'superbrothers/vim-vimperator',
 				\ { 'autoload' : {'filetypes':['vimperator']} }
@@ -482,6 +500,7 @@ set noswapfile  "取消交换区
 set mousehide  " 键入时隐藏鼠标
 set magic " 设置模式的魔术
 set display+=lastline "显示最多行，不用@@
+set sessionoptions=blank,buffers,curdir,folds,slash,tabpages,unix,winsize
 set viminfo=%,'1000,<50,s20,h,n$VIMFILES/viminfo
 " 允许在有未保存的修改时切换缓冲区，此时的修改由 vim 负责保存
 set hidden
@@ -517,11 +536,14 @@ augroup END
 set wildmenu
 set wildmode=list:longest,full  " Command <Tab> completion, list matches, then longest common part, then all.
 " Ignore compiled files
-set wildignore=*.o,*.obj,*~,*.pyc
+set wildignore=*.o,*.obj,*~,*.pyc,*.class
+" Ignore ruby gem
 set wildignore+=*.gem
+" Ignore temp folder
 set wildignore+=tmp/**
-set wildignore+=*.png,*.jpg,*.gif,*.xpm
-set wildignore+=*.so,*.swp,*.zip,*/.Trash/**,*.pdf,*.xz
+" Ignore image file
+set wildignore+=*.png,*.jpg,*.gif,*.xpm,*.tiff
+set wildignore+=*.so,*.swp,*.zip,*/.Trash/**,*.pdf,*.xz,.git
 " 光标移到行尾时，自动换下一行开头 Backspace and cursor keys wrap too
 set whichwrap=b,s,h,l,<,>,[,]
 " ]]]
@@ -594,8 +616,13 @@ augroup Filetype_Specific
 	" }}}
 	" Markdown
 	autocmd FileType markdown setlocal nolist
+	" PHP {{{
+	" PHP 生成的SQL代码高亮
+	autocmd filetype php let php_sql_query=1
+	autocmd filetype php let php_htmlInStrings=1
 	" PHP Twig 模板引擎语法
 	" autocmd BufRead,BufNewFile *.twig set syntax=twig
+	" }}}
 
 	autocmd FileType markdown setlocal nolist
 	" Python 文件的一般设置，比如不要 tab 等
@@ -931,11 +958,14 @@ function! Preserve(command)
 endfunction
 " ]]]
 "  去掉行末空格并调整缩进 [[[2
-function! StripTrailingWhitespaceAndFormat()
+function! StripTrailingWhitespace()
 	call Preserve("%s/\\s\\+$//e")
+endfunction
+function! FullFormat()
 	call Preserve("normal gg=G")
 endfunction
-nmap <Leader>ff :call StripTrailingWhitespaceAndFormat()<CR>
+nmap <Leader>ff :call FullFormat()<CR>
+nmap <Leader><Space> :call StripTrailingWhitespace()<CR>
 "  打开光标下的链接 [[[2
 "  取得光标处的匹配
 function! GetPatternAtCursor(pat)
@@ -1011,13 +1041,13 @@ endfunction
 " ]]]
 " ]]]
 "  以下为插件的设置 [[[1
-"  Ack.vim [[[2
+"-------------------------Ack.vim [[[2
 if executable('ag')
 	let g:ackprg = "ag --nocolor --column --hidden --nogroup --smart-case"
 endif
 "  ]]]
-"-------------------------AutoClose------------------------------"  [[[2
-" let g:AutoClosePairs = {'(': ')', '{': '}', '[': ']', '"': '"', "'": "'", '`': '`'} 
+"-------------------------[Disabled]AutoClose--------------------------"  [[[2
+" let g:AutoClosePairs = {'(': ')', '{': '}', '[': ']', '"': '"', "'": "'", '`': '`'}
 " ]]]
 "-------------------------Auto-Pairs------------------------------"  [[[2
 let g:AutoPairsFlyMode=1
@@ -1037,7 +1067,7 @@ if g:isWindows && g:hasCscope
 	set csprg=cswrapper.exe
 endif
 " ]]]
-"   easymotion  [[[2
+"   EasyMotion  [[[2
 let EasyMotion_leader_key = '<Leader><Leader>'
 let EasyMotion_keys = 'abcdefghijklmnopqrstuvwxyz'
 augroup MyAutoCmd
@@ -1059,7 +1089,6 @@ highlight clear SignColumn
 " Things like vim-gitgutter will match LineNr highlight
 highlight clear LineNr
 let g:gitgutter_realtime = 0
-nnoremap <silent> <Leader>gg :GitGutterToggle<CR>
 "  ]]]
 "   grep.vim[[[2
 " let g:Grep_Default_Options = '--binary-files=without-match'
@@ -1110,7 +1139,7 @@ let NERDTreeAutoCenter=1
 " 指定书签文件
 let NERDTreeBookmarksFile=$VIMFILES.'/.cache/NERDTree_bookmarks'
 " 排除 . .. 文件
-let NERDTreeIgnore=['^\.$', '^\.\.$', '\.pyc', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
+let NERDTreeIgnore=['^\.$', '^\.\.$', '\.pyc', '\.class', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
 " 指定鼠标模式(1.双击打开 2.单目录双文件 3.单击打开)
 let NERDTreeMouseMode=2
 let NERDTreeQuitOnOpen=1
@@ -1129,24 +1158,7 @@ let NERDTreeWinSize=31
 " 启动时不默认打开NERDTreeTabs
 let g:nerdtree_tabs_open_on_gui_startup=0
 " ]]]
-"  Tagbar [[[2
-"let tagbar_left=1
-let tagbar_width=30
-let tagbar_singleclick=1
-let g:tagbar_type_dosini = {
-			\ 'ctagstype': 'ini',
-			\ 'kinds': ['s:sections', 'b:blocks'],
-			\ }
-let g:tagbar_type_pgsql = {
-			\ 'ctagstype': 'pgsql',
-			\ 'kinds': ['f:functions', 't:tables'],
-			\ }
-autocmd MyAutoCmd BufReadPost *.cpp,*.c,*.h,*.hpp,*.cc,*.cxx,*.ini call tagbar#autoopen()
-" ]]]
-"  xml.vim，使所有的标签都关闭[[[2
-let xml_use_xhtml = 1
-" ]]]
-"-------------------------NeoComplcache---------------------------" [[[2
+"-------------------------[Disabled]NeoComplcache---------------------------" [[[2
 " " Disable AutoComplPop.
 " let g:acp_enableAtStartup = 0
 " " Use neocomplcachd.
@@ -1315,13 +1327,16 @@ inoremap <expr><C-e>  neocomplete#cancel_popup()
 "inoremap <expr><TAB>  pumvisible() ? "\<Down>" : "\<C-x>\<C-u>"
 
 " Enable omni completion.
+" set omnifunc=syntaxcomplete#Complete
 augroup Filetype_Specific
 	autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-	autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+	autocmd FileType html,markdown,ctp setlocal omnifunc=htmlcomplete#CompleteTags
 	autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+	autocmd FileType php setlocal omnifunc=phpcomplete#CompletePHP
 	autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 	autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 	autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
+	autocmd FileType vim setlocal omnifunc=syntaxcomplete#Complete
 augroup END
 
 " Enable heavy omni completion.
@@ -1375,6 +1390,30 @@ endif
 " especially when splits are used.
 set completeopt-=preview
 " ]]]
+" Netrw使用curl  [[[2
+if executable("curl")
+  let g:netrw_http_cmd = "curl"
+  let g:netrw_http_xcmd = "-o"
+endif
+"  ]]]
+" PIV [[[2
+let g:DisableAutoPHPFolding = 0
+let g:PIVAutoClose = 0
+" ]]]
+"  Tagbar [[[2
+"let tagbar_left=1
+let tagbar_width=30
+let tagbar_singleclick=1
+" let g:tagbar_type_dosini = {
+" 			\ 'ctagstype': 'ini',
+" 			\ 'kinds': ['s:sections', 'b:blocks'],
+" 			\ }
+let g:tagbar_type_pgsql = {
+			\ 'ctagstype': 'pgsql',
+			\ 'kinds': ['f:functions', 't:tables'],
+			\ }
+autocmd MyAutoCmd BufReadPost *.cpp,*.c,*.h,*.hpp,*.cc,*.cxx,*.ini call tagbar#autoopen()
+" ]]]
 " Unite [[[2
 let bundle = neobundle#get('unite.vim')
 function! bundle.hooks.on_source(bundle)
@@ -1388,9 +1427,10 @@ function! bundle.hooks.on_source(bundle)
 				\ 'converters',['converter_file_directory'])
 	call unite#custom_source('file_rec,file_rec/async,file_mru,file,buffer,grep',
 				\ 'ignore_pattern', join([
+				\ '\.bzr/',
 				\ '\.git/',
-				\ 'git5/.*/review/',
-				\ 'google/obj/',
+				\ '\.hg/',
+				\ '\.svn/',
 				\ 'tmp/',
 				\ '.sass-cache',
 				\ ], '\|'))
@@ -1418,7 +1458,7 @@ if executable('ag')
 	let g:unite_source_grep_recursive_opt=''
 elseif executable('ack')
 	let g:unite_source_grep_command='ack'
-	let g:unite_source_grep_default_opts='--no-heading --no-color -a -C4'
+	let g:unite_source_grep_default_opts='--no-heading --no-color -C4'
 	let g:unite_source_grep_recursive_opt=''
 endif
 
@@ -1430,7 +1470,7 @@ let g:unite_source_file_mru_filename_format = ':~:.'
 let g:unite_source_file_mru_time_format = ''
 
 function! s:unite_settings()
-	nmap <buffer> <esc> <plug>(unite_exit)
+	nmap <buffer> <Esc> <plug>(unite_exit)
 	imap <buffer> <Esc><Esc> <plug>(unite_exit)
 	imap <buffer> <BS> <Plug>(unite_delete_backward_path)
 	imap <buffer><expr> j unite#smart_map('j', '')
@@ -1452,13 +1492,13 @@ if g:isWindows
 	nnoremap <silent> [unite]<space>
 				\ :<C-u>Unite -buffer-name=mixed -no-split -multi-line
 				\ jump_point file_point file_rec:! file file/new buffer file_mru bookmark<cr><c-u>
-	nnoremap <silent> [unite]f :<C-u>Unite -toggle -buffer-name=files file_rec<cr><c-u>
+	nnoremap <silent> [unite]f :<C-u>Unite -toggle -buffer-name=files file_rec:!<cr><c-u>
 else
 	nnoremap <silent> [unite]<space>
 				\ :<C-u>Unite -buffer-name=mixed -no-split -multi-line
 				\ jump_point file_point file_rec/async:! file file/new buffer file_mru bookmark<cr><c-u>
 	nnoremap <silent> [unite]f
-				\ :<C-u>Unite -toggle -buffer-name=files file_rec/async<cr><c-u>
+				\ :<C-u>Unite -toggle -buffer-name=files file_rec/async:!<cr><c-u>
 endif
 nnoremap <silent> [unite]n :<C-u>Unite -buffer-name=bundle neobundle<cr>
 nnoremap <silent> [unite]*
@@ -1472,7 +1512,10 @@ nnoremap <silent> [unite]m
 			\ :<C-u>Unite -auto-resize -buffer-name=mappings mapping<cr>
 " Quickly switch lcd
 nnoremap <silent> [unite]d
-			\ :<C-u>Unite -buffer-name=change-cwd -default-action=lcd directory_mru<CR>
+			\ :<C-u>Unite -buffer-name=change-cwd -default-action=cd directory_mru directory_rec/async<CR>
+" Quickly most recently used
+nnoremap <silent> [unite]e
+			\ :<C-u>Unite -buffer-name=recent file_mru<CR>
 " Quick registers
 nnoremap <silent> [unite]y
 			\ :<C-u>Unite -buffer-name=register register history/yank<CR>
@@ -1494,10 +1537,16 @@ else
 endif
 let g:vimshell_user_prompt = 'fnamemodify(getcwd(), ":~")'
 nmap <Leader>sh :VimShell -split<CR>
-let g:vimshell_temporary_directory=$VIMFILES.'/.cache/vimshell'
+let g:vimshell_data_directory=$VIMFILES.'/.cache/vimshell'
 let g:vimshell_vimshrc_path=$VIMFILES.'/vimshrc'
 " ]]]
-"   Syntastic [[[2
+" [Disabled]Vim-Sneak [[[2
+let g:sneak#streak = 1
+" ]]]
+"  xml.vim，使所有的标签都关闭[[[2
+let xml_use_xhtml = 1
+" ]]]
+"   Syntastic 语法检查 [[[2
 if !g:isWindows
 	let g:syntastic_error_symbol         = '✗ '
 	let g:syntastic_style_error_symbol   = '✠ '
@@ -1509,10 +1558,6 @@ let g:syntastic_mode_map = { 'mode': 'passive',
 			\ 'passive_filetypes': ['puppet'] }
 
 "   ]]]
-" PIV [[[2
-let g:DisableAutoPHPFolding = 0
-let g:PIVAutoClose = 0
-" ]]]
 " UndoTree  [[[2
 let g:undotree_SplitLocation='botright'
 " If undotree is opened, it is likely one wants to interact with it.
@@ -1560,12 +1605,6 @@ let python_highlight_all = 1
 let g:vimsyn_noerror = 1
 let g:netrw_list_hide = '^\.[^.].*'
 "  ]]]
-" netrw使用curl  [[[2
-if executable("curl")
-  let g:netrw_http_cmd = "curl"
-  let g:netrw_http_xcmd = "-o"
-endif
-"  ]]]
 "   surround [[[2
 "  Old text                  Command     New text ~
 "  "Hello *world!"           ds"         Hello world!
@@ -1584,22 +1623,11 @@ augroup MyAutoCmd
 augroup END
 "   VimIm，不要更改弹出菜单的颜色[[[2
 "let g:vimim_menu_color = 1
-"  vimwiki[[[2
-"let g:vimwiki_list = [{'path': '~/.vimwiki/'}]
-"let g:vimwiki_camel_case = 0
-"let g:vimwiki_hl_cb_checked = 1
-"let g:vimwiki_folding = 0
-"let g:vimwiki_browsers = ['firefox']
-"let g:vimwiki_CJK_length = 1
-"let g:vimwiki_dir_link = 'index'
-"let g:vimwiki_html_header_numbering = 2
-"let g:vimwiki_conceallevel = 2
 " PowerLine/AirLine  [[[2
 " 设置显示字体和大小。guifontwide为等宽汉字字体。(干扰Airline，暂不设置)
 if g:isWindows
 	" set guifont=Consolas\ for\ Powerline\ FixedD:h12
 	set guifont=YaHei_Consolas_Hybrid:h12
-	" set guifontwide=XHei-Mono:h12,黑体:h12
 	set laststatus=2
 	" set t_Co=256
 	" let g:Powerline_symbols = 'fancy'
@@ -1675,7 +1703,7 @@ if g:isWindows
 endif
 " ]]]
 " ]]]
-"  CtrlP  [[[2
+"  [Disabled]CtrlP  [[[2
 " let g:ctrlp_working_path_mode='ra'
 " " r -- the nearest ancestor that contains one of these directories or files: `.git/` `.hg/` `.svn/` `.bzr/` `_darcs/`
 " let g:ctrlp_follow_symlinks = 1
@@ -1695,7 +1723,7 @@ endif
 " let g:ctrlp_extensions = ['tag', 'buffertag', 'quickfix', 'dir', 'rtscript', 'mixed']
 " 
 " ]]]
-" Rainbow Parentheses 括号显示增强 [[[2
+" Rainbow Parentheses 括号显示增强 (彩虹色) [[[2
 let g:rbpt_colorpairs = [
 			\ ['brown'       , 'RoyalBlue3']  ,
 			\ ['Darkblue'    , 'SeaGreen3']   ,
@@ -1724,7 +1752,7 @@ augroup MyAutoCmd
 	autocmd Syntax * RainbowParenthesesLoadBraces
 augroup END
 " ]]]
-"CCtree.Vim C Call-Tree Explorer 源码浏览工具 关系树 (赞) [[[2
+"CCTree.Vim C Call-Tree Explorer 源码浏览工具 关系树 (赞) [[[2
 "1. 除了cscope ctags 程序的安装,还需安装强力胶 ccglue(ctags-cscope glue): http://sourceforge.net/projects/ccglue/files/src/
 " (1) ./configure && make && make install
 " (2) $ccglue -S cscope.out -o cctree.out 或 $ccglue -S cscope1.out cscope2.out -o cctree.out
@@ -1752,10 +1780,15 @@ let g:CCTreeUseUTF8Symbols = 1 "为了在终端模式下显示符号
 "1) 将鼠标移动到要解析的函数上面ctrl+\组合键后，按>键，就可以看到该函数调用的函数的结果
 "2) 将鼠标移动到要解析的函数上面ctrl+\组合键后，按<键，就可以看到调用该函数的函数的结果
 "  ]]]
-"  SrcExpl -- 增强源代码浏览，其功能就像Windows中的"Source Insight" [[[2
+"  SrcExpl -- 增强源代码浏览，其功能就像Windows中的 Source Insight [[[2
 " :SrcExpl                                   "打开浏览窗口
 " :SrcExplClose                              "关闭浏览窗口
 " :SrcExplToggle                             "打开/闭浏览窗口
+"  ]]]
+" Startify  起始页 [[[2
+let g:startify_session_dir = $VIMFILES.'/.cache/sessions'
+let g:startify_change_to_vcs_root = 1
+let g:startify_show_sessions = 1
 "  ]]]
 " Tabularize  代码对齐工具 [[[2
 nmap <Leader>a& :Tabularize /&<CR>
@@ -1830,6 +1863,9 @@ nnoremap <silent> <Leader>gw :Gwrite<CR>:GitGutter<CR>
 "  开关Gitv ,g{v,V} [[[3
 nnoremap <silent> <Leader>gv :Gitv<CR>
 nnoremap <silent> <Leader>gV :Gitv!<CR>
+"  ]]]
+"  开关GitGutter [[[3
+nnoremap <silent> <Leader>gg :GitGutterToggle<CR>
 "  ]]]
 "  开关NERDTree F2 [[[3
 function! ShowNerdTree()

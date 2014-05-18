@@ -1,5 +1,6 @@
 bundle
 !bundle/neobundle.vim
 .cache
+..cache-backup_asd
 .flagged
 viminfo
