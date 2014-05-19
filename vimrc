@@ -128,7 +128,7 @@ if count(s:plugin_groups, 'core')
 				\     'unix'    : 'make -f make_unix.mak',
 				\    },
 				\ }
-	" vim-airline 是更轻巧的 powerline 代替品
+	" vim-airline 是更轻巧的 vim-powerline 代替品
 	NeoBundle 'bling/vim-airline'
 	" NeoBundle 'Lokaltog/vim-powerline'
 	NeoBundle 'tpope/vim-repeat'
@@ -148,7 +148,7 @@ if count(s:plugin_groups, 'autocomplete')
 					\ 'vim_version':'7.3.885'}
 	endif
 	NeoBundle 'Shougo/neosnippet.vim'
-	" neosnippet.vim 依赖 neosnippet-snippets
+	" NeoSnippet.vim 依赖 NeoSnippet-Snippets
 	NeoBundle 'Shougo/neosnippet-snippets'
 	NeoBundle 'honza/vim-snippets'
 endif
@@ -617,7 +617,7 @@ augroup Filetype_Specific
 	" Markdown
 	autocmd FileType markdown setlocal nolist
 	" PHP {{{
-	" PHP 生成的SQL代码高亮
+	" PHP 生成的SQL/HTML代码高亮
 	autocmd filetype php let php_sql_query=1
 	autocmd filetype php let php_htmlInStrings=1
 	" PHP Twig 模板引擎语法
@@ -930,7 +930,7 @@ function! <SID>OpenSpecial(ochar,cchar)
 	let col = col('.') - 2
 	if(line[col] != a:ochar)
 		if(col > 0)
-			return "\<esc>a\<CR>"
+			return "\<Esc>a\<CR>"
 		else
 			return "\<CR>"
 		endif
@@ -940,7 +940,7 @@ function! <SID>OpenSpecial(ochar,cchar)
 	else
 		call setline('.',line[:(col)].line[(col+1):])
 	endif
-	return "\<esc>a\<CR>;\<CR>".a:cchar."\<esc>\"_xk$\"_xa"
+	return "\<Esc>a\<CR>;\<CR>".a:cchar."\<Esc>\"_xk$\"_xa"
 endfunction
 inoremap <silent> <CR> <C-R>=<SID>OpenSpecial('{','}')<CR>
 " ]]]
@@ -1041,7 +1041,8 @@ endfunction
 " ]]]
 " ]]]
 "  以下为插件的设置 [[[1
-"-------------------------Ack.vim [[[2
+"-------------------------Ack.vim----------------------------" [[[2
+" Ag 比 Ack 速度要快
 if executable('ag')
 	let g:ackprg = "ag --nocolor --column --hidden --nogroup --smart-case"
 endif
@@ -1050,6 +1051,30 @@ endif
 " let g:AutoClosePairs = {'(': ')', '{': '}', '[': ']', '"': '"', "'": "'", '`': '`'}
 " ]]]
 "-------------------------Auto-Pairs------------------------------"  [[[2
+" System Shortcuts:
+"        <CR>  : Insert new indented line after return if cursor in blank brackets or quotes.
+"        <BS>  : Delete brackets in pair
+"        <M-p> : Toggle Autopairs (g:AutoPairsShortcutToggle)
+"        <M-e> : Fast Wrap (g:AutoPairsShortcutFastWrap)
+"        <M-n> : Jump to next closed pair (g:AutoPairsShortcutJump)
+"        <M-b> : BackInsert (g:AutoPairsShortcutBackInsert)
+
+" Fly Mode
+" --------
+" Fly Mode will always force closed-pair jumping instead of inserting. only for ")", "}", "]"
+
+" If jumps in mistake, could use AutoPairsBackInsert(Default Key: `<M-b>`) to jump back and insert closed pair.
+
+" the most situation maybe want to insert single closed pair in the string, eg ")"
+
+" Fly Mode is DISABLED by default.
+
+" add **let g:AutoPairsFlyMode = 1** .vimrc to turn it on
+
+" Default Options:
+
+"     let g:AutoPairsFlyMode = 0
+"     let g:AutoPairsShortcutBackInsert = '<M-b>'
 let g:AutoPairsFlyMode=1
 " ]]]
 "-------------------------BufExplorer----------------------------"  [[[2
@@ -1080,7 +1105,7 @@ let g:user_emmet_mode='a'
 let g:use_emmet_complete_tag=1
 let g:user_emmet_settings = {'lang': "zh-cn"}
 " ]]]
-"  Fugitive/GitGutter  [[[2
+"  Fugitive/GitGutter Vim内快捷Git命令操作&显示当前文件增改删行 [[[2
 autocmd MyAutoCmd BufReadPost fugitive://* setlocal bufhidden=delete
 " SignColumn should match background for
 " things like vim-gitgutter
@@ -1090,7 +1115,7 @@ highlight clear SignColumn
 highlight clear LineNr
 let g:gitgutter_realtime = 0
 "  ]]]
-"   grep.vim[[[2
+"   grep.vim [[[2
 " let g:Grep_Default_Options = '--binary-files=without-match'
 "  plugin - matchit.vim 对%命令进行扩展使得能在嵌套标签和语句之间跳转  [[[2
 " % 正向匹配      g% 反向匹配
@@ -1184,13 +1209,13 @@ let g:nerdtree_tabs_open_on_gui_startup=0
 " 			\ 'php'        : $VIMFILES.'/dict/php.txt',
 " 			\ 'javascript' : $VIMFILES.'/dict/javascript.txt',
 " 			\ }
-" 
+
 " " Define keyword.
 " if !exists('g:neocomplcache_keyword_patterns')
 " 	let g:neocomplcache_keyword_patterns = {}
 " endif
 " let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
-" 
+"
 " " Plugin key-mappings.
 " "imap <C-k>     <Plug>(neocomplcache_snippets_expand)
 " "smap <C-k>     <Plug>(neocomplcache_snippets_expand)
@@ -1205,11 +1230,11 @@ let g:nerdtree_tabs_open_on_gui_startup=0
 " inoremap <expr><C-Y> neocomplcache#close_popup()
 " inoremap <expr><C-e> neocomplcache#cancel_popup()
 " "inoremap <expr><Enter> pumvisible() ? neocomplcache#close_popup()."\<C-n>" : "\<Enter>"
-" "inoremap <expr><Enter> pumvisible() ? "\<C-Y>" : "\<Enter>" 
-" 
+" "inoremap <expr><Enter> pumvisible() ? "\<C-Y>" : "\<Enter>"
+
 " "下面的 暂时不会，等会了再慢慢搞,暂时先用默认的
 " "imap <expr><TAB> neocomplcache#sources#snippets_complete#expandable() ? "\<Plug>(neocomplcache_snippets_expand)" : pumvisible() ? "\<C-n>" : "\<TAB>"
-" 
+
 " " Recommended key-mappings.
 " " <CR>: close popup and save indent.
 " "inoremap <expr><CR>  neocomplcache#smart_close_popup()."\<CR>"
@@ -1222,14 +1247,14 @@ let g:nerdtree_tabs_open_on_gui_startup=0
 " inoremap <expr><C-e> neocomplcache#cancel_popup()
 " " 类似于AutoComplPop用法
 " let g:neocomplcache_enable_auto_select = 1
-" 
+
 " " Shell like behavior(not recommended).
 " set completeopt+=longest
 " "let g:neocomplcache_disable_auto_complete = 1
 " "inoremap <expr><Tab>  pumvisible() ? "\<Down>" : "\<TAB>"
 " "inoremap <expr><CR>  neocomplcache#smart_close_popup() . "\<CR>"
-" 
-" 
+
+
 " " Enable omni completion.
 " augroup Filetype_Specific
 " 	autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
@@ -1239,7 +1264,7 @@ let g:nerdtree_tabs_open_on_gui_startup=0
 " 	autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 " 	autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
 " augroup END
-" 
+
 " " Enable heavy omni completion.
 " if !exists('g:neocomplcache_omni_patterns')
 " 	let g:neocomplcache_omni_patterns = {}
@@ -1248,7 +1273,7 @@ let g:nerdtree_tabs_open_on_gui_startup=0
 " let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
 " let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
 " let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
-"------------------neocomplcache---------------------------------  ]]]
+"------------------NeoComplcache---------------------------------  ]]]
 "  NeoComplete [[[2
 " Disable AutoComplPop.
 let g:acp_enableAtStartup = 0
@@ -1352,7 +1377,7 @@ let g:neocomplete#sources#omni#input_patterns.ruby = '[^. *\t]\.\h\w*\|\h\w*::'
 " https://github.com/c9s/perlomni.vim
 let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
 " ]]]
-"  NeoSnippet  [[[2
+"  NeoSnippet.vim  [[[2
 " Enable snipMate compatibility feature.
 let g:neosnippet#enable_snipmate_compatibility = 1
 " Tell Neosnippet about the other snippets
@@ -1541,7 +1566,7 @@ let g:vimshell_data_directory=$VIMFILES.'/.cache/vimshell'
 let g:vimshell_vimshrc_path=$VIMFILES.'/vimshrc'
 " ]]]
 " [Disabled]Vim-Sneak [[[2
-let g:sneak#streak = 1
+" let g:sneak#streak = 1
 " ]]]
 "  xml.vim，使所有的标签都关闭[[[2
 let xml_use_xhtml = 1
@@ -1605,24 +1630,9 @@ let python_highlight_all = 1
 let g:vimsyn_noerror = 1
 let g:netrw_list_hide = '^\.[^.].*'
 "  ]]]
-"   surround [[[2
-"  Old text                  Command     New text ~
-"  "Hello *world!"           ds"         Hello world!
-"  [123+4*56]/2              cs])        (123+456)/2
-"  "Look ma, I'm *HTML!"     cs"<q>      <q>Look ma, I'm HTML!</q>
-"  if *x>3 {                 ysW(        if ( x>3 ) {
-"  my $str = *whee!;         vlllls'     my $str = 'whee!';
-"  "Hello *world!"           ds"         Hello world!
-"  (123+4*56)/2              ds)         123+456/2
-"  <div>Yo!*</div>           dst         Yo!
-"  Hello w*orld!             ysiw)       Hello (world)!
-"      原 cs 和 cscope 的冲突了
-augroup MyAutoCmd
-	autocmd VimEnter * silent! nunmap cs
-	autocmd VimEnter * nmap cS <Plug>Csurround
-augroup END
-"   VimIm，不要更改弹出菜单的颜色[[[2
+"   [Disabled]VimIm，不要更改弹出菜单的颜色 [[[2
 "let g:vimim_menu_color = 1
+"  ]]]
 " PowerLine/AirLine  [[[2
 " 设置显示字体和大小。guifontwide为等宽汉字字体。(干扰Airline，暂不设置)
 if g:isWindows
@@ -1641,6 +1651,7 @@ else
 	set guifont=Monospace\ 12
 endif
 " Airline Specific [[[3
+" (取自 github.com/bling)
 if (g:isWindows || g:isGUI || g:isColor)
 	let g:airline_powerline_fonts=1
 	let g:airline_theme='light'
@@ -1707,12 +1718,12 @@ endif
 " let g:ctrlp_working_path_mode='ra'
 " " r -- the nearest ancestor that contains one of these directories or files: `.git/` `.hg/` `.svn/` `.bzr/` `_darcs/`
 " let g:ctrlp_follow_symlinks = 1
-" 
+
 " let g:ctrlp_cache_dir=$VIMFILES.'/.cache/ctrlp'
 " let g:ctrlp_custom_ignore = {
 "     \ 'dir':  '\.git$\|\.hg$\|\.svn$\|\.rvm$',
 "     \ 'file': '\.exe$\|\.so$\|\.dll$\|\.o$\|\.pyc$' }
-" 
+
 " let g:ctrlp_user_command = {
 "     \ 'types': {
 "         \ 1: ['.git', 'cd %s && git ls-files . --cached --exclude-standard --others'],
@@ -1721,7 +1732,7 @@ endif
 "     \ 'fallback': 'find %s -type f'
 " \ }
 " let g:ctrlp_extensions = ['tag', 'buffertag', 'quickfix', 'dir', 'rtscript', 'mixed']
-" 
+
 " ]]]
 " Rainbow Parentheses 括号显示增强 (彩虹色) [[[2
 let g:rbpt_colorpairs = [
@@ -1833,7 +1844,7 @@ autocmd MyAutoCmd SwapExists vimperator*.tmp
 			\ :runtime plugin/vimperator.vim | call VimperatorEditorRecover(1)
 " ]]]
 "   插件调出快捷键  [[[2
-"  a.vim  F9 切换.c/.h  [[[3
+"  a.vim  F9 切换同名.c/.h文件  [[[3
 " :A  ---切换头文件并独占整个窗口
 " :AV ---切换头文件并垂直分割窗口
 " :AS ---切换头文件并水平分割窗口
@@ -1854,17 +1865,17 @@ if g:hasCTags && g:hasCscope
 	endfunction
 endif
 "  ]]]
-"  开关Fugitive ,g{c,d,r,w} [[[3
+"  开关Fugitive <Leader>g{c,d,r,w} [[[3
 nnoremap <silent> <Leader>gc :Gcommit<CR>
 nnoremap <silent> <Leader>gd :Gdiff<CR>
 nnoremap <silent> <Leader>gr :Gread<CR>:GitGutter<CR>
 nnoremap <silent> <Leader>gw :Gwrite<CR>:GitGutter<CR>
 "  ]]]
-"  开关Gitv ,g{v,V} [[[3
+"  开关Gitv <Leader>g{v,V} [[[3
 nnoremap <silent> <Leader>gv :Gitv<CR>
 nnoremap <silent> <Leader>gV :Gitv!<CR>
 "  ]]]
-"  开关GitGutter [[[3
+"  开关GitGutter <Leader>gg [[[3
 nnoremap <silent> <Leader>gg :GitGutterToggle<CR>
 "  ]]]
 "  开关NERDTree F2 [[[3
@@ -1883,32 +1894,52 @@ nnoremap <silent> <F4> :SrcExplToggle<CR>
 "  开关撤销树 F8 [[[3
 nmap <silent> <F8> :UndotreeToggle<CR>
 " ]]]
-"  开关CtrlP [[[3
+"  [Disabled]开关CtrlP Alt+M/Alt+N [[[3
 " nmap <M-m> :CtrlPMRU<CR>
 " nmap <M-n> :CtrlPBuffer<CR>
-"  <Leader>sh 调出命令行界面 [[[3
+"   Surround [[[3
+"   示例 [[[4
+"   Old text                  Command     New text ~
+"   "Hello *world!"           ds"         Hello world!
+"   [123+4*56]/2              cs])        (123+456)/2
+"   "Look ma, I'm *HTML!"     cs"<q>      <q>Look ma, I'm HTML!</q>
+"   if *x>3 {                 ysW(        if ( x>3 ) {
+"   my $str = *whee!;         vlllls'     my $str = 'whee!';
+"   "Hello *world!"           ds"         Hello world!
+"   (123+4*56)/2              ds)         123+456/2
+"   <div>Yo!*</div>           dst         Yo!
+"   Hello w*orld!             ysiw)       Hello (world)!
+"   注：  原 cs 和 cscope 的冲突了
+"   ]]]
+augroup MyAutoCmd
+	autocmd VimEnter * silent! nunmap cs
+	autocmd VimEnter * nmap cS <Plug>Csurround
+augroup END
+"  ]]]
+"  [Disabled]Conque-Shell 调出命令行界面 <Leader>sh [[[3
 " if g:isWindows
-" 	nmap <Leader>sh :ConqueTermVSplit cmd.exe<CR> 
+" 	nmap <Leader>sh :ConqueTermVSplit cmd.exe<CR>
 " elseif executable('zsh')
-" 	nmap <Leader>sh :ConqueTermVSplit zsh<CR> 
+" 	nmap <Leader>sh :ConqueTermVSplit zsh<CR>
 " elseif executable('bash')
-" 	nmap <Leader>sh :ConqueTermVSplit bash<CR> 
+" 	nmap <Leader>sh :ConqueTermVSplit bash<CR>
 " else
 " 	echo "Fail to invoke shell!"
 " endif
 "  ]]]
-"  vim-jsbeautify 格式化javascript ,ff [[[3
+"  Vim-JSBeautify 格式化javascript  <Leader>ff [[[3
 augroup Filetype_Specific
 	autocmd FileType javascript nnoremap <buffer> <Leader>ff :call JsBeautify()<CR>
 	autocmd FileType html nnoremap <buffer> <Leader>ff :call HtmlBeautify()<CR>
 	autocmd FileType css nnoremap <buffer> <Leader>ff :call CSSBeautify()<CR>
 augroup END
 "  ]]]
-" NeoBundle [[[3
+" NeoBundle 更新 <Leader>nbu [[[3
 " nnoremap <leader>nbu :Unite neobundle/update -vertical -no-start-insert<cr>
 "  ]]]
-"  Vim辅助工具配置  [[[1
-"  cscope setting [[[2
+"  Vim辅助工具设置  [[[1
+"  cscope 设置 [[[2
+" (取自 github.com/lilydjwg)
 if g:hasCscope
 	" 设置 [[[3
 	set csto=1
@@ -1960,21 +1991,24 @@ if g:hasCscope
 
 	" 自己来输入命令
 	nmap cs<Space> :cs find 
+	" ]]]
 endif
 " ]]]
 "  Win平台下窗口全屏组件 gvimfullscreen.dll [[[2
-" 用于 Windows Gvim 全屏窗口，可用 F11 切换
+" (取自 github.com/asins)
+" 用于 Windows gVim 全屏窗口，可用 F11 切换
 " 全屏后再隐藏菜单栏、工具栏、滚动条效果更好
-" Shift + t 降低窗口透明度
-" Shift + y 加大窗口透明度
-" Shift + r 切换Vim是否总在最前面显示
+" <Leader>btm 降低窗口透明度
+" <Leader>tm  增加窗口透明度
+" Alt + R     切换Vim是否总在最前面显示
 " Vim启动的时候自动使用当前颜色的背景色以去除Vim的白色边框
 if g:isGUI && has('gui_win32') && has('libcall')
 	let g:MyVimLib = 'gvimfullscreen.dll'
+	"  切换全屏函数 [[[3
 	function! ToggleFullScreen()
 		call libcall(g:MyVimLib, 'ToggleFullScreen', 1)
 	endfunction
-
+	"  设置透明度函数 (Alpha值 默认:245 范围:180~255) [[[3
 	let g:VimAlpha = 245
 	function! SetAlpha(alpha)
 		let g:VimAlpha = g:VimAlpha + a:alpha
@@ -1986,7 +2020,7 @@ if g:isGUI && has('gui_win32') && has('libcall')
 		endif
 		call libcall(g:MyVimLib, 'SetAlpha', g:VimAlpha)
 	endfunction
-
+	"  切换总在最前面显示函数 [[[3
 	let g:VimTopMost = 0
 	function! SwitchVimTopMostMode()
 		if g:VimTopMost == 0
@@ -1996,15 +2030,17 @@ if g:isGUI && has('gui_win32') && has('libcall')
 		endif
 		call libcall(g:MyVimLib, 'EnableTopMost', g:VimTopMost)
 	endfunction
-	"映射 F11 切换全屏vim
+	"  快捷键映射 [[[3
+	"  切换全屏Vim  F11
 	noremap <F11> :call ToggleFullScreen()<cr>
-	"切换Vim是否在最前面显示
+	"  切换Vim是否在最前面显示  Alt + R
 	nmap <M-r> :call SwitchVimTopMostMode()<cr>
-	"增加Vim窗体的不透明度
-	" nmap <s-t> :call SetAlpha(10)<cr>
-	"增加Vim窗体的透明度
-	" nmap <s-y> :call SetAlpha(-10)<cr>
-	" 默认设置透明
+	"  降低Vim窗体的透明度  <Leader>btm
+	nmap <Leader>btm :call SetAlpha(10)<cr>
+	"  增加Vim窗体的透明度  <Leader>tm
+	nmap <Leader>tm :call SetAlpha(-10)<cr>
+	"  ]]]
+	"  默认设置透明
 	autocmd GUIEnter * call libcallnr(g:MyVimLib, 'SetAlpha', g:VimAlpha)
 endif
 " ]]]
