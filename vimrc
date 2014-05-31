@@ -189,12 +189,13 @@ if count(s:plugin_groups, 'javascript')
 	NeoBundleLazy 'pangloss/vim-javascript',
 				\ {'autoload':{'filetypes':['javascript']}}
 	NeoBundleLazy 'othree/javascript-libraries-syntax.vim',
-				\ {'autoload':{'filetypes':['javascript', 'coffee', 'ls', 'typescript']}}
+				\ {'autoload':{'filetypes':['javascript', 'coffee',
+				\	'ls', 'typescript']}}
 	if executable('node') || executable('nodejs')
 		NeoBundleLazy 'maksimr/vim-jsbeautify',
-					\ { 'autoload' : {'commands':['CSSBeautify', 'JsBeautify',
-		'HtmlBeautify']],
-					\ 'filetypes':['javascript']} }
+					\ { 'autoload' : {'commands':['CSSBeautify',
+					\	'JsBeautify', 'HtmlBeautify'],
+					\ 'filetypes':['javascript']}}
 	endif
 endif
 " ]]]
@@ -224,13 +225,15 @@ if count(s:plugin_groups, 'navigation')
 					\ {'autoload':{'commands':'SrcExplToggle'}}
 		if g:hasCscope
 			NeoBundleLazy 'CCTree',
-					\ {'autoload':{'commands':['CCTreeLoadDB', 'CCTreeLoadXRefDBFromDisk']}}
+					\ {'autoload':{'commands':['CCTreeLoadDB',
+					\	'CCTreeLoadXRefDBFromDisk']}}
 		endif
 	endif
 	NeoBundleLazy 'a.vim',
 				\ {'autoload':{'filetypes':['c', 'cpp']}}
 	NeoBundle 'jistr/vim-nerdtree-tabs',
-				\ {'depends':['scrooloose/nerdtree'], 'autoload':{'commands':'NERDTreeTabsToggle'}}
+				\ {'depends':['scrooloose/nerdtree'],
+				\ 'autoload':{'commands':'NERDTreeTabsToggle'}}
 	" NeoBundle 'kien/ctrlp.vim'
 	NeoBundleLazy 'mbbill/undotree',
 				\ {'autoload':{'commands':'UndotreeToggle'}}
@@ -248,7 +251,8 @@ endif
 if count(s:plugin_groups, 'scm')
 	NeoBundle 'airblade/vim-gitgutter'
 	NeoBundleLazy 'gregsexton/gitv',
-				\ {'depends':['tpope/vim-fugitive'], 'autoload':{'commands':'Gitv'}}
+				\ {'depends':['tpope/vim-fugitive'],
+				\ 'autoload':{'commands':'Gitv'}}
 	NeoBundle 'tpope/vim-fugitive'
 endif
 " ]]]
@@ -266,7 +270,7 @@ if count(s:plugin_groups, 'unite')
 	NeoBundleLazy 'Shougo/unite-outline',
 				\ {'autoload':{'unite_sources':'outline'}}
 	NeoBundleLazy 'tsukkee/unite-tag',
-				\ {'autoload':{'unite_sources':['tag','tag/file']}}
+				\ {'autoload':{'unite_sources':['tag', 'tag/file']}}
 endif
 " ]]]
 "  Web开发 [[[2
@@ -274,11 +278,13 @@ if count(s:plugin_groups, 'web')
 	NeoBundleLazy 'amirh/HTML-AutoCloseTag',
 				\ {'autoload':{'filetypes':['html', 'xml']}}
 	NeoBundleLazy 'ap/vim-css-color',
-				\ {'autoload':{'filetypes':[ 'css', 'scss', 'sass', 'less']}}
+				\ {'autoload':{'filetypes':[ 'css', 'scss',
+				\	'sass', 'less']}}
 	NeoBundleLazy 'gregsexton/MatchTag',
 				\ {'autoload':{'filetypes':[ 'html', 'xml']}}
 	NeoBundleLazy 'mattn/emmet-vim',
-				\ {'autoload':{'filetypes':['html','xml','xsl','xslt','xsd','css','sass','scss','less','mustache']}}
+				\ {'autoload':{'filetypes':['html', 'xml', 'xsl', 'xslt',
+				\	'xsd', 'css', 'sass', 'scss', 'less', 'mustache']}}
 	NeoBundleLazy 'othree/html5.vim',
 				\ {'autoload':{'filetypes':['html']}}
 	NeoBundleLazy 'othree/html5-syntax.vim',
@@ -297,7 +303,8 @@ if count(s:plugin_groups, 'misc')
 	NeoBundleLazy 'git@github.com:Firef0x/PKGBUILD.vim',
 				\ { 'autoload' : {'filetypes':['PKGBUILD']} }
 	NeoBundleLazy 'Shougo/vimshell.vim',
-				\ {'autoload':{'commands':[ 'VimShell', 'VimShellInteractive' ]}}
+				\ {'autoload':{'commands':[ 'VimShell',
+				\	'VimShellInteractive' ]}}
 	NeoBundle 'asins/vimcdoc'
 	NeoBundle 'lilydjwg/colorizer'
 	NeoBundle 'mhinz/vim-startify'
@@ -307,6 +314,8 @@ if count(s:plugin_groups, 'misc')
 	NeoBundle 'tomasr/molokai'
 	NeoBundleLazy 'tpope/vim-markdown',
 				\ { 'autoload' : {'filetypes':['markdown']} }
+	NeoBundleLazy 'git@github.com:Firef0x/vim-smali',
+				\ { 'autoload' : {'filetypes':['smali']} }
 	" NeoBundle 'xieyu/vim-assist'
 
 	" vim-scripts repos
@@ -350,8 +359,8 @@ NeoBundleCheck
 " ]]]
 " ]]]
 "  以下为自己的自定义设置  [[[1
-"  设置语言编码 [[[2
 if !exists('g:VimrcIsLoad')
+	"  设置语言编码 [[[2
 	set langmenu=zh_CN.UTF-8
 	let $LANG='zh_CN.UTF-8'
 	set helplang=cn
@@ -363,13 +372,15 @@ if !exists('g:VimrcIsLoad')
 	set fileencodings=utf-8,chinese,taiwan,ucs-2,ucs-2le,ucs-bom,latin1,gbk,gb18030,big5,utf-16le,cp1252,iso-8859-15
 	set encoding=utf-8
 	set fileencoding=utf-8
-endif
-" 解决菜单乱码 [[[2
-if g:isWindows && g:isGUI
-	source $VIMRUNTIME/delmenu.vim
-	source $VIMRUNTIME/menu.vim
-	" 解决console输出乱码
-	language messages zh_CN.UTF-8
+	" ]]]
+	" 解决菜单乱码 [[[2
+	if g:isWindows && g:isGUI
+		source $VIMRUNTIME/delmenu.vim
+		source $VIMRUNTIME/menu.vim
+		" 解决console输出乱码
+		language messages zh_CN.UTF-8
+	endif
+	" ]]]
 endif
 " ]]]
 "  设置图形界面选项  [[[2
@@ -396,86 +407,111 @@ if has('arabic')
 endif
 " ]]]
 " 图形与终端  [[[2
-let colorscheme = 'molokai'
-if g:isGUI
-	" 有些终端不能改变大小
-	set columns=88
-	set lines=32
-	set number
-	set cursorline
-	" 原为double，为了更好地显示airline
-	set ambiwidth=single
-	exe 'colorscheme' colorscheme
-elseif has("unix")
-	set ambiwidth=single
-	let g:rehash256 = 1 "开启molokai终端256色配色
-	" 防止退出时终端乱码
-	" 这里两者都需要。只前者标题会重复，只后者会乱码
-	set t_fs=(B
-	set t_IE=(B
-	if g:isColor
-		set cursorline  "Current Line Adornment
-		exe 'colorscheme' colorscheme
-		set t_Co=256
+if !exists('g:VimrcIsLoad')
+	" 设置字体  [[[3
+	" 设置显示字体和大小。guifontwide为等宽汉字字体。(干扰Airline，暂不设置)
+	if g:isWindows
+		" set guifont=Consolas\ for\ Powerline\ FixedD:h12
+		set guifont=YaHei_Consolas_Hybrid:h12
+		set laststatus=2
+	elseif (g:isGUI || g:isColor)
+		set guifont=Inconsolata\ for\ Powerline\ Medium\ 12
+		" set guifontwide=WenQuanYi\ ZenHei\ Mono\ 12
+		set laststatus=2
 	else
-		" 在Linux文本终端下非插入模式显示块状光标
-		if &term == "linux" || &term == "fbterm"
-			set t_ve+=[?6c
-			augroup MyAutoCmd
-				autocmd InsertEnter * set t_ve-=[?6c
-				autocmd InsertLeave * set t_ve+=[?6c
-				" autocmd VimLeave * set t_ve-=[?6c
-			augroup END
-		endif
-		if &term == "fbterm"
-			set cursorline
-			set number
-			exe 'colorscheme' colorscheme
-		elseif $TERMCAP =~ 'Co#256'
-			set t_Co=256
-			set cursorline
-			exe 'colorscheme' colorscheme
-		else
-			" 暂时只有这个配色比较适合了
-			colorscheme default
-			" 在终端下自动加载vimim输入法
-			"runtime plugin/vimim.vim
-		endif
+		set guifont=Monospace\ 12
 	endif
-	" 在不同模式下使用不同颜色的光标
-	" 不要在 ssh 下使用
-	if g:isColor && !exists('$SSH_TTY')
-		let color_normal = 'HotPink'
-		let color_insert = 'RoyalBlue1'
-		let color_exit = 'green'
-		if &term =~ 'xterm\|rxvt'
-			exe 'silent !echo -ne "\e]12;"' . shellescape(color_normal, 1) . '"\007"'
-			let &t_SI="\e]12;" . color_insert . "\007"
-			let &t_EI="\e]12;" . color_normal . "\007"
-			exe 'autocmd VimLeave * :silent !echo -ne "\e]12;"' . shellescape(color_exit, 1) . '"\007"'
-		elseif &term =~ "screen"
-			if g:isTmux
-				if &ttymouse == 'xterm'
-					set ttymouse=xterm2
-				endif
-				exe 'silent !echo -ne "\033Ptmux;\033\e]12;"' . shellescape(color_normal, 1) . '"\007\033\\"'
-				let &t_SI="\033Ptmux;\033\e]12;" . color_insert . "\007\033\\"
-				let &t_EI="\033Ptmux;\033\e]12;" . color_normal . "\007\033\\"
-				exe 'autocmd VimLeave * :silent !echo -ne "\033Ptmux;\033\e]12;"' . shellescape(color_exit, 1) . '"\007\033\\"'
-			elseif !exists('$SUDO_UID') " or it may still be in tmux
-				exe 'silent !echo -ne "\033P\e]12;"' . shellescape(color_normal, 1) . '"\007\033\\"'
-				let &t_SI="\033P\e]12;" . color_insert . "\007\033\\"
-				let &t_EI="\033P\e]12;" . color_normal . "\007\033\\"
-				exe 'autocmd VimLeave * :silent !echo -ne "\033P\e]12;"' . shellescape(color_exit, 1) . '"\007\033\\"'
+	" ]]]
+	let colorscheme = 'molokai'
+	if g:isGUI
+		" 有些终端不能改变大小
+		set columns=88
+		set lines=32
+		set number
+		set cursorline
+		" 原为double，为了更好地显示airline，改为single
+		set ambiwidth=single
+		exe 'colorscheme' colorscheme
+	elseif has("unix")
+		" 原为double，为了更好地显示airline，改为single
+		set ambiwidth=single
+		"开启molokai终端256色配色
+		let g:rehash256=1
+		" 防止退出时终端乱码
+		" 这里两者都需要。只前者标题会重复，只后者会乱码
+		set t_fs=(B
+		set t_IE=(B
+		if g:isColor
+			set cursorline  "Current Line Adornment
+			exe 'colorscheme' colorscheme
+			set t_Co=256
+		else
+			" 在Linux文本终端下非插入模式显示块状光标
+			if &term == "linux" || &term == "fbterm"
+				set t_ve+=[?6c
+				augroup MyAutoCmd
+					autocmd InsertEnter * set t_ve-=[?6c
+					autocmd InsertLeave * set t_ve+=[?6c
+					" autocmd VimLeave * set t_ve-=[?6c
+				augroup END
+			endif
+			if &term == "fbterm"
+				set cursorline
+				set number
+				exe 'colorscheme' colorscheme
+			elseif $TERMCAP =~ 'Co#256'
+				set t_Co=256
+				set cursorline
+				exe 'colorscheme' colorscheme
+			else
+				" 暂时只有这个配色比较适合了
+				colorscheme default
+				" 在终端下自动加载vimim输入法
+				"runtime plugin/vimim.vim
 			endif
 		endif
-		unlet color_normal
-		unlet color_insert
-		unlet color_exit
+		" 在不同模式下使用不同颜色的光标
+		" 不要在 ssh 下使用
+		if g:isColor && !exists('$SSH_TTY')
+			let color_normal = 'HotPink'
+			let color_insert = 'RoyalBlue1'
+			let color_exit = 'green'
+			if &term =~ 'xterm\|rxvt'
+				exe 'silent !echo -ne "\e]12;"' . shellescape(color_normal, 1) . '"\007"'
+				let &t_SI="\e]12;" . color_insert . "\007"
+				let &t_EI="\e]12;" . color_normal . "\007"
+				exe 'autocmd VimLeave * :silent !echo -ne "\e]12;"' . shellescape(color_exit, 1) . '"\007"'
+			elseif &term =~ "screen"
+				if g:isTmux
+					if &ttymouse == 'xterm'
+						set ttymouse=xterm2
+					endif
+					exe 'silent !echo -ne "\033Ptmux;\033\e]12;"' . shellescape(color_normal, 1) . '"\007\033\\"'
+					let &t_SI="\033Ptmux;\033\e]12;" . color_insert . "\007\033\\"
+					let &t_EI="\033Ptmux;\033\e]12;" . color_normal . "\007\033\\"
+					exe 'autocmd VimLeave * :silent !echo -ne "\033Ptmux;\033\e]12;"' . shellescape(color_exit, 1) . '"\007\033\\"'
+				elseif !exists('$SUDO_UID') " or it may still be in tmux
+					exe 'silent !echo -ne "\033P\e]12;"' . shellescape(color_normal, 1) . '"\007\033\\"'
+					let &t_SI="\033P\e]12;" . color_insert . "\007\033\\"
+					let &t_EI="\033P\e]12;" . color_normal . "\007\033\\"
+					exe 'autocmd VimLeave * :silent !echo -ne "\033P\e]12;"' . shellescape(color_exit, 1) . '"\007\033\\"'
+				endif
+			endif
+			unlet color_normal
+			unlet color_insert
+			unlet color_exit
+		endif
+	elseif has('win32') && exists('$CONEMUBUILD')
+		" 在Windows的ConEmu终端下开启256色
+		set term=xterm
+		set t_Co=256
+		let &t_AB="\e[48;5;%dm"
+		let &t_AF="\e[38;5;%dm"
+		set cursorline
+		exe 'colorscheme' colorscheme
 	endif
+	unlet colorscheme
 endif
-"endif
-unlet colorscheme
 "]]]
 " 关闭错误声音  [[[2
 set noerrorbells
@@ -490,16 +526,20 @@ set nowrap "不自动换行
 set shiftwidth=4  " 设定 << 和 >> 命令移动时的宽度为 4
 set softtabstop=4  " 设置按BackSpace的时候可以一次删除掉4个空格
 set tabstop=4 "tab = 4 spaces
-" 自动切换当前目录为当前文件所在的目录(与fugitive冲突)
+" [Disabled]自动切换当前目录为当前文件所在的目录(与Fugitive冲突，因而禁用)
 " set autochdir
-set ignorecase " 搜索时忽略大小写，但在有一个或以上大写字母时仍大小写敏感
+" 搜索时忽略大小写，但在有一个或以上大写字母时仍大小写敏感
+set ignorecase
 set smartcase
 set nobackup " 覆盖文件时不备份
 set nowritebackup "文件保存后取消备份
 set noswapfile  "取消交换区
 set mousehide  " 键入时隐藏鼠标
 set magic " 设置模式的魔术
-set display+=lastline "显示最多行，不用@@
+if !exists('g:VimrcIsLoad')
+	" 解决自动换行格式下, 如高度在折行之后超过窗口高度结果这一行看不到的问题
+	set display+=lastline "显示最多行，不用@@
+endif
 set sessionoptions=blank,buffers,curdir,folds,slash,tabpages,unix,winsize
 set viminfo=%,'1000,<50,s20,h,n$VIMFILES/viminfo
 " 允许在有未保存的修改时切换缓冲区，此时的修改由 vim 负责保存
@@ -508,11 +548,14 @@ set hidden
 if has('persistent_undo')
 	set undodir=$VIMFILES/.cache/undo
 	if !isdirectory(&undodir)
-    	call mkdir(&undodir, '', 0700)
+		" create undodir's parent if necessary
+    	call mkdir(&undodir, 'p', 0700)
 	endif
 	set undofile
 endif
 set scrolloff=3  " 设置光标之下的最少行数
+" 将命令输出重定向到文件的字符串不要包含标准错误
+set shellredir=>
 " ]]]
 " Display unprintable chars [[[2
 if !g:isWindows
@@ -536,8 +579,10 @@ augroup END
 set wildmenu
 set wildmode=list:longest,full  " Command <Tab> completion, list matches, then longest common part, then all.
 " Ignore compiled files
-set wildignore=*.o,*.obj,*~,*.pyc,*.class
-" Ignore ruby gem
+set wildignore=*.o,*.obj,*~,*.class
+" Ignore Python compiled files
+set wildignore+=*.py[co],__pycache__
+" Ignore Ruby gem
 set wildignore+=*.gem
 " Ignore temp folder
 set wildignore+=tmp/**
@@ -588,51 +633,52 @@ set foldcolumn=0
 " 定义文件格式  [[[2
 augroup Filetype_Specific
 	autocmd!
-	" VimFiles {{{
-	autocmd Filetype vim noremap <buffer> <F1> <Esc>:help <C-r><C-w><CR>
-	autocmd Filetype vim setlocal fdm=indent keywordprg=:help
-	" }}}
-	" Arch Linux {{{
+	" Arch Linux [[[3
 	autocmd BufNewFile,BufRead PKGBUILD setlocal syntax=PKGBUILD ft=PKGBUILD
 	autocmd BufNewFile,BufRead *.install setlocal syntax=sh ft=sh
-	" }}}
-	" dict {{{
-	autocmd filetype javascript set dictionary=$VIMFILES/dict/javascript.txt
-	autocmd filetype css set dictionary=$VIMFILES/dict/css.txt
-	autocmd filetype php set dictionary=$VIMFILES/dict/php.txt
-	" }}}
-	" CSS {{{
-	autocmd FileType css setlocal smartindent foldmethod=indent
-	autocmd FileType css setlocal noexpandtab "tabstop=2 shiftwidth=2
-	autocmd BufNewFile,BufRead *.scss setlocal ft=scss
-	" 删除一条CSS中无用空格
-	autocmd filetype css vnoremap <leader>co J:s/\s*\([{:;,]\)\s*/\1/g<CR>:let @/=''<cr>
-	autocmd filetype css nnoremap <leader>co :s/\s*\([{:;,]\)\s*/\1/g<CR>:let @/=''<cr>
-	" }}}
-	" Javascript {{{
-	autocmd BufRead,BufNewFile jquery.*.js setlocal ft=javascript syntax=jquery
-	" JSON syntax
-	autocmd BufRead,BufNewFile *.json setlocal ft=json
-	" }}}
-	" Markdown
-	autocmd FileType markdown setlocal nolist
-	" PHP {{{
-	" PHP 生成的SQL/HTML代码高亮
-	autocmd filetype php let php_sql_query=1
-	autocmd filetype php let php_htmlInStrings=1
-	" PHP Twig 模板引擎语法
-	" autocmd BufRead,BufNewFile *.twig set syntax=twig
-	" }}}
-
-	autocmd FileType markdown setlocal nolist
-	" Python 文件的一般设置，比如不要 tab 等
-	autocmd FileType python setlocal tabstop=4 shiftwidth=4 expandtab foldmethod=indent
-	" C/C++ {{{
+	" ]]]
+	" C/C++ [[[3
 	"  Don't autofold anything (but I can still fold manually)
 	autocmd FileType c setlocal smartindent foldmethod=syntax foldlevel=100
 	autocmd FileType cpp setlocal smartindent foldmethod=syntax foldlevel=100
-	" }}}
-augroup END
+	" ]]]
+	" CSS [[[3
+	autocmd FileType css setlocal smartindent noexpandtab foldmethod=indent "tabstop=2 shiftwidth=2
+	autocmd FileType css set dictionary=$VIMFILES/dict/css.txt
+	autocmd BufNewFile,BufRead *.scss setlocal ft=scss
+	" 删除一条CSS中无用空格
+	autocmd FileType css vnoremap <leader>co J:s/\s*\([{:;,]\)\s*/\1/g<CR>:let @/=''<cr>
+	autocmd FileType css nnoremap <leader>co :s/\s*\([{:;,]\)\s*/\1/g<CR>:let @/=''<cr>
+	" ]]]
+	" Javascript [[[3
+	autocmd FileType javascript set dictionary=$VIMFILES/dict/javascript.txt
+	" jQuery syntax
+	autocmd BufRead,BufNewFile jquery.*.js setlocal ft=javascript syntax=jquery
+	" JSON syntax
+	autocmd BufRead,BufNewFile *.json setlocal ft=json
+	" ]]]
+	" Markdown [[[3
+	autocmd FileType markdown setlocal nolist
+	" ]]]
+	" PHP [[[3
+	" PHP 生成的SQL/HTML代码高亮
+	autocmd FileType php let php_sql_query=1
+	autocmd FileType php let php_htmlInStrings=1
+	autocmd FileType php set dictionary=$VIMFILES/dict/php.txt
+	" PHP Twig 模板引擎语法
+	" autocmd BufRead,BufNewFile *.twig set syntax=twig
+	" ]]]
+	" Python 文件的一般设置，比如不要 tab 等 [[[3
+	autocmd FileType python setlocal tabstop=4 shiftwidth=4 expandtab foldmethod=indent
+	" ]]]
+	" Smali [[[3
+	autocmd BufRead,BufNewFile *.smali setlocal ft=smali syntax=smali
+	" ]]]
+	" VimFiles [[[3
+	autocmd FileType vim noremap <buffer> <F1> <Esc>:help <C-r><C-w><CR>
+	autocmd FileType vim setlocal fdm=indent keywordprg=:help
+	" ]]]
+augroup END " Filetype_Specific
 " ]]]
 " 当打开一个新缓冲区时，自动切换目录为当前编辑文件所在目录 [[[2
 autocmd MyAutoCmd BufRead,BufNewFile,BufEnter *
@@ -677,36 +723,45 @@ set winaltkeys=no
 nnoremap <space> @=((foldclosed(line('.')) < 0) ? 'zc':'zo')<CR>
 " ]]]
 " Folding [[[2
-"折叠相关的快捷键
-"zR 打开所有的折叠
-"za Open/Close (toggle) a folded group of lines.
-"zA Open a Closed fold or close and open fold recursively.
-"zi 全部 展开/关闭 折叠
-"zo 打开 (open) 在光标下的折叠
-"zc 关闭 (close) 在光标下的折叠
-"zC 循环关闭 (Close) 在光标下的所有折叠
-"zM 关闭所有可折叠区域
+" 折叠相关的快捷键
+" zR 打开所有的折叠
+" za Open/Close (toggle) a folded group of lines.
+" zA Open a Closed fold or close and open fold recursively.
+" zi 全部 展开/关闭 折叠
+" zo 打开 (open) 在光标下的折叠
+" zc 关闭 (close) 在光标下的折叠
+" zC 循环关闭 (Close) 在光标下的所有折叠
+" zM 关闭所有可折叠区域
 " ]]]
 "  脚本运行快捷键  [[[2
 " map <F9> :w <CR>:!python %<CR>
 map <C-F5> :!./%<<CR>
-"  Ctrl-S 保存文件  [[[2
+" ]]]
+"  [Disabled] 以sudo 保存(由sudo.vim插件代替) [[[2
+" if (g:isWindows==0)
+"	  nmap <Leader>w :w !sudo tee % > /dev/null<CR>
+" endif
+" ]]]
+"  :Delete 删除当前文件 [[[2
+command! -nargs=0 Delete   if delete(expand('%'))
+				\|	  echohl WarningMsg
+				\|	  echo "删除当前文件失败!"
+				\|	  echohl None
+				\|endif
+" ]]]
+"  Ctrl-S 或 :UpDate 保存文件  [[[2
 " If the current buffer has never been saved, it will have no name,
 " call the file browser to save it, otherwise just save it.
 command! -nargs=0 -bar UpDate if &modified
-                           \|    if empty(bufname('%'))
-                           \|        browse confirm write
-                           \|    else
-                           \|        confirm write
-                           \|    endif
-                           \|endif
+							\|    if empty(bufname('%'))
+							\|        browse confirm write
+							\|    else
+							\|        confirm write
+							\|    endif
+							\|endif
 nnoremap <silent> <C-S> :<C-u>UpDate<CR>
 inoremap <silent> <C-S> <C-O>:UpDate<CR><CR>
 vnoremap <silent> <C-S> <C-C>:UpDate<CR>
-"  以sudo 保存(由sudo.vim插件代替) [[[2
-" if (g:isWindows==0)
-" nmap <Leader>w :w !sudo tee % > /dev/null<CR>
-" endif
 " ]]]
 "  一键编译单个源文件  [[[2
 map <F5> :w <CR>:call Do_OneFileMake()<CR>
@@ -820,8 +875,23 @@ imap <A-l> <Right>
 inoremap jk <Esc>
 " ]]]
 "  Alt+方向键切换buffer [[[2
-nnoremap <silent> <M-left> :if bufnr("%") == 2\|exe "buffer ".bufnr("$")\|el\|bprev\|en<CR>
-nnoremap <silent> <M-right> :if bufnr("%") == bufnr("$")\|buffer2\|el\|bnext\|en<CR>
+function! SwitchBuffer(direction)
+	if a:direction == 0
+		if bufnr("%") == 2
+			exe "buffer ".bufnr("$")
+		else
+			bprev
+		endif
+	else
+		if bufnr("%") == bufnr("$")
+			buffer2
+		else
+			bnext
+		endif
+	endif
+endfunction
+nnoremap <silent> <M-left> :call SwitchBuffer(0)<CR>
+nnoremap <silent> <M-right> :call SwitchBuffer(1)<CR>
 " ]]]
 "  关闭窗口 [[[2
 function! CloseWindowOrKillBuffer()
@@ -866,7 +936,7 @@ endif
 "  编辑vim配置文件并在保存时加载  [[[2
 nmap <leader>rc :edit $MYVIMRC<CR>
 autocmd! MyAutoCmd BufWritePost .vimrc,_vimrc,vimrc
-			\ source $MYVIMRC | AirlineRefresh
+			\ silent source $MYVIMRC | AirlineRefresh
 " ]]]
 "  切换高亮搜索关键字  [[[2
 nmap <silent> <leader>nh :nohlsearch<CR>
@@ -913,7 +983,7 @@ cmap Tabe tabe
 "function IO()
 "	echo s:isopen
 "	if s:isopen==0
-"		let s:isopen = 1
+"		let s:isopen=1
 "		rightbelow split a.in
 "		rightbelow vsplit a.out	í
 "		wincmd h
@@ -1075,7 +1145,7 @@ endif
 
 "     let g:AutoPairsFlyMode = 0
 "     let g:AutoPairsShortcutBackInsert = '<M-b>'
-let g:AutoPairsFlyMode=1
+let g:AutoPairsFlyMode = 1
 " ]]]
 "-------------------------BufExplorer----------------------------"  [[[2
 " 快速轻松的在缓存中切换（相当于另一种多个文件间的切换方式）
@@ -1101,8 +1171,8 @@ augroup MyAutoCmd
 augroup END
 " ]]]
 " Emmet [[[2
-let g:user_emmet_mode='a'
-let g:use_emmet_complete_tag=1
+let g:user_emmet_mode = 'a'
+let g:use_emmet_complete_tag = 1
 let g:user_emmet_settings = {'lang': "zh-cn"}
 " ]]]
 "  Fugitive/GitGutter Vim内快捷Git命令操作&显示当前文件增改删行 [[[2
@@ -1158,30 +1228,30 @@ highlight def MarkWord6  ctermbg=Blue     ctermfg=Black  guibg=#9999FF    guifg=
 " ]]]
 "  plugin - NERD_tree.vim 文件管理器  [[[2
 " 让Tree把自己给装饰得多姿多彩漂亮点
-let NERDChristmasTree=1
+let NERDChristmasTree = 1
 " 控制当光标移动超过一定距离时，是否自动将焦点调整到屏中心
-let NERDTreeAutoCenter=1
+let NERDTreeAutoCenter = 1
 " 指定书签文件
-let NERDTreeBookmarksFile=$VIMFILES.'/.cache/NERDTree_bookmarks'
+let NERDTreeBookmarksFile = $VIMFILES.'/.cache/NERDTreeBookmarks'
 " 排除 . .. 文件
-let NERDTreeIgnore=['^\.$', '^\.\.$', '\.pyc', '\.class', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
+let NERDTreeIgnore = ['^\.$', '^\.\.$', '\.pyc', '\.class', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
 " 指定鼠标模式(1.双击打开 2.单目录双文件 3.单击打开)
-let NERDTreeMouseMode=2
-let NERDTreeQuitOnOpen=1
+let NERDTreeMouseMode = 2
+let NERDTreeQuitOnOpen = 1
 " 是否默认显示书签列表
-let NERDTreeShowBookmarks=1
+let NERDTreeShowBookmarks = 1
 " 是否默认显示文件
-let NERDTreeShowFiles=1
+let NERDTreeShowFiles = 1
 " 是否默认显示隐藏文件
-let NERDTreeShowHidden=1
+let NERDTreeShowHidden = 1
 " 是否默认显示行号
-let NERDTreeShowLineNumbers=0
+let NERDTreeShowLineNumbers = 0
 " 窗口位置（'left' or 'right'）
-let NERDTreeWinPos='left'
+let NERDTreeWinPos = 'left'
 " 窗口宽度
-let NERDTreeWinSize=31
+let NERDTreeWinSize = 31
 " 启动时不默认打开NERDTreeTabs
-let g:nerdtree_tabs_open_on_gui_startup=0
+let g:nerdtree_tabs_open_on_gui_startup = 0
 " ]]]
 "-------------------------[Disabled]NeoComplcache---------------------------" [[[2
 " " Disable AutoComplPop.
@@ -1195,8 +1265,8 @@ let g:nerdtree_tabs_open_on_gui_startup=0
 " " Use underbar completion.
 " let g:neocomplcache_enable_underbar_completion = 1
 " " 设置缓存目录
-" let g:neocomplcache_temporary_dir=$VIMFILES.'/.cache/neocon'
-" let g:neocomplcache_enable_fuzzy_completion=1
+" let g:neocomplcache_temporary_dir = $VIMFILES.'/.cache/neocon'
+" let g:neocomplcache_enable_fuzzy_completion = 1
 " " Set minimum syntax keyword length.
 " let g:neocomplcache_min_syntax_length = 3
 " let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
@@ -1282,7 +1352,7 @@ let g:neocomplete#enable_at_startup = 1
 " Use smartcase.
 let g:neocomplete#enable_smart_case = 1
 " 设置缓存目录
-let g:neocomplete#data_directory=$VIMFILES.'/.cache/neocomplete'
+let g:neocomplete#data_directory = $VIMFILES.'/.cache/neocomplete'
 let g:neocomplete#enable_auto_delimiter = 1
 " Set minimum syntax keyword length.
 let g:neocomplete#sources#syntax#min_keyword_length = 3
@@ -1377,12 +1447,19 @@ let g:neocomplete#sources#omni#input_patterns.ruby = '[^. *\t]\.\h\w*\|\h\w*::'
 " https://github.com/c9s/perlomni.vim
 let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
 " ]]]
+"  NeoMRU.vim  [[[2
+" Specifies the directory to write the information of most recent used directory.
+let g:neomru#directory_mru_path = $VIMFILES.'/.cache/neomru/directory'
+" Specifies the file to write the information of most recent used files.
+let g:neomru#file_mru_path = $VIMFILES.'/.cache/neomru/file'
+" ]]]
 "  NeoSnippet.vim  [[[2
 " Enable snipMate compatibility feature.
 let g:neosnippet#enable_snipmate_compatibility = 1
 " Tell Neosnippet about the other snippets
-let g:neosnippet#snippets_directory=$VIMFILES.'/bundle/vim-snippets/snippets'
-
+let g:neosnippet#snippets_directory = $VIMFILES.'/bundle/vim-snippets/snippets'
+" Specifies directory for neosnippet cache.
+let g:neosnippet#data_directory = $VIMFILES.'/.cache/neosnippet'
 " Plugin key-mappings.
 "imap <C-k> <Plug>(neocomplcache_snippets_force_expand)
 "smap <C-k> <Plug>(neocomplcache_snippets_force_expand)
@@ -1417,8 +1494,8 @@ set completeopt-=preview
 " ]]]
 " Netrw使用curl  [[[2
 if executable("curl")
-  let g:netrw_http_cmd = "curl"
-  let g:netrw_http_xcmd = "-o"
+	let g:netrw_http_cmd = "curl"
+	let g:netrw_http_xcmd = "--compressed -o"
 endif
 "  ]]]
 " PIV [[[2
@@ -1426,9 +1503,9 @@ let g:DisableAutoPHPFolding = 0
 let g:PIVAutoClose = 0
 " ]]]
 "  Tagbar [[[2
-"let tagbar_left=1
-let tagbar_width=30
-let tagbar_singleclick=1
+"let tagbar_left = 1
+let tagbar_width = 30
+let tagbar_singleclick = 1
 " let g:tagbar_type_dosini = {
 " 			\ 'ctagstype': 'ini',
 " 			\ 'kinds': ['s:sections', 'b:blocks'],
@@ -1437,7 +1514,8 @@ let g:tagbar_type_pgsql = {
 			\ 'ctagstype': 'pgsql',
 			\ 'kinds': ['f:functions', 't:tables'],
 			\ }
-autocmd MyAutoCmd BufReadPost *.cpp,*.c,*.h,*.hpp,*.cc,*.cxx,*.ini call tagbar#autoopen()
+" autocmd MyAutoCmd BufReadPost *.cpp,*.c,*.h,*.hpp,*.cc,*.cxx,*.ini call tagbar#autoopen()
+autocmd MyAutoCmd BufReadPost *.cpp,*.c,*.h,*.hpp,*.cc,*.cxx call tagbar#autoopen()
 " ]]]
 " Unite [[[2
 let bundle = neobundle#get('unite.vim')
@@ -1461,30 +1539,30 @@ function! bundle.hooks.on_source(bundle)
 				\ ], '\|'))
 endfunction
 
-let g:unite_data_directory=$VIMFILES.'/.cache/unite'
+let g:unite_data_directory = $VIMFILES.'/.cache/unite'
 " Start in insert mode
-let g:unite_enable_start_insert=1
+let g:unite_enable_start_insert = 1
 let g:unite_enable_short_source_names = 1
 let g:unite_cursor_line_highlight = 'TabLineSel'
 " Enable history yank source
-let g:unite_source_history_yank_enable=1
+let g:unite_source_history_yank_enable = 1
 " Open in bottom right
 let g:unite_split_rule = "botright"
-let g:unite_source_rec_max_cache_files=5000
+let g:unite_source_rec_max_cache_files = 5000
 if !g:isWindows
 	let g:unite_prompt =  '▶'
 	let g:unite_marked_icon = '✗'
 endif
 " For ack.
 if executable('ag')
-	let g:unite_source_grep_command='ag'
-	let g:unite_source_grep_default_opts=
+	let g:unite_source_grep_command = 'ag'
+	let g:unite_source_grep_default_opts =
 				\ '--line-numbers --nocolor --nogroup --hidden --smart-case -C4'
-	let g:unite_source_grep_recursive_opt=''
+	let g:unite_source_grep_recursive_opt = ''
 elseif executable('ack')
-	let g:unite_source_grep_command='ack'
-	let g:unite_source_grep_default_opts='--no-heading --no-color -C4'
-	let g:unite_source_grep_recursive_opt=''
+	let g:unite_source_grep_command = 'ack'
+	let g:unite_source_grep_default_opts = '--no-heading --no-color -C4'
+	let g:unite_source_grep_recursive_opt = ''
 endif
 
 let g:unite_source_file_mru_limit = 1000
@@ -1562,8 +1640,8 @@ else
 endif
 let g:vimshell_user_prompt = 'fnamemodify(getcwd(), ":~")'
 nmap <Leader>sh :VimShell -split<CR>
-let g:vimshell_data_directory=$VIMFILES.'/.cache/vimshell'
-let g:vimshell_vimshrc_path=$VIMFILES.'/vimshrc'
+let g:vimshell_data_directory = $VIMFILES.'/.cache/vimshell'
+let g:vimshell_vimshrc_path = $VIMFILES.'/vimshrc'
 " ]]]
 " [Disabled]Vim-Sneak [[[2
 " let g:sneak#streak = 1
@@ -1584,9 +1662,9 @@ let g:syntastic_mode_map = { 'mode': 'passive',
 
 "   ]]]
 " UndoTree  [[[2
-let g:undotree_SplitLocation='botright'
+let g:undotree_SplitLocation = 'botright'
 " If undotree is opened, it is likely one wants to interact with it.
-let g:undotree_SetFocusWhenToggle=1
+let g:undotree_SetFocusWhenToggle = 1
 " ]]]
 " PO(Portable Object gettext翻译)  [[[2
 " Actions			                           Key mappings
@@ -1634,30 +1712,14 @@ let g:netrw_list_hide = '^\.[^.].*'
 "let g:vimim_menu_color = 1
 "  ]]]
 " PowerLine/AirLine  [[[2
-" 设置显示字体和大小。guifontwide为等宽汉字字体。(干扰Airline，暂不设置)
-if g:isWindows
-	" set guifont=Consolas\ for\ Powerline\ FixedD:h12
-	set guifont=YaHei_Consolas_Hybrid:h12
-	set laststatus=2
-	" set t_Co=256
-	" let g:Powerline_symbols = 'fancy'
-elseif (g:isGUI || g:isColor)
-	set guifont=Inconsolata\ for\ Powerline\ Medium\ 12
-	" set guifontwide=WenQuanYi\ ZenHei\ Mono\ 12
-	set laststatus=2
-	" set t_Co=256
-	" let g:Powerline_symbols = 'fancy'
-else
-	set guifont=Monospace\ 12
-endif
 " Airline Specific [[[3
 " (取自 github.com/bling)
 if (g:isWindows || g:isGUI || g:isColor)
-	let g:airline_powerline_fonts=1
-	let g:airline_theme='light'
-	let g:airline#extensions#tabline#enabled=1
-	let g:airline#extensions#tabline#tab_nr_type=1
-	let g:airline#extensions#tabline#buffer_nr_show=1
+	let g:airline_powerline_fonts = 1
+	let g:airline_theme = 'light'
+	let g:airline#extensions#tabline#enabled = 1
+	let g:airline#extensions#tabline#tab_nr_type = 1
+	let g:airline#extensions#tabline#buffer_nr_show = 1
 	if !exists('g:airline_symbols')
 		let g:airline_symbols = {}
 	endif
@@ -1715,11 +1777,11 @@ endif
 " ]]]
 " ]]]
 "  [Disabled]CtrlP  [[[2
-" let g:ctrlp_working_path_mode='ra'
+" let g:ctrlp_working_path_mode = 'ra'
 " " r -- the nearest ancestor that contains one of these directories or files: `.git/` `.hg/` `.svn/` `.bzr/` `_darcs/`
 " let g:ctrlp_follow_symlinks = 1
 
-" let g:ctrlp_cache_dir=$VIMFILES.'/.cache/ctrlp'
+" let g:ctrlp_cache_dir = $VIMFILES.'/.cache/ctrlp'
 " let g:ctrlp_custom_ignore = {
 "     \ 'dir':  '\.git$\|\.hg$\|\.svn$\|\.rvm$',
 "     \ 'file': '\.exe$\|\.so$\|\.dll$\|\.o$\|\.pyc$' }
@@ -1826,15 +1888,15 @@ if !g:hasPython
 endif
 "  ]]]
 "  Vim Indent Guide [[[2
-let g:indent_guides_start_level=1
-let g:indent_guides_guide_size=1
-let g:indent_guides_enable_on_vim_startup=1
-let g:indent_guides_color_change_percent=3
+let g:indent_guides_start_level = 1
+let g:indent_guides_guide_size = 1
+let g:indent_guides_enable_on_vim_startup = 1
+" let g:indent_guides_color_change_percent = 3
 if g:isGUI==0
-	let g:indent_guides_auto_colors=0
+	let g:indent_guides_auto_colors = 0
 	function! s:indent_set_console_colors()
-		hi IndentGuidesOdd ctermbg=235
-		hi IndentGuidesEven ctermbg=236
+		hi IndentGuidesOdd ctermbg = 235
+		hi IndentGuidesEven ctermbg = 236
 	endfunction
 	autocmd MyAutoCmd VimEnter,Colorscheme * call s:indent_set_console_colors()
 endif
@@ -1934,16 +1996,16 @@ augroup Filetype_Specific
 	autocmd FileType css nnoremap <buffer> <Leader>ff :call CSSBeautify()<CR>
 augroup END
 "  ]]]
-" NeoBundle 更新 <Leader>nbu [[[3
-" nnoremap <leader>nbu :Unite neobundle/update -vertical -no-start-insert<cr>
+" NeoBundle 更新所有插件  :Nbupd  [[[3
+command! -nargs=0 Nbupd Unite neobundle/update -vertical -no-start-insert
 "  ]]]
 "  Vim辅助工具设置  [[[1
 "  cscope 设置 [[[2
 " (取自 github.com/lilydjwg)
 if g:hasCscope
 	" 设置 [[[3
-	set csto=1
-	set cst
+	set cscopetagorder=1
+	set cscopetag
 	set cscopequickfix=s-,c-,d-,i-,t-,e-
 
 	" add any database in current directory
