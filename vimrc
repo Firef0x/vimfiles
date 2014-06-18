@@ -119,6 +119,8 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 " My bundles here:
 "  核心 [[[2
 if count(s:plugin_groups, 'core')
+	" vim-airline 是更轻巧的 vim-powerline 代替品
+	NeoBundle 'bling/vim-airline'
 	NeoBundle 'matchit.zip'
 	NeoBundle 'Shougo/vimproc.vim', {
 				\ 'build' : {
@@ -128,9 +130,6 @@ if count(s:plugin_groups, 'core')
 				\     'unix'    : 'make -f make_unix.mak',
 				\    },
 				\ }
-	" vim-airline 是更轻巧的 vim-powerline 代替品
-	NeoBundle 'bling/vim-airline'
-	" NeoBundle 'Lokaltog/vim-powerline'
 	NeoBundle 'tpope/vim-repeat'
 	NeoBundle 'tpope/vim-surround'
 	NeoBundle 'tpope/vim-dispatch'
@@ -155,22 +154,26 @@ endif
 " ]]]
 "  文本编辑 [[[2
 if count(s:plugin_groups, 'editing')
+	" tabular 比 Align 更简单，所以替换
+	" NeoBundle 'Align'
 	" auto-pairs 比 AutoClose 更好用
 	" NeoBundle 'AutoClose'
-	NeoBundle 'Lokaltog/vim-easymotion'
-	" vim-sneak 是 vim-easymotion 的代替品
-	" NeoBundle 'justinmk/vim-sneak'
 	NeoBundle 'chrisbra/NrrwRgn'
 	NeoBundle 'dimasg/vim-mark'
 	NeoBundleLazy 'godlygeek/tabular',
 				\ {'autoload':{'commands':'Tabularize'}}
 	NeoBundle 'jiangmiao/auto-pairs'
-	NeoBundle 'kien/rainbow_parentheses.vim'
+	" TODO vim-sneak 是 vim-easymotion 的代替品，考虑是否替换
+	" NeoBundle 'justinmk/vim-sneak'
+	" rainbow 是 rainbow_parentheses.vim 的改进版，所以替换
+	" NeoBundle 'kien/rainbow_parentheses.vim'
+	NeoBundle 'Lokaltog/vim-easymotion'
+	NeoBundle 'luochen1990/rainbow'
 	NeoBundle 'rhysd/clever-f.vim'
 	NeoBundle 'terryma/vim-multiple-cursors'
-	NeoBundle 'tomtom/tcomment_vim'
-	" tcomment_vim 比 nerdcommenter 更智能
+	" tcomment_vim 比 nerdcommenter 更智能，所以替换
 	" NeoBundle 'scrooloose/nerdcommenter'
+	NeoBundle 'tomtom/tcomment_vim'
 endif
 " ]]]
 "  代码缩进 [[[2
@@ -180,6 +183,7 @@ endif
 " ]]]
 "  JavaScript [[[2
 if count(s:plugin_groups, 'javascript')
+	" 以下3个插件以 vim-javascript 和 javascript-libraries-syntax.vim 取代
 	" NeoBundleLazy 'JavaScript-Indent',
 	" 			\ { 'autoload' : {'filetypes':['javascript']} }
 	" NeoBundleLazy 'jQuery',
@@ -201,6 +205,7 @@ endif
 " ]]]
 "  Linux [[[2
 if count(s:plugin_groups, 'linux')
+	" 以 root 权限打开文件
 	NeoBundle 'sudo.vim'
 	if g:hasPython
 		NeoBundle 'fcitx.vim'
@@ -215,9 +220,8 @@ endif
 " ]]]
 "  文本定位/纵览 [[[2
 if count(s:plugin_groups, 'navigation')
-	" NeoBundle 'grep.vim'
 	if g:hasCTags
-		" CTags语法高亮
+		" CTags 语法高亮
 		NeoBundle 'bb:abudden/taghighlight'
 		NeoBundleLazy 'majutsushi/tagbar',
 					\ {'autoload':{'commands':'TagbarToggle'}}
@@ -229,11 +233,13 @@ if count(s:plugin_groups, 'navigation')
 					\	'CCTreeLoadXRefDBFromDisk']}}
 		endif
 	endif
+	" 在同一文件名的.h与.c/.cpp之间切换
 	NeoBundleLazy 'a.vim',
 				\ {'autoload':{'filetypes':['c', 'cpp']}}
 	NeoBundle 'jistr/vim-nerdtree-tabs',
 				\ {'depends':['scrooloose/nerdtree'],
 				\ 'autoload':{'commands':'NERDTreeTabsToggle'}}
+	" Unite 比 CtrlP 更强大，所以替换
 	" NeoBundle 'kien/ctrlp.vim'
 	NeoBundleLazy 'mbbill/undotree',
 				\ {'autoload':{'commands':'UndotreeToggle'}}
@@ -299,28 +305,27 @@ endif
 " ]]]
 "  杂项 [[[2
 if count(s:plugin_groups, 'misc')
+	" 使用 VimShell 暂时取代
 	" NeoBundle 'Conque-Shell'
+	NeoBundle 'asins/vimcdoc'
 	NeoBundleLazy 'git@github.com:Firef0x/PKGBUILD.vim',
 				\ { 'autoload' : {'filetypes':['PKGBUILD']} }
-	NeoBundleLazy 'Shougo/vimshell.vim',
-				\ {'autoload':{'commands':[ 'VimShell',
-				\	'VimShellInteractive' ]}}
-	NeoBundle 'asins/vimcdoc'
+	NeoBundleLazy 'git@github.com:Firef0x/vim-smali',
+				\ { 'autoload' : {'filetypes':['smali']} }
 	NeoBundle 'lilydjwg/colorizer'
 	NeoBundle 'mhinz/vim-startify'
 	NeoBundle 'scrooloose/syntastic'
+	NeoBundleLazy 'Shougo/vimshell.vim',
+				\ {'autoload':{'commands':[ 'VimShell',
+				\	'VimShellInteractive' ]}}
 	NeoBundleLazy 'superbrothers/vim-vimperator',
 				\ { 'autoload' : {'filetypes':['vimperator']} }
 	NeoBundle 'tomasr/molokai'
 	NeoBundleLazy 'tpope/vim-markdown',
 				\ { 'autoload' : {'filetypes':['markdown']} }
-	NeoBundleLazy 'git@github.com:Firef0x/vim-smali',
-				\ { 'autoload' : {'filetypes':['smali']} }
 	" NeoBundle 'xieyu/vim-assist'
 
-	" vim-scripts repos
-	"NeoBundle 'mru.vim'
-	" NeoBundle 'Align'
+	" 从 vim-scripts repos 中安装的脚本 [[[3
 	" 保存时自动创建空文件夹
 	NeoBundle 'auto_mkdir'
 	" 在单独的窗口管理缓冲区
@@ -336,6 +341,7 @@ if count(s:plugin_groups, 'misc')
 	NeoBundle 'vis'
 	" Make a column of increasing or decreasing numbers
 	NeoBundle 'VisIncr'
+	" ]]]
 endif
 " ]]]
 "  使用NeoBundle关闭，结束时开始 [[[2
@@ -466,8 +472,6 @@ if !exists('g:VimrcIsLoad')
 			else
 				" 暂时只有这个配色比较适合了
 				colorscheme default
-				" 在终端下自动加载vimim输入法
-				"runtime plugin/vimim.vim
 			endif
 		endif
 		" 在不同模式下使用不同颜色的光标
@@ -1162,7 +1166,7 @@ if g:isWindows && g:hasCscope
 	set csprg=cswrapper.exe
 endif
 " ]]]
-"   EasyMotion  [[[2
+"  EasyMotion  [[[2
 let EasyMotion_leader_key = '<Leader><Leader>'
 let EasyMotion_keys = 'abcdefghijklmnopqrstuvwxyz'
 augroup MyAutoCmd
@@ -1170,7 +1174,7 @@ augroup MyAutoCmd
 	autocmd ColorScheme * highlight EasyMotionShade ctermfg=237 guifg=#3a3a3a
 augroup END
 " ]]]
-" Emmet [[[2
+"  Emmet [[[2
 let g:user_emmet_mode = 'a'
 let g:use_emmet_complete_tag = 1
 let g:user_emmet_settings = {'lang': "zh-cn"}
@@ -1185,13 +1189,11 @@ highlight clear SignColumn
 highlight clear LineNr
 let g:gitgutter_realtime = 0
 "  ]]]
-"   grep.vim [[[2
-" let g:Grep_Default_Options = '--binary-files=without-match'
-"  plugin - matchit.vim 对%命令进行扩展使得能在嵌套标签和语句之间跳转  [[[2
+"  matchit.vim 对%命令进行扩展使得能在嵌套标签和语句之间跳转 [[[2
 " % 正向匹配      g% 反向匹配
 " [% 定位块首     ]% 定位块尾
 " ]]]
-" plugin - mark.vim 给各种tags标记不同的颜色，便于观看调式的插件。  [[[2
+" mark.vim 给各种tags标记不同的颜色，便于观看调式的插件。 [[[2
 " 这样，当我输入“,hl”时，就会把光标下的单词高亮，在此单词上按“,hh”会清除该单词的高亮。如果在高亮单词外输入“,hh”，会清除所有的高亮。
 " 你也可以使用virsual模式选中一段文本，然后按“,hl”，会高亮你所选中的文本；或者你可以用“,hr”来输入一个正则表达式，这会高亮所有符合这个正则表达式的文本。
 nmap <silent> <leader>hl <plug>MarkSet
@@ -1216,7 +1218,7 @@ highlight def MarkWord4  ctermbg=Red      ctermfg=Black  guibg=#FF7272    guifg=
 highlight def MarkWord5  ctermbg=Magenta  ctermfg=Black  guibg=#FFB3FF    guifg=Black
 highlight def MarkWord6  ctermbg=Blue     ctermfg=Black  guibg=#9999FF    guifg=Black
 " ]]]
-"  plugin - NERD_commenter.vim 注释代码用的，以下映射已写在插件中 [[[2
+"  [Disabled]NERD_commenter.vim 注释代码用的，以下映射已写在插件中 [[[2
 " <leader>ca 在可选的注释方式之间切换，比如C/C++ 的块注释/* */和行注释//
 " <leader>cc 注释当前行
 " <leader>cs 以”性感”的方式注释
@@ -1226,7 +1228,7 @@ highlight def MarkWord6  ctermbg=Blue     ctermfg=Black  guibg=#9999FF    guifg=
 " let NERD_c_alt_style = 1
 " let NERDSpaceDelims = 1
 " ]]]
-"  plugin - NERD_tree.vim 文件管理器  [[[2
+"  NERD_tree.vim 文件管理器 [[[2
 " 让Tree把自己给装饰得多姿多彩漂亮点
 let NERDChristmasTree = 1
 " 控制当光标移动超过一定距离时，是否自动将焦点调整到屏中心
@@ -1253,7 +1255,7 @@ let NERDTreeWinSize = 31
 " 启动时不默认打开NERDTreeTabs
 let g:nerdtree_tabs_open_on_gui_startup = 0
 " ]]]
-"-------------------------[Disabled]NeoComplcache---------------------------" [[[2
+"  [Disabled]NeoComplcache [[[2
 " " Disable AutoComplPop.
 " let g:acp_enableAtStartup = 0
 " " Use neocomplcachd.
@@ -1447,13 +1449,13 @@ let g:neocomplete#sources#omni#input_patterns.ruby = '[^. *\t]\.\h\w*\|\h\w*::'
 " https://github.com/c9s/perlomni.vim
 let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
 " ]]]
-"  NeoMRU.vim  [[[2
+"  NeoMRU.vim [[[2
 " Specifies the directory to write the information of most recent used directory.
 let g:neomru#directory_mru_path = $VIMFILES.'/.cache/neomru/directory'
 " Specifies the file to write the information of most recent used files.
 let g:neomru#file_mru_path = $VIMFILES.'/.cache/neomru/file'
 " ]]]
-"  NeoSnippet.vim  [[[2
+"  NeoSnippet.vim [[[2
 " Enable snipMate compatibility feature.
 let g:neosnippet#enable_snipmate_compatibility = 1
 " Tell Neosnippet about the other snippets
@@ -1492,13 +1494,13 @@ endif
 " especially when splits are used.
 set completeopt-=preview
 " ]]]
-" Netrw使用curl  [[[2
+"  Netrw使用curl [[[2
 if executable("curl")
 	let g:netrw_http_cmd = "curl"
 	let g:netrw_http_xcmd = "--compressed -o"
 endif
 "  ]]]
-" PIV [[[2
+"  PIV [[[2
 let g:DisableAutoPHPFolding = 0
 let g:PIVAutoClose = 0
 " ]]]
@@ -1517,7 +1519,7 @@ let g:tagbar_type_pgsql = {
 " autocmd MyAutoCmd BufReadPost *.cpp,*.c,*.h,*.hpp,*.cc,*.cxx,*.ini call tagbar#autoopen()
 autocmd MyAutoCmd BufReadPost *.cpp,*.c,*.h,*.hpp,*.cc,*.cxx call tagbar#autoopen()
 " ]]]
-" Unite [[[2
+"  Unite [[[2
 let bundle = neobundle#get('unite.vim')
 function! bundle.hooks.on_source(bundle)
 	call unite#filters#matcher_default#use(['matcher_fuzzy'])
@@ -1632,7 +1634,7 @@ nnoremap <silent> [unite]o
 " unite-help
 nnoremap <silent> [unite]h :<C-u>Unite -buffer-name=help help<cr>
 " ]]]
-" VimShell [[[2
+"  VimShell [[[2
 if g:isWindows
 	let g:vimshell_prompt =  '$'
 else
@@ -1643,13 +1645,13 @@ nmap <Leader>sh :VimShell -split<CR>
 let g:vimshell_data_directory = $VIMFILES.'/.cache/vimshell'
 let g:vimshell_vimshrc_path = $VIMFILES.'/vimshrc'
 " ]]]
-" [Disabled]Vim-Sneak [[[2
+"  [Disabled]Vim-Sneak [[[2
 " let g:sneak#streak = 1
 " ]]]
-"  xml.vim，使所有的标签都关闭[[[2
+"  xml.vim 使所有的标签都关闭[[[2
 let xml_use_xhtml = 1
 " ]]]
-"   Syntastic 语法检查 [[[2
+"  Syntastic 语法检查 [[[2
 if !g:isWindows
 	let g:syntastic_error_symbol         = '✗ '
 	let g:syntastic_style_error_symbol   = '✠ '
@@ -1661,12 +1663,12 @@ let g:syntastic_mode_map = { 'mode': 'passive',
 			\ 'passive_filetypes': ['puppet'] }
 
 "   ]]]
-" UndoTree  [[[2
+"  UndoTree 撤销树视图 [[[2
 let g:undotree_SplitLocation = 'botright'
 " If undotree is opened, it is likely one wants to interact with it.
 let g:undotree_SetFocusWhenToggle = 1
 " ]]]
-" PO(Portable Object gettext翻译)  [[[2
+"  PO (Portable Object gettext翻译)  [[[2
 " Actions			                           Key mappings
 " -------------------------------------------------------
 " Move to a string (transl. or untransl) forward      \m
@@ -1691,27 +1693,24 @@ augroup Filetype_Specific
 augroup END
 let g:po_translator = "Firef0x <firefgx { at } gmail { dot } com>"
 " ]]]
-" indent/html.vim [[[2
+"  indent/html.vim [[[2
 let g:html_indent_inctags = "html,body,head,tbody,p,li,dd,marquee,header,nav,article,section"
 let g:html_indent_script1 = "inc"
 let g:html_indent_style1 = "inc"
 "  ]]]
-" syntax/haskell.vim [[[2
+"  syntax/haskell.vim [[[2
 let hs_highlight_boolean = 1
 let hs_highlight_types = 1
 let hs_highlight_more_types = 1
 "  ]]]
-" syntax/python.vim [[[2
+"  syntax/python.vim [[[2
 let python_highlight_all = 1
 "  ]]]
-" syntax/vim.vim 默认会高亮 s:[a-z] 这样的函数名为错误 [[[2
+"  syntax/vim.vim 默认会高亮 s:[a-z] 这样的函数名为错误 [[[2
 let g:vimsyn_noerror = 1
 let g:netrw_list_hide = '^\.[^.].*'
 "  ]]]
-"   [Disabled]VimIm，不要更改弹出菜单的颜色 [[[2
-"let g:vimim_menu_color = 1
-"  ]]]
-" PowerLine/AirLine  [[[2
+"  PowerLine/AirLine  [[[2
 " Airline Specific [[[3
 " (取自 github.com/bling)
 if (g:isWindows || g:isGUI || g:isColor)
@@ -1776,7 +1775,7 @@ if g:isWindows
 endif
 " ]]]
 " ]]]
-"  [Disabled]CtrlP  [[[2
+"  [Disabled]CtrlP [[[2
 " let g:ctrlp_working_path_mode = 'ra'
 " " r -- the nearest ancestor that contains one of these directories or files: `.git/` `.hg/` `.svn/` `.bzr/` `_darcs/`
 " let g:ctrlp_follow_symlinks = 1
@@ -1796,36 +1795,69 @@ endif
 " let g:ctrlp_extensions = ['tag', 'buffertag', 'quickfix', 'dir', 'rtscript', 'mixed']
 
 " ]]]
-" Rainbow Parentheses 括号显示增强 (彩虹色) [[[2
-let g:rbpt_colorpairs = [
-			\ ['brown'       , 'RoyalBlue3']  ,
-			\ ['Darkblue'    , 'SeaGreen3']   ,
-			\ ['darkgray'    , 'DarkOrchid3'] ,
-			\ ['darkgreen'   , 'firebrick3']  ,
-			\ ['darkcyan'    , 'RoyalBlue3']  ,
-			\ ['darkred'     , 'SeaGreen3']   ,
-			\ ['darkmagenta' , 'DarkOrchid3'] ,
-			\ ['brown'       , 'firebrick3']  ,
-			\ ['gray'        , 'RoyalBlue3']  ,
-			\ ['black'       , 'SeaGreen3']   ,
-			\ ['darkmagenta' , 'DarkOrchid3'] ,
-			\ ['Darkblue'    , 'firebrick3']  ,
-			\ ['darkgreen'   , 'RoyalBlue3']  ,
-			\ ['darkcyan'    , 'SeaGreen3']   ,
-			\ ['darkred'     , 'DarkOrchid3'] ,
-			\ ['red'         , 'firebrick3']  ,
-			\ ]
-let g:rbpt_max = 16
-let g:rbpt_loadcmd_toggle = 0
-" 默认打开并关联大中小括号
-augroup MyAutoCmd
-	autocmd VimEnter * RainbowParenthesesToggle
-	autocmd Syntax * RainbowParenthesesLoadRound
-	autocmd Syntax * RainbowParenthesesLoadSquare
-	autocmd Syntax * RainbowParenthesesLoadBraces
-augroup END
+"  Rainbow 彩虹括号增强版 (Rainbow Parentheses Improved) [[[2
+" 通过将不同层次的括号高亮为不同的颜色, 帮助你阅读世界上最复杂的代码
+let g:rainbow_active = 1
+" 高级配置
+" 'guifgs': GUI界面的括号颜色(将按顺序循环使用)
+" 'ctermfgs': 终端下的括号颜色(同上,插件将根据环境进行选择)
+" 'operators': 描述你希望哪些运算符跟着与它同级的括号一起高亮(见vim帮助 :syn-pattern)
+" 'parentheses': 描述哪些模式将被当作括号处理,每一组括号由两个vim正则表达式描述
+" 'separately': 针对文件类型(由&ft决定)作不同的配置,未被设置的文件类型使用'*'下的配置
+let g:rainbow_conf = {
+\   'guifgs': ['RoyalBlue3', 'DarkOrange3', 'SeaGreen3', 'firebrick3', 'DarkOrchid3'],
+\   'ctermfgs': [
+\             'brown',
+\             'Darkblue',
+\             'darkgray',
+\             'darkgreen',
+\             'darkcyan',
+\             'darkred',
+\             'darkmagenta',
+\             'brown',
+\             'gray',
+\             'black',
+\             'darkmagenta',
+\             'Darkblue',
+\             'darkgreen',
+\             'darkcyan',
+\             'darkred',
+\             'red',
+\             ],
+\   'operators': '_,_',
+\   'parentheses': [['(',')'], ['\[','\]'], ['{','}']],
+\   'separately': {
+\       '*': {},
+\		'cpp': {
+\			'parentheses': [['(', ')'], ['\[', '\]'], ['{', '}'],
+\			['\v%(<operator\_s*)@<!%(%(\i|^\_s*|template\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!)', '\v%(-)@<!\>']],
+\		},
+\		'cs': {
+\			'parentheses': [['(', ')'], ['\[', '\]'], ['{', '}'],
+\			['\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!', '\v%(-)@<!\>']],
+\		},
+\		'java': {
+\			'parentheses': [['(', ')'], ['\[', '\]'], ['{', '}'],
+\			['\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!', '\v%(-)@<!\>']],
+\		},
+\       'html': {
+\           'parentheses': [['(',')'], ['\[','\]'], ['{','}'], ['<\a[^>]*[^/]>\|<\a>','</[^>]*>']],
+\       },
+\		'rust': {
+\			'parentheses': [['(', ')'], ['\[', '\]'], ['{', '}'],
+\			['\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!', '\v%(-)@<!\>']],
+\		},
+\       'tex': {
+\           'operators': '',
+\           'parentheses': [['(',')'], ['\[','\]']],
+\       },
+\       'xml': {
+\           'parentheses': [['(',')'], ['\[','\]'], ['{','}'], ['<\a[^>]*[^/]>\|<\a>','</[^>]*>']],
+\       },
+\   }
+\}
 " ]]]
-"CCTree.Vim C Call-Tree Explorer 源码浏览工具 关系树 (赞) [[[2
+"  CCTree.Vim C Call-Tree Explorer 源码浏览工具 关系树 (赞) [[[2
 "1. 除了cscope ctags 程序的安装,还需安装强力胶 ccglue(ctags-cscope glue): http://sourceforge.net/projects/ccglue/files/src/
 " (1) ./configure && make && make install
 " (2) $ccglue -S cscope.out -o cctree.out 或 $ccglue -S cscope1.out cscope2.out -o cctree.out
@@ -1858,12 +1890,12 @@ let g:CCTreeUseUTF8Symbols = 1 "为了在终端模式下显示符号
 " :SrcExplClose                              "关闭浏览窗口
 " :SrcExplToggle                             "打开/闭浏览窗口
 "  ]]]
-" Startify  起始页 [[[2
+"  Startify  起始页 [[[2
 let g:startify_session_dir = $VIMFILES.'/.cache/sessions'
 let g:startify_change_to_vcs_root = 1
 let g:startify_show_sessions = 1
 "  ]]]
-" Tabularize  代码对齐工具 [[[2
+"  Tabularize 代码对齐工具 [[[2
 nmap <Leader>a& :Tabularize /&<CR>
 vmap <Leader>a& :Tabularize /&<CR>
 nmap <Leader>a= :Tabularize /=<CR>
@@ -1879,7 +1911,7 @@ vmap <Leader>a,, :Tabularize /,\zs<CR>
 nmap <Leader>a<Bar> :Tabularize /<Bar><CR>
 vmap <Leader>a<Bar> :Tabularize /<Bar><CR>
 "  ]]]
-" Tag Highlight  代码对齐工具 [[[2
+"  Tag Highlight -- CTags 语法高亮 [[[2
 if !exists('g:TagHighlightSettings')
 	let g:TagHighlightSettings = {}
 endif
@@ -1959,7 +1991,7 @@ nmap <silent> <F8> :UndotreeToggle<CR>
 "  [Disabled]开关CtrlP Alt+M/Alt+N [[[3
 " nmap <M-m> :CtrlPMRU<CR>
 " nmap <M-n> :CtrlPBuffer<CR>
-"   Surround [[[3
+"  Surround [[[3
 "   示例 [[[4
 "   Old text                  Command     New text ~
 "   "Hello *world!"           ds"         Hello world!
