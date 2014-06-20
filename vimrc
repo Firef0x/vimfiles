@@ -223,15 +223,17 @@ if count(s:plugin_groups, 'navigation')
 	if g:hasCTags
 		" CTags 语法高亮
 		NeoBundle 'bb:abudden/taghighlight'
-		NeoBundleLazy 'majutsushi/tagbar',
-					\ {'autoload':{'commands':'TagbarToggle'}}
-		NeoBundleLazy 'wesleyche/SrcExpl',
-					\ {'autoload':{'commands':'SrcExplToggle'}}
+		" C Call-Tree Explorer 源码浏览工具
 		if g:hasCscope
 			NeoBundleLazy 'CCTree',
 					\ {'autoload':{'commands':['CCTreeLoadDB',
 					\	'CCTreeLoadXRefDBFromDisk']}}
 		endif
+		NeoBundleLazy 'majutsushi/tagbar',
+					\ {'autoload':{'commands':'TagbarToggle'}}
+		" 增强源代码浏览
+		NeoBundleLazy 'wesleyche/SrcExpl',
+					\ {'autoload':{'commands':'SrcExplToggle'}}
 	endif
 	" 在同一文件名的.h与.c/.cpp之间切换
 	NeoBundleLazy 'a.vim',
@@ -245,6 +247,8 @@ if count(s:plugin_groups, 'navigation')
 				\ {'autoload':{'commands':'UndotreeToggle'}}
 	NeoBundle 'mileszs/ack.vim'
 	NeoBundle 'scrooloose/nerdtree'
+	" 显示尾部多余空格
+	NeoBundle 'git@github.com:Firef0x/ShowTrailingWhitespace'
 endif
 " ]]]
 "  PHP [[[2
@@ -365,8 +369,10 @@ NeoBundleCheck
 " ]]]
 " ]]]
 "  以下为自己的自定义设置  [[[1
+"  以下设置在Vim全屏运行时source vimrc的时候不能再执行 [[[2
+"  否则会退出全屏
 if !exists('g:VimrcIsLoad')
-	"  设置语言编码 [[[2
+	"  设置语言编码 [[[3
 	set langmenu=zh_CN.UTF-8
 	let $LANG='zh_CN.UTF-8'
 	set helplang=cn
@@ -379,7 +385,7 @@ if !exists('g:VimrcIsLoad')
 	set encoding=utf-8
 	set fileencoding=utf-8
 	" ]]]
-	" 解决菜单乱码 [[[2
+	"  解决菜单乱码 [[[3
 	if g:isWindows && g:isGUI
 		source $VIMRUNTIME/delmenu.vim
 		source $VIMRUNTIME/menu.vim
@@ -387,21 +393,21 @@ if !exists('g:VimrcIsLoad')
 		language messages zh_CN.UTF-8
 	endif
 	" ]]]
+	"  设置图形界面选项  [[[3
+	if g:isGUI
+		set shortmess=atI  " 启动的时候不显示那个援助乌干达儿童的提示
+		" set guioptions=   "无菜单、工具栏
+		set guioptions+=t  "分离式菜单
+		set guioptions-=T  "不显示工具栏
+		if g:isWindows
+			autocmd MyAutoCmd GUIEnter * simalt ~x    " 在Windows下启动时最大化窗口
+		endif
+		set guitablabel=%N\ \ %t\ %M   "标签页上显示序号
+	endif
+	" ]]]
 endif
 " ]]]
-"  设置图形界面选项  [[[2
-"set guioptions=   "无菜单、工具栏
-"  去掉欢迎界面
-set shortmess=atI
-if g:isGUI && !exists('g:VimrcIsLoad')
-	set guioptions+=t  "分离式菜单
-	set guioptions-=T  "不显示工具栏
-	if g:isWindows
-		autocmd MyAutoCmd GUIEnter * simalt ~x    "Max GUI window on start
-	endif
-	autocmd MyAutoCmd GUIEnter * set t_vb=
-	set guitablabel=%N\ \ %t\ %M   "标签页上显示序号
-endif
+"  设置更多图形界面选项  [[[2
 " Don't redraw while executing macros (good performance config)
 set lazyredraw
 " Change the terminal's title
@@ -409,10 +415,12 @@ set title
 " Avoid command-line redraw on every entered character by turning off Arabic
 " shaping (which is implemented poorly).
 if has('arabic')
-  set noarabicshape
+	set noarabicshape
 endif
 " ]]]
-" 图形与终端  [[[2
+"  图形与终端  [[[2
+"  以下设置在Vim全屏运行时source vimrc的时候不能再执行
+"  否则会退出全屏
 if !exists('g:VimrcIsLoad')
 	" 设置字体  [[[3
 	" 设置显示字体和大小。guifontwide为等宽汉字字体。(干扰Airline，暂不设置)
@@ -428,7 +436,9 @@ if !exists('g:VimrcIsLoad')
 		set guifont=Monospace\ 12
 	endif
 	" ]]]
+	" 设置配色方案  [[[3
 	let colorscheme = 'molokai'
+	" 以下取自 github.com/lilydjwg/dotvim
 	if g:isGUI
 		" 有些终端不能改变大小
 		set columns=88
@@ -515,9 +525,10 @@ if !exists('g:VimrcIsLoad')
 		exe 'colorscheme' colorscheme
 	endif
 	unlet colorscheme
+	" ]]]
 endif
 "]]]
-" 关闭错误声音  [[[2
+"  关闭错误声音  [[[2
 set noerrorbells
 set visualbell t_vb=
 " ]]]
@@ -553,7 +564,7 @@ if has('persistent_undo')
 	set undodir=$VIMFILES/.cache/undo
 	if !isdirectory(&undodir)
 		" create undodir's parent if necessary
-    	call mkdir(&undodir, 'p', 0700)
+		call mkdir(&undodir, 'p', 0700)
 	endif
 	set undofile
 endif
@@ -561,23 +572,12 @@ set scrolloff=3  " 设置光标之下的最少行数
 " 将命令输出重定向到文件的字符串不要包含标准错误
 set shellredir=>
 " ]]]
-" Display unprintable chars [[[2
+" Display unprintable characters [[[2
 if !g:isWindows
 	set list
 	set listchars=tab:▸\ ,extends:❯,precedes:❮,nbsp:␣
-	set showbreak=↪ 
+	set showbreak=↪
 endif
-
-" listchar=trail is not as flexible, use the below to highlight trailing
-" whitespace. Don't do it for unite windows or readonly files
-highlight ExtraWhitespace ctermbg=red guibg=red
-match ExtraWhitespace /\s\+$/
-augroup MyAutoCmd
-	autocmd BufWinEnter * if &modifiable && &ft!='unite' | match ExtraWhitespace /\s\+$/ | endif
-	autocmd InsertEnter * if &modifiable && &ft!='unite' | match ExtraWhitespace /\s\+\%#\@<!$/ | endif
-	autocmd InsertLeave * if &modifiable && &ft!='unite' | match ExtraWhitespace /\s\+$/ | endif
-	autocmd BufWinLeave * if &modifiable && &ft!='unite' | call clearmatches() | endif
-augroup END
 " ]]]
 "  开启Wild菜单 [[[2
 set wildmenu
@@ -711,9 +711,6 @@ function! s:RestoreFileEncodings()
 endfunction
 autocmd MyAutoCmd BufReadPre *.nfo call s:SetFileEncodings('cp437')
 autocmd MyAutoCmd BufReadPost *.nfo call s:RestoreFileEncodings()
-" ]]]
-" source时让一些设置不再执行 [[[2
-let g:VimrcIsLoad=1
 " ]]]
 " ]]]
 "  快捷键设置  [[[1
@@ -1504,6 +1501,9 @@ endif
 let g:DisableAutoPHPFolding = 0
 let g:PIVAutoClose = 0
 " ]]]
+"  ShowTrailingWhitespace 显示尾部多余空格 [[[2
+highlight ShowTrailingWhitespace ctermbg=Red guibg=Red
+" ]]]
 "  Tagbar [[[2
 "let tagbar_left = 1
 let tagbar_width = 30
@@ -1710,9 +1710,8 @@ let python_highlight_all = 1
 let g:vimsyn_noerror = 1
 let g:netrw_list_hide = '^\.[^.].*'
 "  ]]]
-"  PowerLine/AirLine  [[[2
-" Airline Specific [[[3
-" (取自 github.com/bling)
+"  Vim-AirLine  [[[2
+"  以下取自 github.com/bling/vim-airline
 if (g:isWindows || g:isGUI || g:isColor)
 	let g:airline_powerline_fonts = 1
 	let g:airline_theme = 'light'
@@ -1724,7 +1723,7 @@ if (g:isWindows || g:isGUI || g:isColor)
 	endif
 	" let g:airline_symbols.space = "\ua0"
 endif
-" 显示Mode的简称
+"  显示Mode的简称
 let g:airline_mode_map = {
 			\ '__' : '-',
 			\ 'n'  : 'N',
@@ -1773,7 +1772,6 @@ if g:isWindows
 	" 	let g:airline_paste_symbol                 = '∥'
 	"	let g:airline_symbols.whitespace           = 'Ξ'
 endif
-" ]]]
 " ]]]
 "  [Disabled]CtrlP [[[2
 " let g:ctrlp_working_path_mode = 'ra'
@@ -2021,7 +2019,10 @@ augroup END
 " 	echo "Fail to invoke shell!"
 " endif
 "  ]]]
-"  Vim-JSBeautify 格式化javascript  <Leader>ff [[[3
+"  ShowTrailingWhitespace 开关显示尾部多余空格 <Leader>t$ [[[3
+nnoremap <silent> <Leader>t$ :<C-u>call ShowTrailingWhitespace#Toggle(0)<Bar>echo (ShowTrailingWhitespace#IsSet() ? 'Show trailing whitespace' : 'Not showing trailing whitespace')<CR>
+"  ]]]
+"  Vim-JSBeautify 格式化javascript <Leader>ff [[[3
 augroup Filetype_Specific
 	autocmd FileType javascript nnoremap <buffer> <Leader>ff :call JsBeautify()<CR>
 	autocmd FileType html nnoremap <buffer> <Leader>ff :call HtmlBeautify()<CR>
@@ -2137,6 +2138,9 @@ if g:isGUI && has('gui_win32') && has('libcall')
 	"  默认设置透明
 	autocmd GUIEnter * call libcallnr(g:MyVimLib, 'SetAlpha', g:VimAlpha)
 endif
+" ]]]
+" source时让一些设置不再执行 [[[1
+let g:VimrcIsLoad=1
 " ]]]
 "  Vim Modeline [[[1
 " vim:fdm=marker:fmr=[[[,]]]
