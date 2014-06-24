@@ -7,68 +7,98 @@ endif
 "]]]
 "  判定当前操作系统类型  [[[2
 if has("win32") || has("win95") || has("win64") || has("win16")
-	let g:isWindows=1
+	let s:isWindows=1
 	" For gVimPortable
 	let $VIMFILES = $VIM."/../../Data/settings/vimfiles"
 else
-	let g:isWindows=0
+	let s:isWindows=0
 	let $VIMFILES = $HOME."/.vim"
 endif
 " ]]]
 "  判定当前是否图形界面 [[[2
 if has("gui_running")
-	let g:isGUI=1
+	let s:isGUI=1
 else
-	let g:isGUI=0
+	let s:isGUI=0
 endif
 " ]]]
 "  判定当前终端是否256色 [[[2
-if (g:isWindows==0 && g:isGUI==0 &&
+if (s:isWindows==0 && s:isGUI==0 &&
 	\ (&term =~ "256color" || &term =~ "xterm" || &term =~ "fbterm"))
-	let g:isColor=1
+	let s:isColor=1
 else
-	let g:isColor=0
+	let s:isColor=0
 endif
 " ]]]
-"  判定当前终端是否tmux [[[2
+"  判定当前终端是否Tmux [[[2
 if exists('$TMUX')
-	let g:isTmux=1
+	let s:isTmux=1
 else
-	let g:isTmux=0
+	let s:isTmux=0
 endif
 " ]]]
 "  判定当前是否支持Lua [[[2
 if has('lua')
-	let g:hasLua=1
+	let s:hasLua=1
 else
-	let g:hasLua=0
+	let s:hasLua=0
 endif
 " ]]]
 "  判定当前是否支持Python2或3 [[[2
 if has('python') || has('python3')
-	let g:hasPython=1
+	let s:hasPython=1
 else
-	let g:hasPython=0
+	let s:hasPython=0
 endif
 " ]]]
 "  判定当前是否有CTags [[[2
 if executable('ctags')
-	let g:hasCTags=1
+	let s:hasCTags=1
 else
-	let g:hasCTags=0
+	let s:hasCTags=0
 endif
 " ]]]
 "  判定当前是否有Cscope [[[2
 if has('cscope') && executable('cscope')
-	let g:hasCscope=1
+	let s:hasCscope=1
 else
-	let g:hasCscope=0
+	let s:hasCscope=0
 endif
 " ]]]
 "  设置AuGroup [[[2
 augroup MyAutoCmd
 	autocmd!
 augroup END
+"  ]]]
+"  设置缓存目录 (取自 github.com/bling/dotvim )[[[2
+let s:cache_dir = $VIMFILES."/.cache"
+"  ]]]
+"  ]]]
+"  定义函数 (取自 github.com/bling/dotvim ) [[[1
+"  获取缓存目录 [[[2
+function! s:get_cache_dir(suffix)
+	return resolve(expand(s:cache_dir . "/" . a:suffix))
+endfunction
+"  ]]]
+"  保证该目录存在，若不存在则新建目录 [[[2
+function! EnsureExists(path)
+	if !isdirectory(expand(a:path))
+		call mkdir(expand(a:path))
+	endif
+endfunction
+"  ]]]
+"  执行特定命令并保留光标位置及搜索历史 [[[2
+function! Preserve(command)
+	" preparation: save last search, and cursor position.
+	let _s=@/
+	let l = line(".")
+	let c = col(".")
+	" do the business:
+	execute a:command
+	" clean up: restore previous search history, and cursor position
+	let @/=_s
+	call cursor(l, c)
+endfunction
 "  ]]]
 "  ]]]
 "  NeoBundle 插件管理器 [[[1
@@ -79,15 +109,15 @@ call add(s:plugin_groups, 'autocomplete')
 call add(s:plugin_groups, 'editing')
 call add(s:plugin_groups, 'indent')
 call add(s:plugin_groups, 'javascript')
-if !g:isWindows
+if !s:isWindows
 	call add(s:plugin_groups, 'linux')
-	if g:isTmux
+	if s:isTmux
 		call add(s:plugin_groups, 'tmux')
 	endif
 else
 	call add(s:plugin_groups, 'windows')
 endif
-if g:hasLua
+if s:hasLua
 	call add(s:plugin_groups, 'lua')
 endif
 call add(s:plugin_groups, 'misc')
@@ -100,7 +130,7 @@ call add(s:plugin_groups, 'web')
 " 设置自动完成使用的插件 [[[2
 let s:autocomplete_method = 'neocomplcache'
 " Neocomplete 要求支持 Lua
-if g:hasLua
+if s:hasLua
 	let s:autocomplete_method = 'neocomplete'
 endif
 "  ]]]
@@ -156,6 +186,11 @@ endif
 if count(s:plugin_groups, 'editing')
 	" tabular 比 Align 更简单，所以替换
 	" NeoBundle 'Align'
+	" 打散合并单行语句
+	NeoBundleLazy 'AndrewRadev/splitjoin.vim',
+				\ {'autoload':{'commands':[
+				\ 'SplitjoinSplit',
+				\ 'SplitjoinJoin']}}
 	" auto-pairs 比 AutoClose 更好用
 	" NeoBundle 'AutoClose'
 	NeoBundle 'chrisbra/NrrwRgn'
@@ -205,9 +240,10 @@ endif
 " ]]]
 "  Linux [[[2
 if count(s:plugin_groups, 'linux')
-	" 以 root 权限打开文件
-	NeoBundle 'sudo.vim'
-	if g:hasPython
+	" 以 root 权限打开文件，以 SudoEdit.vim 代替 sudo.vim
+	" 参见 http://vim.wikia.com/wiki/Su-write
+	NeoBundle 'chrisbra/SudoEdit.vim'
+	if s:hasPython
 		NeoBundle 'fcitx.vim'
 	endif
 endif
@@ -220,11 +256,11 @@ endif
 " ]]]
 "  文本定位/纵览 [[[2
 if count(s:plugin_groups, 'navigation')
-	if g:hasCTags
+	if s:hasCTags
 		" CTags 语法高亮
 		NeoBundle 'bb:abudden/taghighlight'
 		" C Call-Tree Explorer 源码浏览工具
-		if g:hasCscope
+		if s:hasCscope
 			NeoBundleLazy 'CCTree',
 					\ {'autoload':{'commands':['CCTreeLoadDB',
 					\	'CCTreeLoadXRefDBFromDisk']}}
@@ -290,6 +326,9 @@ if count(s:plugin_groups, 'web')
 	NeoBundleLazy 'ap/vim-css-color',
 				\ {'autoload':{'filetypes':[ 'css', 'scss',
 				\	'sass', 'less']}}
+	NeoBundleLazy 'ariutta/Css-Pretty',
+				\ {'autoload':{'commands':'Csspretty',
+				\	'filetypes':['css']}}
 	NeoBundleLazy 'gregsexton/MatchTag',
 				\ {'autoload':{'filetypes':[ 'html', 'xml']}}
 	NeoBundleLazy 'mattn/emmet-vim',
@@ -303,7 +342,7 @@ if count(s:plugin_groups, 'web')
 				\ {'autoload':{'filetypes':['html', 'xml']}}
 endif
 "  Windows [[[2
-if count(s:plugin_groups, 'windows') && g:hasCscope
+if count(s:plugin_groups, 'windows') && s:hasCscope
 	NeoBundle 'cscope-wrapper'
 endif
 " ]]]
@@ -349,6 +388,7 @@ if count(s:plugin_groups, 'misc')
 endif
 " ]]]
 "  使用NeoBundle关闭，结束时开始 [[[2
+"  针对不同的文件类型加载对应的插件
 filetype plugin indent on     " required!
 " ]]]
 "  NeoBundle帮助 [[[2
@@ -376,7 +416,7 @@ if !exists('g:VimrcIsLoad')
 	set langmenu=zh_CN.UTF-8
 	let $LANG='zh_CN.UTF-8'
 	set helplang=cn
-	if g:isWindows && has("multi_byte")
+	if s:isWindows && has("multi_byte")
 		set termencoding=cp850
 	else
 		set termencoding=utf-8
@@ -386,7 +426,7 @@ if !exists('g:VimrcIsLoad')
 	set fileencoding=utf-8
 	" ]]]
 	"  解决菜单乱码 [[[3
-	if g:isWindows && g:isGUI
+	if s:isWindows && s:isGUI
 		source $VIMRUNTIME/delmenu.vim
 		source $VIMRUNTIME/menu.vim
 		" 解决console输出乱码
@@ -394,12 +434,12 @@ if !exists('g:VimrcIsLoad')
 	endif
 	" ]]]
 	"  设置图形界面选项  [[[3
-	if g:isGUI
+	if s:isGUI
 		set shortmess=atI  " 启动的时候不显示那个援助乌干达儿童的提示
 		" set guioptions=   "无菜单、工具栏
 		set guioptions+=t  "分离式菜单
 		set guioptions-=T  "不显示工具栏
-		if g:isWindows
+		if s:isWindows
 			autocmd MyAutoCmd GUIEnter * simalt ~x    " 在Windows下启动时最大化窗口
 		endif
 		set guitablabel=%N\ \ %t\ %M   "标签页上显示序号
@@ -424,11 +464,12 @@ endif
 if !exists('g:VimrcIsLoad')
 	" 设置字体  [[[3
 	" 设置显示字体和大小。guifontwide为等宽汉字字体。(干扰Airline，暂不设置)
-	if g:isWindows
+	if s:isWindows
 		" set guifont=Consolas\ for\ Powerline\ FixedD:h12
+		" 雅黑 Consolas Powerline 混合字体，取自 https://github.com/Jackson-soft/Vim/tree/master/user_fonts
 		set guifont=YaHei_Consolas_Hybrid:h12
 		set laststatus=2
-	elseif (g:isGUI || g:isColor)
+	elseif (s:isGUI || s:isColor)
 		set guifont=Inconsolata\ for\ Powerline\ Medium\ 12
 		" set guifontwide=WenQuanYi\ ZenHei\ Mono\ 12
 		set laststatus=2
@@ -439,7 +480,7 @@ if !exists('g:VimrcIsLoad')
 	" 设置配色方案  [[[3
 	let colorscheme = 'molokai'
 	" 以下取自 github.com/lilydjwg/dotvim
-	if g:isGUI
+	if s:isGUI
 		" 有些终端不能改变大小
 		set columns=88
 		set lines=32
@@ -457,7 +498,7 @@ if !exists('g:VimrcIsLoad')
 		" 这里两者都需要。只前者标题会重复，只后者会乱码
 		set t_fs=(B
 		set t_IE=(B
-		if g:isColor
+		if s:isColor
 			set cursorline  "Current Line Adornment
 			exe 'colorscheme' colorscheme
 			set t_Co=256
@@ -486,7 +527,7 @@ if !exists('g:VimrcIsLoad')
 		endif
 		" 在不同模式下使用不同颜色的光标
 		" 不要在 ssh 下使用
-		if g:isColor && !exists('$SSH_TTY')
+		if s:isColor && !exists('$SSH_TTY')
 			let color_normal = 'HotPink'
 			let color_insert = 'RoyalBlue1'
 			let color_exit = 'green'
@@ -496,7 +537,7 @@ if !exists('g:VimrcIsLoad')
 				let &t_EI="\e]12;" . color_normal . "\007"
 				exe 'autocmd VimLeave * :silent !echo -ne "\e]12;"' . shellescape(color_exit, 1) . '"\007"'
 			elseif &term =~ "screen"
-				if g:isTmux
+				if s:isTmux
 					if &ttymouse == 'xterm'
 						set ttymouse=xterm2
 					endif
@@ -559,21 +600,25 @@ set sessionoptions=blank,buffers,curdir,folds,slash,tabpages,unix,winsize
 set viminfo=%,'1000,<50,s20,h,n$VIMFILES/viminfo
 " 允许在有未保存的修改时切换缓冲区，此时的修改由 vim 负责保存
 set hidden
+" 保证缓存目录存在
+call EnsureExists(s:cache_dir)
 " 将撤销树保存到文件
 if has('persistent_undo')
-	set undodir=$VIMFILES/.cache/undo
-	if !isdirectory(&undodir)
-		" create undodir's parent if necessary
-		call mkdir(&undodir, 'p', 0700)
-	endif
 	set undofile
+	let &undodir = s:get_cache_dir("undo")
+	" 保证撤销缓存目录存在
+	call EnsureExists(&undodir)
 endif
-set scrolloff=3  " 设置光标之下的最少行数
+" 设置光标之下的最少行数
+set scrolloff=3
 " 将命令输出重定向到文件的字符串不要包含标准错误
 set shellredir=>
+" 使用管道(与 SudoEdit.vim 冲突，暂不使用)
+" 参见 https://github.com/chrisbra/SudoEdit.vim/issues/32
+" set noshelltemp
 " ]]]
 " Display unprintable characters [[[2
-if !g:isWindows
+if !s:isWindows
 	set list
 	set listchars=tab:▸\ ,extends:❯,precedes:❮,nbsp:␣
 	set showbreak=↪
@@ -592,7 +637,8 @@ set wildignore+=*.gem
 set wildignore+=tmp/**
 " Ignore image file
 set wildignore+=*.png,*.jpg,*.gif,*.xpm,*.tiff
-set wildignore+=*.so,*.swp,*.zip,*/.Trash/**,*.pdf,*.xz,.git
+" 不应该忽略.git，因为会破坏Fugitive的功能，参见 https://github.com/tpope/vim-fugitive/issues/121
+set wildignore+=*.so,*.swp,*.zip,*/.Trash/**,*.pdf,*.xz
 " 光标移到行尾时，自动换下一行开头 Backspace and cursor keys wrap too
 set whichwrap=b,s,h,l,<,>,[,]
 " ]]]
@@ -603,15 +649,16 @@ set cindent
 set smartindent
 " 设定命令行的行数为 1
 set cmdheight=1
-"显示括号配对情况
+" 显示括号配对情况
 set showmatch
 set tags+=$VIMFILES/tags/cpp/stl.tags  " 增加C++ STL Tags
 set tags+=$VIMFILES/tags/perl/cpan.tags  " 增加Perl CPAN Tags
 source $VIMRUNTIME/ftplugin/man.vim
-set formatoptions=tcqroj  " 使得注释换行时自动加上前导的空格和星号
+" 使得注释换行时自动加上前导的空格和星号
+set formatoptions=tcqroj
 " ]]]
 " 自动关联系统剪贴板(即+、*寄存器) [[[2
-if g:isTmux
+if s:isTmux
 	set clipboard=
 elseif has ('unnamedplus')
 	set clipboard=unnamedplus
@@ -739,7 +786,7 @@ nnoremap <space> @=((foldclosed(line('.')) < 0) ? 'zc':'zo')<CR>
 map <C-F5> :!./%<<CR>
 " ]]]
 "  [Disabled] 以sudo 保存(由sudo.vim插件代替) [[[2
-" if (g:isWindows==0)
+" if (s:isWindows==0)
 "	  nmap <Leader>w :w !sudo tee % > /dev/null<CR>
 " endif
 " ]]]
@@ -788,13 +835,13 @@ function! Do_OneFileMake()
 		return
 	endif
 	if &filetype=="c"
-		if g:isWindows==1
+		if s:isWindows==1
 			set makeprg=gcc\ -o\ %<.exe\ %
 		else
 			set makeprg=gcc\ -o\ %<\ %
 		endif
 	elseif &filetype=="cpp"
-		if g:isWindows==1
+		if s:isWindows==1
 			set makeprg=g++\ -o\ %<.exe\ %
 		else
 			set makeprg=g++\ -o\ %<\ %
@@ -802,7 +849,7 @@ function! Do_OneFileMake()
 		"elseif &filetype=="cs"
 		"set makeprg=csc\ \/nologo\ \/out:%<.exe\ %
 	endif
-	if(g:isWindows==1)
+	if(s:isWindows==1)
 		let outfilename=substitute(sourcefileename,'\(\.[^.]*\)' ,'.exe','g')
 		let toexename=outfilename
 	else
@@ -810,7 +857,7 @@ function! Do_OneFileMake()
 		let toexename=outfilename
 	endif
 	if filereadable(outfilename)
-		if(g:isWindows==1)
+		if(s:isWindows==1)
 			let outdeletedsuccess=delete(getcwd()."\\".outfilename)
 		else
 			let outdeletedsuccess=delete("./".outfilename)
@@ -827,7 +874,7 @@ function! Do_OneFileMake()
 	set makeprg=make
 	execute "normal :"
 	if filereadable(outfilename)
-		if(g:isWindows==1)
+		if(s:isWindows==1)
 			execute "!".toexename
 		else
 			execute "!./".toexename
@@ -935,9 +982,13 @@ if executable('ctags')
 endif
 " ]]]
 "  编辑vim配置文件并在保存时加载  [[[2
+"  加载完之后需要执行AirlineRefresh来刷新，
+"  否则tabline排版会乱，参见https://github.com/bling/vim-airline/issues/312
+"  似乎要AirlineRefresh两次才能完全刷新，参见https://github.com/bling/vim-airline/issues/539
 nmap <leader>rc :edit $MYVIMRC<CR>
 autocmd! MyAutoCmd BufWritePost .vimrc,_vimrc,vimrc
 			\ silent source $MYVIMRC | AirlineRefresh
+autocmd! MyAutoCmd BufWritePost .vimrc,_vimrc,vimrc AirlineRefresh
 " ]]]
 "  切换高亮搜索关键字  [[[2
 nmap <silent> <leader>nh :nohlsearch<CR>
@@ -1015,28 +1066,18 @@ function! <SID>OpenSpecial(ochar,cchar)
 endfunction
 inoremap <silent> <CR> <C-R>=<SID>OpenSpecial('{','}')<CR>
 " ]]]
-"  执行特定命令并保留光标位置及搜索历史 [[[2
-function! Preserve(command)
-	" preparation: save last search, and cursor position.
-	let _s=@/
-	let l = line(".")
-	let c = col(".")
-	" do the business:
-	execute a:command
-	" clean up: restore previous search history, and cursor position
-	let @/=_s
-	call cursor(l, c)
-endfunction
-" ]]]
-"  去掉行末空格并调整缩进 [[[2
+"  去掉行末空格并调整缩进 <Leader><Space> (取自 github.com/bling/dotvim ) [[[2
 function! StripTrailingWhitespace()
 	call Preserve("%s/\\s\\+$//e")
 endfunction
+nmap <Leader><Space> :call StripTrailingWhitespace()<CR>
+" ]]]
+"  格式化全文 <Leader>ff [[[2
 function! FullFormat()
 	call Preserve("normal gg=G")
 endfunction
 nmap <Leader>ff :call FullFormat()<CR>
-nmap <Leader><Space> :call StripTrailingWhitespace()<CR>
+" ]]]
 "  打开光标下的链接 [[[2
 "  取得光标处的匹配
 function! GetPatternAtCursor(pat)
@@ -1068,7 +1109,7 @@ function! OpenURL()
     echohl None
   else
     echo '??URL?' . s:url
-    if g:isWindows
+    if s:isWindows
 	" start 不是程序，所以无效。并且，cmd 只能使用双引号
       call system("cmd /q /c start \"" . s:url . "\"")
     else
@@ -1159,7 +1200,7 @@ let g:bufExplorerDefaultHelp = 0  " 不显示默认帮助信息
 let g:bufExplorerSortBy = 'mru' " 使用最近使用的排列方式
 " ]]]
 "  cscope-wrapper  [[[2
-if g:isWindows && g:hasCscope
+if s:isWindows && s:hasCscope
 	set csprg=cswrapper.exe
 endif
 " ]]]
@@ -1231,7 +1272,7 @@ let NERDChristmasTree = 1
 " 控制当光标移动超过一定距离时，是否自动将焦点调整到屏中心
 let NERDTreeAutoCenter = 1
 " 指定书签文件
-let NERDTreeBookmarksFile = $VIMFILES.'/.cache/NERDTreeBookmarks'
+let NERDTreeBookmarksFile = s:get_cache_dir("NERDTreeBookmarks")
 " 排除 . .. 文件
 let NERDTreeIgnore = ['^\.$', '^\.\.$', '\.pyc', '\.class', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
 " 指定鼠标模式(1.双击打开 2.单目录双文件 3.单击打开)
@@ -1264,7 +1305,7 @@ let g:nerdtree_tabs_open_on_gui_startup = 0
 " " Use underbar completion.
 " let g:neocomplcache_enable_underbar_completion = 1
 " " 设置缓存目录
-" let g:neocomplcache_temporary_dir = $VIMFILES.'/.cache/neocon'
+" let g:neocomplcache_temporary_dir = s:get_cache_dir("neocon")
 " let g:neocomplcache_enable_fuzzy_completion = 1
 " " Set minimum syntax keyword length.
 " let g:neocomplcache_min_syntax_length = 3
@@ -1351,7 +1392,7 @@ let g:neocomplete#enable_at_startup = 1
 " Use smartcase.
 let g:neocomplete#enable_smart_case = 1
 " 设置缓存目录
-let g:neocomplete#data_directory = $VIMFILES.'/.cache/neocomplete'
+let g:neocomplete#data_directory = s:get_cache_dir("neocomplete")
 let g:neocomplete#enable_auto_delimiter = 1
 " Set minimum syntax keyword length.
 let g:neocomplete#sources#syntax#min_keyword_length = 3
@@ -1448,9 +1489,9 @@ let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
 " ]]]
 "  NeoMRU.vim [[[2
 " Specifies the directory to write the information of most recent used directory.
-let g:neomru#directory_mru_path = $VIMFILES.'/.cache/neomru/directory'
+let g:neomru#directory_mru_path = s:get_cache_dir("neomru/directory")
 " Specifies the file to write the information of most recent used files.
-let g:neomru#file_mru_path = $VIMFILES.'/.cache/neomru/file'
+let g:neomru#file_mru_path = s:get_cache_dir("neomru/file")
 " ]]]
 "  NeoSnippet.vim [[[2
 " Enable snipMate compatibility feature.
@@ -1458,7 +1499,7 @@ let g:neosnippet#enable_snipmate_compatibility = 1
 " Tell Neosnippet about the other snippets
 let g:neosnippet#snippets_directory = $VIMFILES.'/bundle/vim-snippets/snippets'
 " Specifies directory for neosnippet cache.
-let g:neosnippet#data_directory = $VIMFILES.'/.cache/neosnippet'
+let g:neosnippet#data_directory = s:get_cache_dir("neosnippet")
 " Plugin key-mappings.
 "imap <C-k> <Plug>(neocomplcache_snippets_force_expand)
 "smap <C-k> <Plug>(neocomplcache_snippets_force_expand)
@@ -1481,7 +1522,7 @@ if has('conceal')
 	set conceallevel=2
 	" 'i' is for neosnippet
 	set concealcursor=i
-	if !g:isWindows
+	if !s:isWindows
 		set listchars+=conceal:Δ
 	endif
 endif
@@ -1503,6 +1544,10 @@ let g:PIVAutoClose = 0
 " ]]]
 "  ShowTrailingWhitespace 显示尾部多余空格 [[[2
 highlight ShowTrailingWhitespace ctermbg=Red guibg=Red
+" ]]]
+"  SudoEdit.vim 以 root 权限打开文件 [[[2
+"  不使用图形化的askpass
+let g:sudo_no_gui=1
 " ]]]
 "  Tagbar [[[2
 "let tagbar_left = 1
@@ -1541,7 +1586,7 @@ function! bundle.hooks.on_source(bundle)
 				\ ], '\|'))
 endfunction
 
-let g:unite_data_directory = $VIMFILES.'/.cache/unite'
+let g:unite_data_directory = s:get_cache_dir("unite")
 " Start in insert mode
 let g:unite_enable_start_insert = 1
 let g:unite_enable_short_source_names = 1
@@ -1551,7 +1596,7 @@ let g:unite_source_history_yank_enable = 1
 " Open in bottom right
 let g:unite_split_rule = "botright"
 let g:unite_source_rec_max_cache_files = 5000
-if !g:isWindows
+if !s:isWindows
 	let g:unite_prompt =  '▶'
 	let g:unite_marked_icon = '✗'
 endif
@@ -1593,7 +1638,7 @@ xmap ; [unite]
 nnoremap [unite] <Nop>
 xnoremap [unite] <Nop>
 
-if g:isWindows
+if s:isWindows
 	nnoremap <silent> [unite]<space>
 				\ :<C-u>Unite -buffer-name=mixed -no-split -multi-line
 				\ jump_point file_point file_rec:! file file/new buffer file_mru bookmark<cr><c-u>
@@ -1634,15 +1679,15 @@ nnoremap <silent> [unite]o
 " unite-help
 nnoremap <silent> [unite]h :<C-u>Unite -buffer-name=help help<cr>
 " ]]]
-"  VimShell [[[2
-if g:isWindows
+"  VimShell <Leader>sh [[[2
+if s:isWindows
 	let g:vimshell_prompt =  '$'
 else
 	let g:vimshell_prompt =  '▶'
 endif
 let g:vimshell_user_prompt = 'fnamemodify(getcwd(), ":~")'
 nmap <Leader>sh :VimShell -split<CR>
-let g:vimshell_data_directory = $VIMFILES.'/.cache/vimshell'
+let g:vimshell_data_directory = s:get_cache_dir("vimshell")
 let g:vimshell_vimshrc_path = $VIMFILES.'/vimshrc'
 " ]]]
 "  [Disabled]Vim-Sneak [[[2
@@ -1652,7 +1697,7 @@ let g:vimshell_vimshrc_path = $VIMFILES.'/vimshrc'
 let xml_use_xhtml = 1
 " ]]]
 "  Syntastic 语法检查 [[[2
-if !g:isWindows
+if !s:isWindows
 	let g:syntastic_error_symbol         = '✗ '
 	let g:syntastic_style_error_symbol   = '✠ '
 	let g:syntastic_warning_symbol       = '∆ '
@@ -1712,7 +1757,7 @@ let g:netrw_list_hide = '^\.[^.].*'
 "  ]]]
 "  Vim-AirLine  [[[2
 "  以下取自 github.com/bling/vim-airline
-if (g:isWindows || g:isGUI || g:isColor)
+if (s:isWindows || s:isGUI || s:isColor)
 	let g:airline_powerline_fonts = 1
 	let g:airline_theme = 'light'
 	let g:airline#extensions#tabline#enabled = 1
@@ -1737,7 +1782,7 @@ let g:airline_mode_map = {
 			\ 'S'  : 'SL',
 			\ '' : 'SB',
 			\ }
-if g:isWindows
+if s:isWindows
 	let g:airline_symbols.whitespace = ""
 	" powerline symbols
 	" let g:airline_left_sep                         = ''
@@ -1751,7 +1796,7 @@ if g:isWindows
 	" let g:airline_symbols.branch                   = ''
 	" let g:airline_symbols.readonly                 = ''
 	" let g:airline_symbols.linenr                   = ''
-	" elseif g:isGUI
+	" elseif s:isGUI
 	" 	" unicode symbols
 	" 	let g:airline_left_sep                     = '»'
 	" 	let g:airline_left_sep                     = '▶'
@@ -1778,7 +1823,7 @@ endif
 " " r -- the nearest ancestor that contains one of these directories or files: `.git/` `.hg/` `.svn/` `.bzr/` `_darcs/`
 " let g:ctrlp_follow_symlinks = 1
 
-" let g:ctrlp_cache_dir = $VIMFILES.'/.cache/ctrlp'
+" let g:ctrlp_cache_dir = s:get_cache_dir("ctrlp")
 " let g:ctrlp_custom_ignore = {
 "     \ 'dir':  '\.git$\|\.hg$\|\.svn$\|\.rvm$',
 "     \ 'file': '\.exe$\|\.so$\|\.dll$\|\.o$\|\.pyc$' }
@@ -1889,7 +1934,7 @@ let g:CCTreeUseUTF8Symbols = 1 "为了在终端模式下显示符号
 " :SrcExplToggle                             "打开/闭浏览窗口
 "  ]]]
 "  Startify  起始页 [[[2
-let g:startify_session_dir = $VIMFILES.'/.cache/sessions'
+let g:startify_session_dir = s:get_cache_dir("sessions")
 let g:startify_change_to_vcs_root = 1
 let g:startify_show_sessions = 1
 "  ]]]
@@ -1913,7 +1958,7 @@ vmap <Leader>a<Bar> :Tabularize /<Bar><CR>
 if !exists('g:TagHighlightSettings')
 	let g:TagHighlightSettings = {}
 endif
-if !g:hasPython
+if !s:hasPython
 	let g:TagHighlightSettings['ForcedPythonVariant'] = 'compiled'
 endif
 "  ]]]
@@ -1922,7 +1967,7 @@ let g:indent_guides_start_level = 1
 let g:indent_guides_guide_size = 1
 let g:indent_guides_enable_on_vim_startup = 1
 " let g:indent_guides_color_change_percent = 3
-if g:isGUI==0
+if s:isGUI==0
 	let g:indent_guides_auto_colors = 0
 	function! s:indent_set_console_colors()
 		hi IndentGuidesOdd ctermbg = 235
@@ -1946,7 +1991,7 @@ nnoremap <silent> <F9> :A<CR>
 nnoremap <silent> <C-F4> :Ack<CR>
 "  ]]]
 "  开关CCTree Ctrl-F12 [[[3
-if g:hasCTags && g:hasCscope
+if s:hasCTags && s:hasCscope
 	nmap <C-F12> :call LoadCCTree()<CR>
 	function! LoadCCTree()
 		if filereadable('cctree.out')
@@ -2009,7 +2054,7 @@ augroup MyAutoCmd
 augroup END
 "  ]]]
 "  [Disabled]Conque-Shell 调出命令行界面 <Leader>sh [[[3
-" if g:isWindows
+" if s:isWindows
 " 	nmap <Leader>sh :ConqueTermVSplit cmd.exe<CR>
 " elseif executable('zsh')
 " 	nmap <Leader>sh :ConqueTermVSplit zsh<CR>
@@ -2018,6 +2063,13 @@ augroup END
 " else
 " 	echo "Fail to invoke shell!"
 " endif
+"  ]]]
+"  打散合并单行语句 <Leader>sj/ss [[[3
+"  不使用默认的键映射
+let g:splitjoin_split_mapping = ''
+let g:splitjoin_join_mapping = ''
+nmap <Leader>sj :SplitjoinJoin<CR>
+nmap <Leader>ss :SplitjoinSplit<CR>
 "  ]]]
 "  ShowTrailingWhitespace 开关显示尾部多余空格 <Leader>t$ [[[3
 nnoremap <silent> <Leader>t$ :<C-u>call ShowTrailingWhitespace#Toggle(0)<Bar>echo (ShowTrailingWhitespace#IsSet() ? 'Show trailing whitespace' : 'Not showing trailing whitespace')<CR>
@@ -2035,7 +2087,7 @@ command! -nargs=0 Nbupd Unite neobundle/update -vertical -no-start-insert
 "  Vim辅助工具设置  [[[1
 "  cscope 设置 [[[2
 " (取自 github.com/lilydjwg)
-if g:hasCscope
+if s:hasCscope
 	" 设置 [[[3
 	set cscopetagorder=1
 	set cscopetag
@@ -2052,7 +2104,7 @@ if g:hasCscope
 
 	"  调用这个函数就可以用cscope生成数据库，并添加到vim中
 	function! Cscope_DoTag()
-		if g:isWindows
+		if s:isWindows
 			silent! execute "Dispatch! dir /b *.c,*.cpp,*.h,*.java,*.cs >> cscope.files"
 		else
 			silent! execute "Dispatch! find . -name '*.h' -o -name '*.c' -o -name '*.cpp' -o -name '*.java' -o -name '*.cs' >> cscope.files"
@@ -2097,7 +2149,7 @@ endif
 " <Leader>tm  增加窗口透明度
 " Alt + R     切换Vim是否总在最前面显示
 " Vim启动的时候自动使用当前颜色的背景色以去除Vim的白色边框
-if g:isGUI && has('gui_win32') && has('libcall')
+if s:isGUI && has('gui_win32') && has('libcall')
 	let g:MyVimLib = 'gvimfullscreen.dll'
 	"  切换全屏函数 [[[3
 	function! ToggleFullScreen()
