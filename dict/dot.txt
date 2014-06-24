@@ -8,3 +8,17 @@ circle
 ellipse
 plaintext
 triangle
+box
+circle
+diamond
+edge
+ellipse
+fontsize
+label
+node
+plaintext
+shape
+style
+subgraph
+triangle
+ellipse
