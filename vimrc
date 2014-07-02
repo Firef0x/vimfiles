@@ -161,6 +161,8 @@ if count(s:plugin_groups, 'core')
 				\    },
 				\ }
 	NeoBundle 'tpope/vim-repeat'
+	" 包含普遍使用的 Vim 的通用配置
+	NeoBundle 'tpope/vim-sensible'
 	NeoBundle 'tpope/vim-surround'
 	NeoBundle 'tpope/vim-dispatch'
 endif
@@ -468,11 +470,9 @@ if !exists('g:VimrcIsLoad')
 		" set guifont=Consolas\ for\ Powerline\ FixedD:h12
 		" 雅黑 Consolas Powerline 混合字体，取自 https://github.com/Jackson-soft/Vim/tree/master/user_fonts
 		set guifont=YaHei_Consolas_Hybrid:h12
-		set laststatus=2
 	elseif (s:isGUI || s:isColor)
 		set guifont=Inconsolata\ for\ Powerline\ Medium\ 12
 		" set guifontwide=WenQuanYi\ ZenHei\ Mono\ 12
-		set laststatus=2
 	else
 		set guifont=Monospace\ 12
 	endif
@@ -574,7 +574,6 @@ set noerrorbells
 set visualbell t_vb=
 " ]]]
 "   设置文字编辑选项  [[[2
-set autoread "auto reload
 set background=dark	"dark background 开启molokai终端配色必须指令
 set confirm "read only or haven't saved
 set noexpandtab  "键入Tab时不转换成空格
@@ -592,10 +591,6 @@ set nowritebackup "文件保存后取消备份
 set noswapfile  "取消交换区
 set mousehide  " 键入时隐藏鼠标
 set magic " 设置模式的魔术
-if !exists('g:VimrcIsLoad')
-	" 解决自动换行格式下, 如高度在折行之后超过窗口高度结果这一行看不到的问题
-	set display+=lastline "显示最多行，不用@@
-endif
 set sessionoptions=blank,buffers,curdir,folds,slash,tabpages,unix,winsize
 set viminfo=%,'1000,<50,s20,h,n$VIMFILES/viminfo
 " 允许在有未保存的修改时切换缓冲区，此时的修改由 vim 负责保存
@@ -609,41 +604,43 @@ if has('persistent_undo')
 	" 保证撤销缓存目录存在
 	call EnsureExists(&undodir)
 endif
-" 设置光标之下的最少行数
-set scrolloff=3
+" 设置光标之下的最少行数(暂时使用vim-sensible中的设置，不在此处设置)
+" set scrolloff=3
 " 将命令输出重定向到文件的字符串不要包含标准错误
 set shellredir=>
-" 使用管道(与 SudoEdit.vim 冲突，暂不使用)
-" 参见 https://github.com/chrisbra/SudoEdit.vim/issues/32
-" set noshelltemp
+" 使用管道
+set noshelltemp
 " ]]]
 " Display unprintable characters [[[2
+" 不在Windows和Mac下使用Unicode符号
+" 参见 https://github.com/tpope/vim-sensible/issues/44
+" 和   https://github.com/tpope/vim-sensible/issues/57
 if !s:isWindows
 	set list
-	set listchars=tab:▸\ ,extends:❯,precedes:❮,nbsp:␣
+	" set listchars=tab:▸\ ,extends:❯,precedes:❮,nbsp:␣
+	let &listchars="tab:\u25b8 ,extends:\u276f,precedes:\u276e,nbsp:\u2423"
 	set showbreak=↪
 endif
 " ]]]
 "  开启Wild菜单 [[[2
-set wildmenu
 set wildmode=list:longest,full  " Command <Tab> completion, list matches, then longest common part, then all.
 " Ignore compiled files
 set wildignore=*.o,*.obj,*~,*.class
 " Ignore Python compiled files
-set wildignore+=*.py[co],__pycache__
+set wildignore+=*.pyc,*.pyo,*/__pycache__/**,*.egginfo/**
 " Ignore Ruby gem
 set wildignore+=*.gem
 " Ignore temp folder
-set wildignore+=tmp/**
+set wildignore+=**/tmp/**
 " Ignore image file
 set wildignore+=*.png,*.jpg,*.gif,*.xpm,*.tiff
 " 不应该忽略.git，因为会破坏Fugitive的功能，参见 https://github.com/tpope/vim-fugitive/issues/121
-set wildignore+=*.so,*.swp,*.zip,*/.Trash/**,*.pdf,*.xz
+set wildignore+=*.so,*.swp,*.lock,*.db,*.zip,*/.Trash/**,*.pdf,*.xz,*.DS_Store,*/.sass-cache/**
 " 光标移到行尾时，自动换下一行开头 Backspace and cursor keys wrap too
 set whichwrap=b,s,h,l,<,>,[,]
 " ]]]
 "  设置代码相关选项  [[[2
-set autoindent "设置自动缩进选项
+" 打开自动 C 程序缩进
 set cindent
 " 智能自动缩进
 set smartindent
@@ -982,13 +979,12 @@ if executable('ctags')
 endif
 " ]]]
 "  编辑vim配置文件并在保存时加载  [[[2
+nmap <leader>rc :edit $MYVIMRC<CR>
 "  加载完之后需要执行AirlineRefresh来刷新，
 "  否则tabline排版会乱，参见https://github.com/bling/vim-airline/issues/312
-"  似乎要AirlineRefresh两次才能完全刷新，参见https://github.com/bling/vim-airline/issues/539
-nmap <leader>rc :edit $MYVIMRC<CR>
-autocmd! MyAutoCmd BufWritePost .vimrc,_vimrc,vimrc
+"  FIXME 似乎要AirlineRefresh两次才能完全刷新，参见https://github.com/bling/vim-airline/issues/539
+autocmd! MyAutoCmd BufWritePost $MYVIMRC
 			\ silent source $MYVIMRC | AirlineRefresh
-autocmd! MyAutoCmd BufWritePost .vimrc,_vimrc,vimrc AirlineRefresh
 " ]]]
 "  切换高亮搜索关键字  [[[2
 nmap <silent> <leader>nh :nohlsearch<CR>
@@ -1274,7 +1270,24 @@ let NERDTreeAutoCenter = 1
 " 指定书签文件
 let NERDTreeBookmarksFile = s:get_cache_dir("NERDTreeBookmarks")
 " 排除 . .. 文件
-let NERDTreeIgnore = ['^\.$', '^\.\.$', '\.pyc', '\.class', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
+let NERDTreeIgnore = [
+					\ '__pycache__',
+					\ '\.DS_Store',
+					\ '\.bzr',
+					\ '\.class',
+					\ '\.git',
+					\ '\.hg',
+					\ '\.idea',
+					\ '\.pyc',
+					\ '\.pyo',
+					\ '\.rvm',
+					\ '\.sass-cache',
+					\ '\.svn',
+					\ '\.swo$',
+					\ '\.swp$',
+					\ '^\.$',
+					\ '^\.\.$',
+					\ ]
 " 指定鼠标模式(1.双击打开 2.单目录双文件 3.单击打开)
 let NERDTreeMouseMode = 2
 let NERDTreeQuitOnOpen = 1
@@ -1523,7 +1536,8 @@ if has('conceal')
 	" 'i' is for neosnippet
 	set concealcursor=i
 	if !s:isWindows
-		set listchars+=conceal:Δ
+		" set listchars+=conceal:Δ
+		let &listchars=&listchars.",conceal:\u0394"
 	endif
 endif
 
@@ -1548,6 +1562,8 @@ highlight ShowTrailingWhitespace ctermbg=Red guibg=Red
 "  SudoEdit.vim 以 root 权限打开文件 [[[2
 "  不使用图形化的askpass
 let g:sudo_no_gui=1
+"  显示调试信息
+" let g:sudoDebug=1
 " ]]]
 "  Tagbar [[[2
 "let tagbar_left = 1
@@ -1566,24 +1582,33 @@ autocmd MyAutoCmd BufReadPost *.cpp,*.c,*.h,*.hpp,*.cc,*.cxx call tagbar#autoope
 " ]]]
 "  Unite [[[2
 let bundle = neobundle#get('unite.vim')
+				" \ '__pycache__/',
+				" \ 'tmp/',
+				" \ '\.sass-cache/',
+let s:unite_ignores = [
+				\ '\.bzr/',
+				\ '\.git/',
+				\ '\.hg/',
+				\ '\.idea/',
+				\ '\.rvm/',
+				\ '\.svn/',
+				\ ]
+
 function! bundle.hooks.on_source(bundle)
 	call unite#filters#matcher_default#use(['matcher_fuzzy'])
 	call unite#filters#sorter_default#use(['sorter_rank'])
-	call unite#set_profile('files', 'smartcase', 1)
+	call unite#custom#profile('files', 'smartcase', 1)
 	call unite#custom#source('line,outline','matchers','matcher_fuzzy')
 	call unite#custom#source('file_rec/async,file_mru,file_rec,buffer',
 				\ 'matchers',['converter_tail', 'matcher_fuzzy'])
 	call unite#custom#source('file_rec/async,file_mru',
 				\ 'converters',['converter_file_directory'])
-	call unite#custom_source('file_rec,file_rec/async,file_mru,file,buffer,grep',
-				\ 'ignore_pattern', join([
-				\ '\.bzr/',
-				\ '\.git/',
-				\ '\.hg/',
-				\ '\.svn/',
-				\ 'tmp/',
-				\ '.sass-cache',
-				\ ], '\|'))
+	call unite#custom#source('file_rec,file_rec/async,file_mru,file,buffer,grep',
+				\ 'ignore_pattern',
+				\ escape(
+				\	substitute(join(split(&wildignore, ","), '\|'),
+				\   '**/\?', '', 'g'), '.') . '\|' .
+				\ join(s:unite_ignores, '\|'))
 endfunction
 
 let g:unite_data_directory = s:get_cache_dir("unite")
@@ -1597,8 +1622,10 @@ let g:unite_source_history_yank_enable = 1
 let g:unite_split_rule = "botright"
 let g:unite_source_rec_max_cache_files = 5000
 if !s:isWindows
-	let g:unite_prompt =  '▶'
-	let g:unite_marked_icon = '✗'
+	" let g:unite_prompt =  '▸'
+	let g:unite_prompt =  "\u25b8"
+	" let g:unite_marked_icon = '✗'
+	let g:unite_marked_icon = "\u2717"
 endif
 " For ack.
 if executable('ag')
@@ -1698,10 +1725,14 @@ let xml_use_xhtml = 1
 " ]]]
 "  Syntastic 语法检查 [[[2
 if !s:isWindows
-	let g:syntastic_error_symbol         = '✗ '
-	let g:syntastic_style_error_symbol   = '✠ '
-	let g:syntastic_warning_symbol       = '∆ '
-	let g:syntastic_style_warning_symbol = '≈'
+	" let g:syntastic_error_symbol         = '✗'
+	" let g:syntastic_style_error_symbol   = '✠'
+	" let g:syntastic_warning_symbol       = '⚠'
+	" let g:syntastic_style_warning_symbol = '≈'
+	let g:syntastic_error_symbol         = "\u2717"
+	let g:syntastic_style_error_symbol   = "\u2720"
+	let g:syntastic_warning_symbol       = "\u26a0"
+	let g:syntastic_style_warning_symbol = "\u2248"
 endif
 let g:syntastic_mode_map = { 'mode': 'passive',
 			\ 'active_filetypes': ['lua', 'php', 'sh'],
@@ -1766,7 +1797,6 @@ if (s:isWindows || s:isGUI || s:isColor)
 	if !exists('g:airline_symbols')
 		let g:airline_symbols = {}
 	endif
-	" let g:airline_symbols.space = "\ua0"
 endif
 "  显示Mode的简称
 let g:airline_mode_map = {
@@ -1825,8 +1855,8 @@ endif
 
 " let g:ctrlp_cache_dir = s:get_cache_dir("ctrlp")
 " let g:ctrlp_custom_ignore = {
-"     \ 'dir':  '\.git$\|\.hg$\|\.svn$\|\.rvm$',
-"     \ 'file': '\.exe$\|\.so$\|\.dll$\|\.o$\|\.pyc$' }
+"     \ 'dir':  '\v[\/]\.(bzr|git|hg|idea|rvm|sass-cache|svn)$',
+"     \ 'file': '\v\.(dll|exe|o|pyc|pyo|so|DS_Store)$' }
 
 " let g:ctrlp_user_command = {
 "     \ 'types': {
@@ -2191,8 +2221,12 @@ if s:isGUI && has('gui_win32') && has('libcall')
 	autocmd GUIEnter * call libcallnr(g:MyVimLib, 'SetAlpha', g:VimAlpha)
 endif
 " ]]]
-" source时让一些设置不再执行 [[[1
-let g:VimrcIsLoad=1
+"  source vimrc 时让一些设置不再执行，并记录 source vimrc 的次数 [[[1
+if !exists("g:VimrcIsLoad")
+	let g:VimrcIsLoad = 1
+else
+	let g:VimrcIsLoad = g:VimrcIsLoad + 1
+endif
 " ]]]
 "  Vim Modeline [[[1
 " vim:fdm=marker:fmr=[[[,]]]
