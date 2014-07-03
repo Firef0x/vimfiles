@@ -132,7 +132,6 @@ endif
 " ---------------------------------------------------------------------
 " 为 node.js 而加
 syn match javaScriptLineComment /^\%1l#!.*$/
-runtime! syntax/jquery.vim
 " ---------------------------------------------------------------------
 " Vim Modeline:
 " vim:ts=4:fdm=expr:fde=getline(v\:lnum-1)=~'\\v"\\s*-{20,}'?'>1'\:1
