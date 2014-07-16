@@ -268,6 +268,8 @@ if count(s:plugin_groups, 'linux')
 	" 以 root 权限打开文件，以 SudoEdit.vim 代替 sudo.vim
 	" 参见 http://vim.wikia.com/wiki/Su-write
 	NeoBundle 'chrisbra/SudoEdit.vim'
+	" 在终端下自动开启关闭 paste 选项
+	NeoBundle 'ConradIrwin/vim-bracketed-paste'
 	if s:hasPython
 		NeoBundle 'fcitx.vim'
 	endif
@@ -655,7 +657,7 @@ set noshelltemp
 " 不在Windows和Mac下使用Unicode符号
 " 参见 https://github.com/tpope/vim-sensible/issues/44
 " 和   https://github.com/tpope/vim-sensible/issues/57
-if !s:isWindows
+if !s:isWindows && s:isGUI
 	set list
 	" set listchars=tab:▸\ ,extends:❯,precedes:❮,nbsp:␣
 	let &listchars="tab:\u25b8 ,extends:\u276f,precedes:\u276e,nbsp:\u2423"
@@ -919,18 +921,18 @@ function! Do_OneFileMake()
 	endif
 	if &filetype=="c"
 		if s:isWindows==1
-			set makeprg=gcc\ -o\ %<.exe\ %
+			setlocal makeprg=gcc\ -o\ %<.exe\ %
 		else
-			set makeprg=gcc\ -o\ %<\ %
+			setlocal makeprg=gcc\ -o\ %<\ %
 		endif
 	elseif &filetype=="cpp"
 		if s:isWindows==1
-			set makeprg=g++\ -o\ %<.exe\ %
+			setlocal makeprg=g++\ -o\ %<.exe\ %
 		else
-			set makeprg=g++\ -o\ %<\ %
+			setlocal makeprg=g++\ -o\ %<\ %
 		endif
 		"elseif &filetype=="cs"
-		"set makeprg=csc\ \/nologo\ \/out:%<.exe\ %
+		"setlocal makeprg=csc\ \/nologo\ \/out:%<.exe\ %
 	endif
 	if(s:isWindows==1)
 		let outfilename=substitute(sourcefileename,'\(\.[^.]*\)' ,'.exe','g')
@@ -946,7 +948,7 @@ function! Do_OneFileMake()
 			let outdeletedsuccess=delete("./".outfilename)
 		endif
 		if(outdeletedsuccess!=0)
-			set makeprg=make
+			setlocal makeprg=make
 			echohl WarningMsg
 						\| echo "Fail to make! I cannot delete the ".outfilename
 						\| echohl None
@@ -954,7 +956,7 @@ function! Do_OneFileMake()
 		endif
 	endif
 	execute "Make"
-	set makeprg=make
+	setlocal makeprg=make
 	execute "normal :"
 	if filereadable(outfilename)
 		if(s:isWindows==1)
@@ -968,7 +970,7 @@ endfunction
 map <F5> :w <CR>:call Do_OneFileMake()<CR>
 " 进行make的设置
 function! Do_make()
-	set makeprg=make
+	setlocal makeprg=make
 	execute "Make"
 	execute "cwindow"
 endfunction
@@ -1080,7 +1082,7 @@ nmap <silent> <leader>nh :nohlsearch<CR>
 nnoremap <Leader>nu :call <SID>toggle_number()<CR>
 " ]]]
 "  切换自动换行 <Leader>wr [[[2
-nnoremap <Leader>wr :execute &wrap==1 ? 'set nowrap' : 'set wrap'<CR>
+nnoremap <Leader>wr :execute &wrap==1 ? 'setlocal nowrap' : 'setlocal wrap'<CR>
 " ]]]
 "  Shift+鼠标滚动[[[2
 if v:version < 703
@@ -1639,7 +1641,7 @@ if has('conceal')
 	set conceallevel=2
 	" 'i' is for neosnippet
 	set concealcursor=i
-	if !s:isWindows
+	if !s:isWindows && s:isGUI
 		" set listchars+=conceal:Δ
 		let &listchars=&listchars.",conceal:\u0394"
 	endif
@@ -1786,7 +1788,7 @@ nnoremap <silent> [unite]*
 			\ :<C-u>UniteWithCursorWord -no-split -buffer-name=line line<cr>
 " Quick buffer and mru
 nnoremap <silent> [unite]b :<C-u>Unite -buffer-name=buffers buffer file_mru<cr>
-" Quick grep from cwd
+" Quick grep from current directory(prompt for word)
 nnoremap <silent> [unite]/
 			\ :<C-u>Unite -auto-preview -no-empty -no-quit -resume -buffer-name=search grep:.<cr>
 nnoremap <silent> [unite]m
@@ -2019,13 +2021,14 @@ let g:rainbow_conf = {
 \			'parentheses': [['(', ')'], ['\[', '\]'], ['{', '}'],
 \			['\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!', '\v%(-)@<!\>']],
 \		},
+\       'html': {
+\			'parentheses': [['(',')'], ['\[','\]'], ['{','}'],
+\			['\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>','</\z1>']],
+\       },
 \		'java': {
 \			'parentheses': [['(', ')'], ['\[', '\]'], ['{', '}'],
 \			['\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!', '\v%(-)@<!\>']],
 \		},
-\       'html': {
-\           'parentheses': [['(',')'], ['\[','\]'], ['{','}'], ['<\a[^>]*[^/]>\|<\a>','</[^>]*>']],
-\       },
 \		'rust': {
 \			'parentheses': [['(', ')'], ['\[', '\]'], ['{', '}'],
 \			['\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!', '\v%(-)@<!\>']],
@@ -2034,8 +2037,13 @@ let g:rainbow_conf = {
 \           'operators': '',
 \           'parentheses': [['(',')'], ['\[','\]']],
 \       },
+\		'xhtml': {
+\			'parentheses': [['(',')'], ['\[','\]'], ['{','}'],
+\			['\v\<\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'))?)*\>','</\z1>']],
+\		},
 \       'xml': {
-\           'parentheses': [['(',')'], ['\[','\]'], ['{','}'], ['<\a[^>]*[^/]>\|<\a>','</[^>]*>']],
+\           'parentheses': [['(',')'], ['\[','\]'], ['{','}'],
+\			['\v\<\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'))?)*\>','</\z1>']],
 \       },
 \   }
 \}
@@ -2093,6 +2101,11 @@ nmap <Leader>a,, :Tabularize /,\zs<CR>
 vmap <Leader>a,, :Tabularize /,\zs<CR>
 nmap <Leader>a<Bar> :Tabularize /<Bar><CR>
 vmap <Leader>a<Bar> :Tabularize /<Bar><CR>
+"  只对齐第一个,或:
+nmap <Leader>af, :Tabularize /^[^,]*\zs,/<CR>
+vmap <Leader>af, :Tabularize /^[^,]*\zs,/<CR>
+nmap <Leader>af: :Tabularize /^[^:]*\zs:/<CR>
+vmap <Leader>af: :Tabularize /^[^:]*\zs:/<CR>
 "  ]]]
 "  Tag Highlight -- CTags 语法高亮 [[[2
 if !exists('g:TagHighlightSettings')
