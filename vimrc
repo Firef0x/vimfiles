@@ -70,11 +70,11 @@ augroup MyAutoCmd
 	autocmd!
 augroup END
 "  ]]]
-"  设置缓存目录 (取自 github.com/bling/dotvim )[[[2
+"  设置缓存目录 (取自 https://github.com/bling/dotvim )[[[2
 let s:cache_dir = $VIMFILES."/.cache"
 "  ]]]
 "  ]]]
-"  定义函数 (取自 github.com/bling/dotvim ) [[[1
+"  定义函数 (取自 https://github.com/bling/dotvim ) [[[1
 "  获取缓存目录 [[[2
 function! s:get_cache_dir(suffix)
 	return resolve(expand(s:cache_dir . "/" . a:suffix))
@@ -343,14 +343,15 @@ endif
 " ]]]
 "  TMux [[[2
 if count(s:plugin_groups, 'tmux')
-	NeoBundle 'christoomey/vim-tmux-navigtor'
+	NeoBundle 'christoomey/vim-tmux-navigator'
 endif
 "  Unite 插件组 [[[2
 if count(s:plugin_groups, 'unite')
 	NeoBundleLazy 'Shougo/unite.vim',
 				\ {'autoload':{'commands':'Unite'}}
 	NeoBundleLazy 'Shougo/neomru.vim',
-				\ {'autoload':{'unite_sources':'file_mru'}}
+				\ {'autoload':{'unite_sources':['neomru/file',
+				\ 'neomru/directory', 'file_mru', 'directory_mru']}}
 	NeoBundleLazy 'Shougo/unite-help',
 				\ {'autoload':{'unite_sources':'help'}}
 	NeoBundleLazy 'Shougo/unite-outline',
@@ -521,7 +522,7 @@ if !exists('g:VimrcIsLoad')
 	" ]]]
 	" 设置配色方案  [[[3
 	let colorscheme = 'molokai'
-	" 以下取自 github.com/lilydjwg/dotvim
+	" 以下取自 https://github.com/lilydjwg/dotvim
 	if s:isGUI
 		" 有些终端不能改变大小
 		set columns=88
@@ -786,7 +787,7 @@ augroup Filetype_Specific
 	" ]]]
 	" More ignored extensions [[[3
 	" (modified from the standard one)
-	" 取自 github.com/lilydjwg/dotvim
+	" 取自 https://github.com/lilydjwg/dotvim
 	if exists("*fnameescape")
 		autocmd BufNewFile,BufRead ?\+.pacsave,?\+.pacnew
 			\ exe "doau filetypedetect BufRead " . fnameescape(expand("<afile>:r"))
@@ -814,7 +815,7 @@ augroup Filetype_Specific
 	autocmd BufNewFile,BufRead *openvpn*/*.conf,*.ovpn setlocal ft=openvpn
 	" ]]]
 	" Websites [[[3
-	" 取自 github.com/lilydjwg/dotvim
+	" 取自 https://github.com/lilydjwg/dotvim
 	autocmd BufRead forum.ubuntu.org.cn_*,bbs.archlinuxcn.org_post.php*.txt setlocal ft=bbcode
 	autocmd BufRead *fck_source.html* setlocal ft=html
 	autocmd BufRead *docs.google.com_Doc* setlocal ft=html
@@ -1153,7 +1154,7 @@ endfunction
 inoremap <silent> <CR> <C-R>=<SID>OpenSpecial('{','}')<CR>
 " ]]]
 "  去掉行末空格并调整缩进 <Leader><Space> [[[2
-" (取自 github.com/bling/dotvim )
+" (取自 https://github.com/bling/dotvim )
 function! StripTrailingWhitespace()
 	call Preserve("%s/\\s\\+$//e")
 endfunction
@@ -1166,7 +1167,7 @@ endfunction
 nmap <Leader>ff :call FullFormat()<CR>
 " ]]]
 "  打开光标下的链接 <Leader>ur [[[2
-" (取自 github.com/lilydjwg/dotvim )
+"  (取自 https://github.com/lilydjwg/dotvim )
 "  取得光标处的匹配
 function! GetPatternAtCursor(pat)
   let col = col('.') - 1
@@ -1189,18 +1190,24 @@ function! GetPatternAtCursor(pat)
     return ""
   endif
 endfunction
+"  用火狐打开链接
 function! OpenURL()
-  let s:url = GetPatternAtCursor('\v%(https?://|ftp://|file:/{3}|www\.)%(\w|[.-])+%(:\d+)?%(/%(\w|[~@#$%^&+=/.?:-])*[^,.?:''"-])?')
+  let s:url = GetPatternAtCursor('\v%(https?|ftp)://[^]''" \t\r\n>*。，\`)]*')
   if s:url == ""
     echohl WarningMsg
     echomsg '在光标处未发现URL！'
     echohl None
   else
-    echo '??URL?' . s:url
+    echo '打开URL：' . s:url
     if s:isWindows
-	" start 不是程序，所以无效。并且，cmd 只能使用双引号
-      call system("cmd /q /c start \"" . s:url . "\"")
+      " start 不是程序，所以无效。并且，cmd 只能使用双引号
+      " call system("start '" . s:url . "'")
+      " call system("cmd /q /c start \"" . s:url . "\"")
+      call system("E:\\PortableApps\\firefox\\firefox.exe \"" . s:url . "\"")
+    elseif has("mac")
+      call system("open '" . s:url . "'")
     else
+      " call system("gnome-open " . s:url)
       call system("setsid firefox '" . s:url . "' &")
     endif
   endif
@@ -1208,6 +1215,20 @@ function! OpenURL()
 endfunction
 nmap <silent> <Leader>ur :call OpenURL()<CR>
 " ]]]
+"  %xx -> 对应的字符(到消息)[[[2
+"  (取自 https://github.com/lilydjwg/dotvim )
+function! GetHexChar()
+  let chars = GetPatternAtCursor('\(%[[:xdigit:]]\{2}\)\+')
+  if chars == ''
+    echohl WarningMsg
+    echo '在光标处未发现%表示的十六进制字符串！'
+    echohl None
+    return
+  endif
+  let str = substitute(chars, '%', '\\x', 'g')
+  exe 'echo "'. str . '"'
+endfunction
+nmap <silent> <Leader>% :call GetHexChar()<CR>
 " ]]]
 "  以下为Lilydjwg的设置  [[[1
 "   切换显示行号/相对行号 [[[2
@@ -1774,12 +1795,12 @@ xnoremap [unite] <Nop>
 if s:isWindows
 	nnoremap <silent> [unite]<space>
 				\ :<C-u>Unite -buffer-name=mixed -no-split -multi-line
-				\ jump_point file_point file_rec:! file file/new buffer file_mru bookmark<cr><c-u>
+				\ jump_point file_point file_rec:! file file/new buffer neomru/file bookmark<cr><c-u>
 	nnoremap <silent> [unite]f :<C-u>Unite -toggle -buffer-name=files file_rec:!<cr><c-u>
 else
 	nnoremap <silent> [unite]<space>
 				\ :<C-u>Unite -buffer-name=mixed -no-split -multi-line
-				\ jump_point file_point file_rec/async:! file file/new buffer file_mru bookmark<cr><c-u>
+				\ jump_point file_point file_rec/async:! file file/new buffer neomru/file bookmark<cr><c-u>
 	nnoremap <silent> [unite]f
 				\ :<C-u>Unite -toggle -buffer-name=files file_rec/async:!<cr><c-u>
 endif
@@ -1787,7 +1808,7 @@ nnoremap <silent> [unite]n :<C-u>Unite -buffer-name=bundle neobundle<cr>
 nnoremap <silent> [unite]*
 			\ :<C-u>UniteWithCursorWord -no-split -buffer-name=line line<cr>
 " Quick buffer and mru
-nnoremap <silent> [unite]b :<C-u>Unite -buffer-name=buffers buffer file_mru<cr>
+nnoremap <silent> [unite]b :<C-u>Unite -buffer-name=buffers buffer neomru/file<cr>
 " Quick grep from current directory(prompt for word)
 nnoremap <silent> [unite]/
 			\ :<C-u>Unite -auto-preview -no-empty -no-quit -resume -buffer-name=search grep:.<cr>
@@ -1795,10 +1816,10 @@ nnoremap <silent> [unite]m
 			\ :<C-u>Unite -auto-resize -buffer-name=mappings mapping<cr>
 " Quickly switch lcd
 nnoremap <silent> [unite]d
-			\ :<C-u>Unite -buffer-name=change-cwd -default-action=cd directory_mru directory_rec/async<CR>
+			\ :<C-u>Unite -buffer-name=change-cwd -default-action=lcd neomru/directory directory_rec/async<CR>
 " Quickly most recently used
 nnoremap <silent> [unite]e
-			\ :<C-u>Unite -buffer-name=recent file_mru<CR>
+			\ :<C-u>Unite -buffer-name=recent neomru/file<CR>
 " Quick registers
 nnoremap <silent> [unite]y
 			\ :<C-u>Unite -buffer-name=register register history/yank<CR>
@@ -1899,7 +1920,7 @@ let g:vimsyn_noerror = 1
 let g:netrw_list_hide = '^\.[^.].*'
 "  ]]]
 "  Vim-AirLine  [[[2
-"  以下取自 github.com/bling/vim-airline
+"  以下取自 https://github.com/bling/vim-airline
 if (s:isWindows || s:isGUI || s:isColor)
 	let g:airline_powerline_fonts = 1
 	let g:airline_theme = 'light'
@@ -2021,6 +2042,7 @@ let g:rainbow_conf = {
 \			'parentheses': [['(', ')'], ['\[', '\]'], ['{', '}'],
 \			['\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!', '\v%(-)@<!\>']],
 \		},
+\       'css': 0,
 \       'html': {
 \			'parentheses': [['(',')'], ['\[','\]'], ['{','}'],
 \			['\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>','</\z1>']],
@@ -2033,9 +2055,12 @@ let g:rainbow_conf = {
 \			'parentheses': [['(', ')'], ['\[', '\]'], ['{', '}'],
 \			['\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!', '\v%(-)@<!\>']],
 \		},
+\       'stylus': 0,
 \       'tex': {
-\           'operators': '',
-\           'parentheses': [['(',')'], ['\[','\]']],
+\           'parentheses': [['(',')'], ['\[','\]'], ['\\begin{.*}','\\end{.*}']],
+\       },
+\       'vim': {
+\           'parentheses': [['fu\w* \s*.*)','endfu\w*'], ['for','endfor'], ['while', 'endwhile'], ['if','_elseif\|else_','endif'], ['(',')'], ['\[','\]'], ['{','}']],
 \       },
 \		'xhtml': {
 \			'parentheses': [['(',')'], ['\[','\]'], ['{','}'],
@@ -2308,7 +2333,7 @@ command! -nargs=0 Nbupd Unite neobundle/update -vertical -no-start-insert
 "  ]]]
 "  Vim辅助工具设置  [[[1
 "  cscope 设置 [[[2
-" (取自 github.com/lilydjwg/dotvim )
+" (取自 https://github.com/lilydjwg/dotvim )
 if s:hasCscope
 	" 设置 [[[3
 	set cscopetagorder=1
@@ -2364,7 +2389,7 @@ if s:hasCscope
 endif
 " ]]]
 "  Win平台下窗口全屏组件 gvimfullscreen.dll [[[2
-" (取自 github.com/asins/vim )
+" (取自 https://github.com/asins/vim )
 " 用于 Windows gVim 全屏窗口，可用 F11 切换
 " 全屏后再隐藏菜单栏、工具栏、滚动条效果更好
 " <Leader>btm 降低窗口透明度
