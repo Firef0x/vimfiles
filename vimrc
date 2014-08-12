@@ -111,6 +111,7 @@ call add(s:plugin_groups, 'indent')
 call add(s:plugin_groups, 'javascript')
 if !s:isWindows
 	call add(s:plugin_groups, 'linux')
+	call add(s:plugin_groups, 'scm')
 	if s:isTmux
 		call add(s:plugin_groups, 'tmux')
 	endif
@@ -123,7 +124,6 @@ endif
 call add(s:plugin_groups, 'misc')
 call add(s:plugin_groups, 'navigation')
 call add(s:plugin_groups, 'php')
-call add(s:plugin_groups, 'scm')
 call add(s:plugin_groups, 'unite')
 call add(s:plugin_groups, 'web')
 "  ]]]
@@ -210,6 +210,8 @@ if count(s:plugin_groups, 'editing')
 				\ 'Tabularize',
 				\ 'AddTabularPipeline']}}
 	NeoBundle 'jiangmiao/auto-pairs'
+	" 自动更新 Last Modified 字符串
+	NeoBundle 'jmcantrell/vim-lastmod'
 	" TODO vim-sneak 是 vim-easymotion 的代替品，考虑是否替换
 	" NeoBundle 'justinmk/vim-sneak'
 	NeoBundleLazy 'kana/vim-scratch',
@@ -221,6 +223,8 @@ if count(s:plugin_groups, 'editing')
 	" NeoBundle 'kien/rainbow_parentheses.vim'
 	NeoBundle 'Lokaltog/vim-easymotion'
 	NeoBundle 'luochen1990/rainbow'
+	" 连续按 j/k 时加速移动光标
+	NeoBundle 'rhysd/accelerated-jk'
 	NeoBundle 'rhysd/clever-f.vim'
 	NeoBundle 'terryma/vim-multiple-cursors'
 	" 在 Visual 模式下使用 */# 跳转
@@ -277,8 +281,8 @@ endif
 " ]]]
 "  Lua [[[2
 if count(s:plugin_groups, 'lua')
-	NeoBundleLazy 'luarefvim',
-				\ {'autoload':{'filetypes':['lua']}}
+	" NeoBundleLazy 'luarefvim',
+	" 			\ {'autoload':{'filetypes':['lua']}}
 endif
 " ]]]
 "  文本定位/纵览 [[[2
@@ -1833,6 +1837,23 @@ nnoremap <silent> [unite]o
 " unite-help
 nnoremap <silent> [unite]h :<C-u>Unite -buffer-name=help help<cr>
 " ]]]
+"  Vim-lastmod [[[2
+" The format of the time stamp
+"
+" syntax - format - example
+" %a - Day - Sat
+" %Y - YYYY - 2005
+" %b - Mon - Sep (3 digit month)
+" %m - mm - 09 (2 digit month)
+" %d - dd - 10
+" %H - HH - 15 (hour upto 24)
+" %I - HH - 12 (hour upto 12)
+" %M - MM - 50 (minute)
+" %X - HH:MM:SS - (12:29:34)
+" %p - AM/PM
+"
+let g:lastmod_format="%d-%b-%Y %H:%M %z"
+" ]]]
 "  VimShell <Leader>sh [[[2
 if s:isWindows
 	let g:vimshell_prompt =  '$'
@@ -2164,6 +2185,10 @@ autocmd MyAutoCmd SwapExists vimperator*.tmp
 " :AV ---切换头文件并垂直分割窗口
 " :AS ---切换头文件并水平分割窗口
 nnoremap <silent> <F9> :A<CR>
+" ]]]
+"  accelerated-jk 连续按 j/k 时加速移动光标 [[[3
+nmap j <Plug>(accelerated_jk_gj)
+nmap k <Plug>(accelerated_jk_gk)
 " ]]]
 "  Ack  Ctrl-F4 查找光标下词语  [[[3
 nnoremap <silent> <C-F4> :Ack<CR>
