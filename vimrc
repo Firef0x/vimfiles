@@ -1,4 +1,5 @@
 scriptencoding utf-8
+"  Last Modified: 18 Aug 2014 04:25 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -1851,8 +1852,15 @@ nnoremap <silent> [unite]h :<C-u>Unite -buffer-name=help help<cr>
 " %M - MM - 50 (minute)
 " %X - HH:MM:SS - (12:29:34)
 " %p - AM/PM
+" %z %Z - TimeZone - UTC
 "
-let g:lastmod_format="%d-%b-%Y %H:%M %z"
+if s:isWindows
+	language time english
+else
+	language time en_US.UTF-8
+endif
+let g:lastmod_format="%d %b %Y %H:%M"
+let g:lastmod_suffix=" +0800"
 " ]]]
 "  VimShell <Leader>sh [[[2
 if s:isWindows
