@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 18 Aug 2014 04:25 +0800
+"  Last Modified: 19 Aug 2014 23:34 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -1860,6 +1860,7 @@ else
 	language time en_US.UTF-8
 endif
 let g:lastmod_format="%d %b %Y %H:%M"
+let g:lastmod_lines=7
 let g:lastmod_suffix=" +0800"
 " ]]]
 "  VimShell <Leader>sh [[[2
