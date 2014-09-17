@@ -766,8 +766,6 @@ augroup Filetype_Specific
 	autocmd BufNewFile,BufRead *.jsm setlocal ft=javascript
 	" jQuery syntax
 	autocmd BufNewFile,BufRead jquery.*.js setlocal ft=javascript syntax=jquery
-	" JSON syntax
-	autocmd BufNewFile,BufRead *.json setlocal ft=json
 	" ]]]
 	" Markdown [[[3
 	autocmd FileType markdown setlocal nolist
