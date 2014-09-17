@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 19 Aug 2014 23:34 +0800
+"  Last Modified: 18 Sep 2014 02:22 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -491,6 +491,9 @@ if !exists('g:VimrcIsLoad')
 		set guioptions-=T  "不显示工具栏
 		if s:isWindows
 			autocmd MyAutoCmd GUIEnter * simalt ~x    " 在Windows下启动时最大化窗口
+			if has('directx')
+				set renderoptions=type:directx
+			endif
 		endif
 		set guitablabel=%N\ \ %t\ %M   "标签页上显示序号
 	endif
@@ -658,6 +661,20 @@ endif
 set shellredir=>
 " 使用管道
 set noshelltemp
+" ]]]
+"   设置加密选项  [[[2
+"  (取自 https://github.com/lilydjwg/dotvim )
+try
+	" Vim 7.4.399+
+	set cryptmethod=blowfish2
+catch /.*/
+	" Vim 7.3+
+	try
+		set cryptmethod=blowfish
+	catch /.*/
+		" Vim 7.2-, neovim
+	endtry
+endtry
 " ]]]
 " Display unprintable characters [[[2
 " 不在Windows和Mac下使用Unicode符号
