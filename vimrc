@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 19 Sep 2014 22:35 +0800
+"  Last Modified: 23 Sep 2014 18:47 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -791,6 +791,9 @@ augroup Filetype_Specific
 	" Markdown [[[3
 	autocmd FileType markdown setlocal nolist
 	" ]]]
+	" OpenSUSE Build Service [[[3
+	autocmd BufNewFile,BufRead _service setlocal ft=xml
+	" ]]]
 	" PHP [[[3
 	" PHP 生成的SQL/HTML代码高亮
 	autocmd FileType php let php_sql_query=1
@@ -1071,21 +1074,25 @@ function! CloseWindowOrKillBuffer()
 endfunction
 nmap <silent> <Leader>c :call CloseWindowOrKillBuffer()<CR>
 " ]]]
-" 自动居中 [[[2
+"  使用 n/N/g*/g#/Ctrl-o/Ctrl-i 时自动居中 [[[2
 nnoremap <silent> n nzz
 nnoremap <silent> N Nzz
 nnoremap <silent> g* g*zz
 nnoremap <silent> g# g#zz
 nnoremap <silent> <C-o> <C-o>zz
 nnoremap <silent> <C-i> <C-i>zz
-" 缩进后继续选定 [[[2
+" ]]]
+"  使用 </> 缩进后继续选定 [[[2
 vnoremap < <gv
 vnoremap > >gv
-" 将Y映射为复制到行尾 [[[2
+" ]]]
+"  将Y映射为复制到行尾 [[[2
 nnoremap Y y$
-" 允许在Visual模式下按 . 重复执行操作 [[[2
+" ]]]
+"  允许在Visual模式下按 . 重复执行操作 [[[2
 vnoremap . :normal .<CR>
-"   切换Quickfix <Shift-F12> [[[2
+" ]]]
+"  切换Quickfix <Shift-F12> [[[2
 " nmap <F11> :cnext<CR>
 " nmap <S-F11> :cprevious<CR>
 if executable('ctags')
@@ -1239,7 +1246,7 @@ function! OpenURL()
 endfunction
 nmap <silent> <Leader>ur :call OpenURL()<CR>
 " ]]]
-"  %xx -> 对应的字符(到消息)[[[2
+"  %xx -> 对应的字符(到消息) <Leader>% [[[2
 "  (取自 https://github.com/lilydjwg/dotvim )
 function! GetHexChar()
   let chars = GetPatternAtCursor('\(%[[:xdigit:]]\{2}\)\+')
@@ -1254,8 +1261,21 @@ function! GetHexChar()
 endfunction
 nmap <silent> <Leader>% :call GetHexChar()<CR>
 " ]]]
+" 删除所有未显示且无修改的缓冲区以减少内存占用 :BufClean [[[2
+if has('user_commands')
+	command! BufClean call cleanbufs()
+endif
+" ]]]
 "  以下为Lilydjwg的设置  [[[1
-"   切换显示行号/相对行号 [[[2
+"  删除所有未显示且无修改的缓冲区以减少内存占用[[[2
+function! s:cleanbufs()
+	for bufNr in filter(range(1, bufnr('$')),
+	\ 'buflisted(v:val) && !bufloaded(v:val)')
+		execute bufNr . 'bdelete'
+	endfor
+endfunction
+" ]]]
+"  切换显示行号/相对行号 [[[2
 function! s:toggle_number()
 	if &nu && &rnu
 		setlocal nornu
@@ -1267,7 +1287,6 @@ function! s:toggle_number()
 		setlocal nornu
 	endif
 endfunction
-
 " ]]]
 "  退格删除自动缩进 [[[2
 function! Lilydjwg_checklist_bs(pat)
@@ -1461,7 +1480,9 @@ if s:autocomplete_method == 'neocomplcache'
 	" Set minimum syntax keyword length.
 	let g:neocomplcache_min_syntax_length = 3
 	let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
-	let g:neocomplcache_enable_quick_match = 1 " 每次补全菜单弹出时，可以再按一个”-“键，这是补全菜单中的每个候选词会被标上一个字母，只要再输入对应字母就可以马上完成选择。
+	" 每次补全菜单弹出时，可以再按一个”-“键，这是补全菜单中的每个候选词
+	" 会被标上一个字母，只要再输入对应字母就可以马上完成选择。
+	let g:neocomplcache_enable_quick_match = 1
 	let g:neocomplcache_dictionary_filetype_lists = {
 				\ 'default'    : '',
 				\ 'vimshell'   : $HOME.'/.vimshell_hist',
