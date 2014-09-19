@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 18 Sep 2014 02:22 +0800
+"  Last Modified: 19 Sep 2014 22:35 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -405,6 +405,8 @@ if count(s:plugin_groups, 'misc')
 				\ { 'autoload' : {'filetypes':['smali']} }
 	NeoBundle 'lilydjwg/colorizer'
 	NeoBundle 'mhinz/vim-startify'
+	NeoBundleLazy 'openvpn',
+				\ { 'autoload' : {'filetypes':['openvpn']} }
 	NeoBundle 'scrooloose/syntastic'
 	NeoBundleLazy 'Shougo/vimshell.vim',
 				\ {'autoload':{'commands':['VimShell',
