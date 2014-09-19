@@ -413,6 +413,8 @@ if count(s:plugin_groups, 'misc')
 				\ 'VimShellExecute', 'VimShellInteractive',
 				\ 'VimShellTerminal', 'VimShellPop'],
 				\ 'mappings' : ['<Plug>(vimshell_']}}
+	NeoBundleLazy 'dogrover/vim-pentadactyl',
+				\ { 'autoload' : {'filetypes':['pentadactyl']} }
 	NeoBundleLazy 'superbrothers/vim-vimperator',
 				\ { 'autoload' : {'filetypes':['vimperator']} }
 	NeoBundle 'tomasr/molokai'
