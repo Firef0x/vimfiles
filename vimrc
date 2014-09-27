@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 23 Sep 2014 18:47 +0800
+"  Last Modified: 28 Sep 2014 02:53 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -2081,29 +2081,29 @@ let g:rainbow_active = 1
 " 'parentheses': 描述哪些模式将被当作括号处理,每一组括号由两个vim正则表达式描述
 " 'separately': 针对文件类型(由&ft决定)作不同的配置,未被设置的文件类型使用'*'下的配置
 let g:rainbow_conf = {
-\   'guifgs': ['RoyalBlue3', 'DarkOrange3', 'SeaGreen3', 'firebrick3', 'DarkOrchid3'],
-\   'ctermfgs': [
-\             'brown',
-\             'Darkblue',
-\             'darkgray',
-\             'darkgreen',
-\             'darkcyan',
-\             'darkred',
-\             'darkmagenta',
-\             'brown',
-\             'gray',
-\             'black',
-\             'darkmagenta',
-\             'Darkblue',
-\             'darkgreen',
-\             'darkcyan',
-\             'darkred',
-\             'red',
-\             ],
-\   'operators': '_,_',
-\   'parentheses': [['(',')'], ['\[','\]'], ['{','}']],
-\   'separately': {
-\       '*': {},
+\	'guifgs': ['RoyalBlue3', 'DarkOrange3', 'SeaGreen3', 'firebrick3', 'DarkOrchid3'],
+\	'ctermfgs': [
+\			  'brown',
+\			  'lightblue',
+\			  'lightyellow',
+\			  'darkgreen',
+\			  'lightmagenta',
+\			  'lightcyan',
+\			  'darkred',
+\			  'brown',
+\			  'gray',
+\			  'black',
+\			  'darkmagenta',
+\			  'Darkblue',
+\			  'darkgreen',
+\			  'darkcyan',
+\			  'darkred',
+\			  'red',
+\			  ],
+\	'operators': '_,_',
+\	'parentheses': [['(',')'], ['\[','\]'], ['{','}']],
+\	'separately': {
+\		'*': {},
 \		'cpp': {
 \			'parentheses': [['(', ')'], ['\[', '\]'], ['{', '}'],
 \			['\v%(<operator\_s*)@<!%(%(\i|^\_s*|template\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!)', '\v%(-)@<!\>']],
@@ -2112,35 +2112,38 @@ let g:rainbow_conf = {
 \			'parentheses': [['(', ')'], ['\[', '\]'], ['{', '}'],
 \			['\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!', '\v%(-)@<!\>']],
 \		},
-\       'css': 0,
-\       'html': {
+\		'css': 0,
+\		'html': {
 \			'parentheses': [['(',')'], ['\[','\]'], ['{','}'],
 \			['\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>','</\z1>']],
-\       },
+\		},
 \		'java': {
 \			'parentheses': [['(', ')'], ['\[', '\]'], ['{', '}'],
 \			['\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!', '\v%(-)@<!\>']],
+\		},
+\		'php': {
+\			'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold', 'start=/(/ end=/)/ containedin=@htmlPreproc contains=@phpClTop', 'start=/\[/ end=/\]/ containedin=@htmlPreproc contains=@phpClTop', 'start=/{/ end=/}/ containedin=@htmlPreproc contains=@phpClTop'],
 \		},
 \		'rust': {
 \			'parentheses': [['(', ')'], ['\[', '\]'], ['{', '}'],
 \			['\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!', '\v%(-)@<!\>']],
 \		},
-\       'stylus': 0,
-\       'tex': {
-\           'parentheses': [['(',')'], ['\[','\]'], ['\\begin{.*}','\\end{.*}']],
-\       },
-\       'vim': {
-\           'parentheses': [['fu\w* \s*.*)','endfu\w*'], ['for','endfor'], ['while', 'endwhile'], ['if','_elseif\|else_','endif'], ['(',')'], ['\[','\]'], ['{','}']],
-\       },
+\		'stylus': 0,
+\		'tex': {
+\			'parentheses': [['(',')'], ['\[','\]'], ['\\begin{.*}','\\end{.*}']],
+\		},
+\		'vim': {
+\			'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/', 'start=/(/ end=/)/ containedin=vimFuncBody', 'start=/\[/ end=/\]/ containedin=vimFuncBody', 'start=/{/ end=/}/ containedin=vimFuncBody'],
+\		},
 \		'xhtml': {
 \			'parentheses': [['(',')'], ['\[','\]'], ['{','}'],
 \			['\v\<\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'))?)*\>','</\z1>']],
 \		},
-\       'xml': {
-\           'parentheses': [['(',')'], ['\[','\]'], ['{','}'],
+\		'xml': {
+\			'parentheses': [['(',')'], ['\[','\]'], ['{','}'],
 \			['\v\<\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'))?)*\>','</\z1>']],
-\       },
-\   }
+\		},
+\	}
 \}
 " ]]]
 "  CCTree.Vim C Call-Tree Explorer 源码浏览工具 关系树 (赞) [[[2
