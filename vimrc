@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 28 Sep 2014 02:53 +0800
+"  Last Modified: 29 Sep 2014 01:48 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -469,6 +469,7 @@ if !exists('g:VimrcIsLoad')
 	"  设置语言编码 [[[3
 	set langmenu=zh_CN.UTF-8
 	let $LANG='zh_CN.UTF-8'
+	" 显示中文帮助
 	set helplang=cn
 	if s:isWindows && has("multi_byte")
 		set termencoding=cp850
@@ -505,7 +506,7 @@ if !exists('g:VimrcIsLoad')
 endif
 " ]]]
 "  设置更多图形界面选项  [[[2
-" Don't redraw while executing macros (good performance config)
+" 执行宏、寄存器和其它不通过输入的命令时屏幕不会重画(提高性能)
 set lazyredraw
 " Change the terminal's title
 set title
@@ -625,12 +626,14 @@ if !exists('g:VimrcIsLoad')
 endif
 "]]]
 "  关闭错误声音  [[[2
+" 去掉输入错误的提示声音
 set noerrorbells
+" 不要闪烁
 set visualbell t_vb=
 " ]]]
-"   设置文字编辑选项  [[[2
-set background=dark	"dark background 开启molokai终端配色必须指令
-set confirm "read only or haven't saved
+"  设置文字编辑选项  [[[2
+set background=dark "背景使用黑色，开启molokai终端配色必须指令
+set confirm " 在处理未保存或只读文件的时候，弹出确认
 set noexpandtab  "键入Tab时不转换成空格
 set nowrap "不自动换行
 set shiftwidth=4  " 设定 << 和 >> 命令移动时的宽度为 4
@@ -693,6 +696,7 @@ endif
 " ]]]
 "  开启Wild菜单 [[[2
 set wildmode=list:longest,full  " Command <Tab> completion, list matches, then longest common part, then all.
+"  Tab 键的自动完成忽略这些，影响代码提示 [[[3
 " Ignore compiled files
 set wildignore=*.o,*.obj,*~,*.class
 " Ignore Python compiled files
@@ -705,6 +709,7 @@ set wildignore+=**/tmp/**
 set wildignore+=*.png,*.jpg,*.gif,*.xpm,*.tiff
 " 不应该忽略.git，因为会破坏Fugitive的功能，参见 https://github.com/tpope/vim-fugitive/issues/121
 set wildignore+=*.so,*.swp,*.lock,*.db,*.zip,*/.Trash/**,*.pdf,*.xz,*.DS_Store,*/.sass-cache/**
+" ]]]
 " 光标移到行尾时，自动换下一行开头 Backspace and cursor keys wrap too
 set whichwrap=b,s,h,l,<,>,[,]
 " ]]]
@@ -747,6 +752,7 @@ if has('clipboard')
 endif
 " ]]]
 "  设置语法折叠 [[[2
+" 允许折叠
 set foldenable
 " manual  手工定义折叠
 " indent  更多的缩进表示更高级别的折叠
