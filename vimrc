@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 29 Sep 2014 01:48 +0800
+"  Last Modified: 02 Oct 2014 22:35 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -771,8 +771,8 @@ set foldcolumn=0
 augroup Filetype_Specific
 	autocmd!
 	" Arch Linux [[[3
-	" autocmd BufNewFile,BufRead PKGBUILD setlocal syntax=PKGBUILD ft=PKGBUILD
-	" autocmd BufNewFile,BufRead *.install,install setlocal syntax=sh ft=sh
+	autocmd FileType PKGBUILD setlocal tabstop=2 shiftwidth=2 expandtab
+	autocmd BufNewFile,BufRead *.install,install setlocal tabstop=2 shiftwidth=2 expandtab
 	" ]]]
 	" C/C++ [[[3
 	"  Don't autofold anything (but I can still fold manually)
@@ -790,15 +790,15 @@ augroup Filetype_Specific
 	" Javascript [[[3
 	autocmd FileType javascript set dictionary=$VIMFILES/dict/javascript.txt
 	" Javascript Code Modules(Mozilla)
-	autocmd BufNewFile,BufRead *.jsm setlocal ft=javascript
+	autocmd BufNewFile,BufRead *.jsm setlocal filetype=javascript
 	" jQuery syntax
-	autocmd BufNewFile,BufRead jquery.*.js setlocal ft=javascript syntax=jquery
+	autocmd BufNewFile,BufRead jquery.*.js setlocal filetype=javascript syntax=jquery
 	" ]]]
 	" Markdown [[[3
 	autocmd FileType markdown setlocal nolist
 	" ]]]
 	" OpenSUSE Build Service [[[3
-	autocmd BufNewFile,BufRead _service setlocal ft=xml
+	autocmd BufNewFile,BufRead _service setlocal filetype=xml
 	" ]]]
 	" PHP [[[3
 	" PHP 生成的SQL/HTML代码高亮
@@ -812,11 +812,11 @@ augroup Filetype_Specific
 	autocmd FileType python setlocal tabstop=4 shiftwidth=4 expandtab foldmethod=indent
 	" ]]]
 	" Smali [[[3
-	autocmd BufNewFile,BufRead *.smali setlocal ft=smali syntax=smali
+	autocmd BufNewFile,BufRead *.smali setlocal filetype=smali syntax=smali
 	" ]]]
 	" VimFiles [[[3
 	autocmd FileType vim noremap <buffer> <F1> <Esc>:help <C-r><C-w><CR>
-	autocmd FileType vim setlocal fdm=indent keywordprg=:help
+	autocmd FileType vim setlocal foldmethod=indent keywordprg=:help
 	" ]]]
 	" More ignored extensions [[[3
 	" (modified from the standard one)
@@ -828,24 +828,25 @@ augroup Filetype_Specific
 		echomsg "Warning: some filetypes will not be recognized because this version of vim does not have fnameescape()"
 	endif
 
-	autocmd BufNewFile,BufRead *.lrc setlocal ft=lrc
-	autocmd BufNewFile,BufRead *.asm,*.asm setlocal ft=masm
-	autocmd BufRead *access[._]log* setlocal ft=httplog
-	autocmd BufNewFile,BufRead .htaccess.* setlocal ft=apache
-	autocmd BufRead pacman.log setlocal ft=pacmanlog
-	autocmd BufRead /var/log/*.log* setlocal ft=messages
-	autocmd BufNewFile,BufRead *.aspx,*.ascx setlocal ft=html
-	autocmd BufRead grub.cfg,burg.cfg setlocal ft=sh
-	autocmd BufNewFile,BufRead $VIMFILES/dict/*.txt setlocal ft=dict
-	autocmd BufNewFile,BufRead fcitx_skin.conf,*/fcitx*.{conf,desc}*,*/fcitx/profile setlocal ft=dosini
-	autocmd BufNewFile,BufRead mimeapps.list setlocal ft=desktop
-	autocmd BufRead *tmux.conf setlocal ft=tmux
-	autocmd BufRead rc.conf setlocal ft=sh
-	autocmd BufRead *.grf,*.url setlocal ft=dosini
-	autocmd BufNewFile,BufRead ejabberd.cfg* setlocal ft=erlang
-	autocmd BufNewFile,BufRead */xorg.conf.d/* setlocal ft=xf86conf
-	autocmd BufNewFile,BufRead hg-editor-*.txt setlocal ft=hgcommit
-	autocmd BufNewFile,BufRead *openvpn*/*.conf,*.ovpn setlocal ft=openvpn
+	autocmd BufNewFile,BufRead *.lrc setlocal filetype=lrc
+	autocmd BufNewFile,BufRead *.asm,*.asm setlocal filetype=masm
+	autocmd BufRead *access[._]log* setlocal filetype=httplog
+	autocmd BufNewFile,BufRead .htaccess.* setlocal filetype=apache
+	autocmd BufRead pacman.log setlocal filetype=pacmanlog
+	autocmd BufRead /var/log/*.log* setlocal filetype=messages
+	autocmd BufNewFile,BufRead *.aspx,*.ascx setlocal filetype=html
+	autocmd BufRead grub.cfg,burg.cfg setlocal filetype=sh
+	autocmd BufNewFile,BufRead $VIMFILES/dict/*.txt setlocal filetype=dict
+	autocmd BufNewFile,BufRead fcitx_skin.conf,*/fcitx*.{conf,desc}*,*/fcitx/profile setlocal filetype=dosini
+	autocmd BufNewFile,BufRead /etc/goagent setlocal filetype=dosini
+	autocmd BufNewFile,BufRead mimeapps.list setlocal filetype=desktop
+	autocmd BufRead *tmux.conf setlocal filetype=tmux
+	autocmd BufRead rc.conf setlocal filetype=sh
+	autocmd BufRead *.grf,*.url setlocal filetype=dosini
+	autocmd BufNewFile,BufRead ejabberd.cfg* setlocal filetype=erlang
+	autocmd BufNewFile,BufRead */xorg.conf.d/* setlocal filetype=xf86conf
+	autocmd BufNewFile,BufRead hg-editor-*.txt setlocal filetype=hgcommit
+	autocmd BufNewFile,BufRead *openvpn*/*.conf,*.ovpn setlocal filetype=openvpn
 	" ]]]
 	" Websites [[[3
 	" 取自 https://github.com/lilydjwg/dotvim
