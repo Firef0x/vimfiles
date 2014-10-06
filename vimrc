@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 02 Oct 2014 22:35 +0800
+"  Last Modified: 06 Oct 2014 12:47 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -1776,6 +1776,10 @@ let s:unite_ignores = [
 function! bundle.hooks.on_source(bundle)
 	call unite#filters#matcher_default#use(['matcher_fuzzy'])
 	call unite#filters#sorter_default#use(['sorter_rank'])
+	call unite#custom#profile('default', 'context', {
+				\ 'start_insert': 1,
+				\ 'direction': 'botright',
+				\ })
 	call unite#custom#profile('files', 'smartcase', 1)
 	call unite#custom#source('line,outline','matchers','matcher_fuzzy')
 	call unite#custom#source('file_rec/async,file_mru,file_rec,buffer',
@@ -1792,7 +1796,6 @@ endfunction
 
 let g:unite_data_directory = s:get_cache_dir("unite")
 " Start in insert mode
-let g:unite_enable_start_insert = 1
 let g:unite_enable_short_source_names = 1
 let g:unite_cursor_line_highlight = 'TabLineSel'
 " Enable history yank source
