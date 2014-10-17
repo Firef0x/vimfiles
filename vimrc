@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 06 Oct 2014 12:47 +0800
+"  Last Modified: 17 Oct 2014 08:46 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -136,9 +136,8 @@ if s:hasLua
 endif
 "  ]]]
 "  设置NeoBundle [[[2
-filetype off
 set runtimepath+=$VIMFILES/bundle/neobundle.vim/
-call neobundle#rc(expand("$VIMFILES/bundle/"))
+call neobundle#begin(expand("$VIMFILES/bundle/"))
 " set shellquote="\""
 " set shellxquote="\""
 " set noshellslash
@@ -442,6 +441,7 @@ if count(s:plugin_groups, 'misc')
 endif
 " ]]]
 "  使用NeoBundle关闭，结束时开始 [[[2
+call neobundle#end()
 "  针对不同的文件类型加载对应的插件
 filetype plugin indent on     " required!
 " ]]]
@@ -1780,7 +1780,9 @@ function! bundle.hooks.on_source(bundle)
 				\ 'start_insert': 1,
 				\ 'direction': 'botright',
 				\ })
-	call unite#custom#profile('files', 'smartcase', 1)
+	call unite#custom#profile('files', 'context', {
+				\ 'smartcase': 1,
+				\ })
 	call unite#custom#source('line,outline','matchers','matcher_fuzzy')
 	call unite#custom#source('file_rec/async,file_mru,file_rec,buffer',
 				\ 'matchers',['converter_tail', 'matcher_fuzzy'])
