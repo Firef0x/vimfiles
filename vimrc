@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 17 Oct 2014 08:46 +0800
+"  Last Modified: 01 Nov 2014 13:21 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -194,21 +194,28 @@ endif
 " ]]]
 "  文本编辑 [[[2
 if count(s:plugin_groups, 'editing')
-	" tabular 比 Align 更简单，所以替换
-	" NeoBundle 'Align'
+	" 比较指定文本块
+	NeoBundleLazy 'AndrewRadev/linediff.vim',
+				\ {'autoload':{'commands':[
+				\ 'Linediff',
+				\ 'LinediffReset'
+				\ ]}}
 	" 打散合并单行语句
 	NeoBundleLazy 'AndrewRadev/splitjoin.vim',
 				\ {'autoload':{'commands':[
 				\ 'SplitjoinJoin',
-				\ 'SplitjoinSplit']}}
+				\ 'SplitjoinSplit'
+				\ ]}}
 	" auto-pairs 比 AutoClose 更好用
 	" NeoBundle 'AutoClose'
 	NeoBundle 'chrisbra/NrrwRgn'
 	NeoBundle 'dimasg/vim-mark'
+	" tabular 比 Align 更简单，所以替换
 	NeoBundleLazy 'godlygeek/tabular',
 				\ {'autoload':{'commands':[
 				\ 'Tabularize',
-				\ 'AddTabularPipeline']}}
+				\ 'AddTabularPipeline'
+				\ ]}}
 	NeoBundle 'jiangmiao/auto-pairs'
 	" 自动更新 Last Modified 字符串
 	NeoBundle 'jmcantrell/vim-lastmod'
@@ -218,7 +225,8 @@ if count(s:plugin_groups, 'editing')
 				\ {'autoload':{'commands':[
 				\ 'ScratchClose',
 				\ 'ScratchEvaluate',
-				\ 'ScratchOpen']}}
+				\ 'ScratchOpen'
+				\ ]}}
 	" rainbow 是 rainbow_parentheses.vim 的改进版，所以替换
 	" NeoBundle 'kien/rainbow_parentheses.vim'
 	NeoBundle 'Lokaltog/vim-easymotion'
@@ -257,13 +265,24 @@ if count(s:plugin_groups, 'javascript')
 	NeoBundleLazy 'pangloss/vim-javascript',
 				\ {'autoload':{'filetypes':['javascript']}}
 	NeoBundleLazy 'othree/javascript-libraries-syntax.vim',
-				\ {'autoload':{'filetypes':['javascript', 'coffee',
-				\	'ls', 'typescript']}}
+				\ {'autoload':{'filetypes':[
+				\ 'javascript',
+				\ 'coffee',
+				\ 'ls',
+				\ 'typescript'
+				\ ]}}
 	if executable('node') || executable('nodejs')
 		NeoBundleLazy 'maksimr/vim-jsbeautify',
-					\ { 'autoload' : {'commands':['CSSBeautify',
-					\	'JsBeautify', 'HtmlBeautify'],
-					\ 'filetypes':['javascript']}}
+					\ { 'autoload' : {'commands':[
+					\ 'CSSBeautify',
+					\ 'JsBeautify',
+					\ 'HtmlBeautify'
+					\ ],
+					\ 'filetypes':[
+					\ 'html',
+					\ 'javascript',
+					\ 'json'
+					\ ]}}
 	endif
 endif
 " ]]]
@@ -293,8 +312,10 @@ if count(s:plugin_groups, 'navigation')
 		" C Call-Tree Explorer 源码浏览工具
 		if s:hasCscope
 			NeoBundleLazy 'CCTree',
-					\ {'autoload':{'commands':['CCTreeLoadDB',
-					\	'CCTreeLoadXRefDBFromDisk']}}
+					\ {'autoload':{'commands':[
+					\ 'CCTreeLoadDB',
+					\ 'CCTreeLoadXRefDBFromDisk'
+					\ ]}}
 		endif
 		NeoBundleLazy 'majutsushi/tagbar',
 					\ {'autoload':{'commands':'TagbarToggle'}}
@@ -307,10 +328,10 @@ if count(s:plugin_groups, 'navigation')
 				\ {'autoload':{'filetypes':['c', 'cpp']}}
 	" 对三路合并时的<<< >>> === 标记语法高亮
 	NeoBundle 'ConflictDetection',
-				\ { 'depends': 'ingo-library' }
+				\ {'depends':'ingo-library'}
 	" 在三路合并时的<<< >>> === 代码块之间快速移动
 	NeoBundle 'ConflictMotions',
-				\ { 'depends': ['ingo-library', 'CountJump'] }
+				\ {'depends':['ingo-library','CountJump']}
 	NeoBundle 'jistr/vim-nerdtree-tabs',
 				\ {'depends':['scrooloose/nerdtree'],
 				\ 'autoload':{'commands':'NERDTreeTabsToggle'}}
@@ -354,8 +375,12 @@ if count(s:plugin_groups, 'unite')
 	NeoBundleLazy 'Shougo/unite.vim',
 				\ {'autoload':{'commands':'Unite'}}
 	NeoBundleLazy 'Shougo/neomru.vim',
-				\ {'autoload':{'unite_sources':['neomru/file',
-				\ 'neomru/directory', 'file_mru', 'directory_mru']}}
+				\ {'autoload':{'unite_sources':[
+				\ 'neomru/file',
+				\ 'neomru/directory',
+				\ 'file_mru',
+				\ 'directory_mru'
+				\ ]}}
 	NeoBundleLazy 'Shougo/unite-help',
 				\ {'autoload':{'unite_sources':'help'}}
 	NeoBundleLazy 'Shougo/unite-outline',
@@ -369,18 +394,22 @@ if count(s:plugin_groups, 'web')
 	NeoBundleLazy 'amirh/HTML-AutoCloseTag',
 				\ {'autoload':{'filetypes':['html', 'xml']}}
 	NeoBundleLazy 'ap/vim-css-color',
-				\ {'autoload':{'filetypes':[ 'css', 'scss',
-				\	'sass', 'less']}}
+				\ {'autoload':{'filetypes':[
+				\ 'css',
+				\ 'scss',
+				\ 'sass',
+				\ 'less'
+				\ ]}}
 	NeoBundleLazy 'ariutta/Css-Pretty',
 				\ {'autoload':{'commands':'Csspretty',
-				\	'filetypes':['css']}}
+				\ 'filetypes':['css']}}
 	NeoBundleLazy 'evanmiller/nginx-vim-syntax',
 				\ {'autoload':{'filetypes':['nginx']}}
 	NeoBundleLazy 'gregsexton/MatchTag',
 				\ {'autoload':{'filetypes':[ 'html', 'xml', 'xsl']}}
 	NeoBundleLazy 'mattn/emmet-vim',
 				\ {'autoload':{'filetypes':['html', 'xml', 'xsl', 'xslt',
-				\	'xsd', 'css', 'sass', 'scss', 'less', 'mustache']}}
+				\ 'xsd', 'css', 'sass', 'scss', 'less', 'mustache']}}
 	NeoBundleLazy 'othree/html5.vim',
 				\ {'autoload':{'filetypes':['html']}}
 	NeoBundleLazy 'othree/html5-syntax.vim',
@@ -399,26 +428,30 @@ if count(s:plugin_groups, 'misc')
 	" NeoBundle 'Conque-Shell'
 	NeoBundle 'asins/vimcdoc'
 	NeoBundleLazy 'git@github.com:Firef0x/PKGBUILD.vim',
-				\ { 'autoload' : {'filetypes':['PKGBUILD']} }
+				\ {'autoload':{'filetypes':['PKGBUILD']}}
 	NeoBundleLazy 'git@github.com:Firef0x/vim-smali',
-				\ { 'autoload' : {'filetypes':['smali']} }
+				\ {'autoload':{'filetypes':['smali']}}
 	NeoBundle 'lilydjwg/colorizer'
 	NeoBundle 'mhinz/vim-startify'
 	NeoBundleLazy 'openvpn',
-				\ { 'autoload' : {'filetypes':['openvpn']} }
+				\ {'autoload':{'filetypes':['openvpn']}}
 	NeoBundle 'scrooloose/syntastic'
 	NeoBundleLazy 'Shougo/vimshell.vim',
-				\ {'autoload':{'commands':['VimShell',
-				\ 'VimShellExecute', 'VimShellInteractive',
-				\ 'VimShellTerminal', 'VimShellPop'],
-				\ 'mappings' : ['<Plug>(vimshell_']}}
+				\ {'autoload':{'commands':[
+				\ 'VimShell',
+				\ 'VimShellExecute',
+				\ 'VimShellInteractive',
+				\ 'VimShellTerminal',
+				\ 'VimShellPop'
+				\ ],
+				\ 'mappings':['<Plug>(vimshell_']}}
 	NeoBundleLazy 'dogrover/vim-pentadactyl',
-				\ { 'autoload' : {'filetypes':['pentadactyl']} }
+				\ {'autoload':{'filetypes':['pentadactyl']}}
 	NeoBundleLazy 'superbrothers/vim-vimperator',
-				\ { 'autoload' : {'filetypes':['vimperator']} }
+				\ {'autoload':{'filetypes':['vimperator']}}
 	NeoBundle 'tomasr/molokai'
 	NeoBundleLazy 'tpope/vim-markdown',
-				\ { 'autoload' : {'filetypes':['markdown']} }
+				\ {'autoload':{'filetypes':['markdown']}}
 	" NeoBundle 'xieyu/vim-assist'
 
 	" 从 vim-scripts repos 中安装的脚本 [[[3
@@ -429,10 +462,12 @@ if count(s:plugin_groups, 'misc')
 	NeoBundle 'mbbill/fencview'
 	" PO (Portable Object, gettext)
 	NeoBundleLazy 'po.vim--gray',
-				\ { 'autoload' : {'filetypes':['po']} }
+				\ {'autoload':{'filetypes':['po']}}
+	" 重命名当前文件
+	NeoBundle 'Rename'
 	" STL语法高亮
 	NeoBundleLazy 'STL-improved',
-				\ { 'autoload' : {'filetypes':['c', 'cpp']} }
+				\ {'autoload':{'filetypes':['c', 'cpp']}}
 	" Ctrl-V选择区域，然后按:B执行命令，或按:S查找匹配字符串
 	NeoBundle 'vis'
 	" Make a column of increasing or decreasing numbers
@@ -1728,7 +1763,7 @@ set completeopt-=preview
 "  Netrw使用curl [[[2
 if executable("curl")
 	let g:netrw_http_cmd = "curl"
-	let g:netrw_http_xcmd = "--compressed -o"
+	let g:netrw_http_xcmd = "-L --compressed -o"
 endif
 "  ]]]
 "  PIV [[[2
