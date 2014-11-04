@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 01 Nov 2014 13:21 +0800
+"  Last Modified: 04 Nov 2014 10:59 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -1521,7 +1521,10 @@ if s:autocomplete_method == 'neocomplcache'
 	let g:neocomplcache_enable_fuzzy_completion = 1
 	" Set minimum syntax keyword length.
 	let g:neocomplcache_min_syntax_length = 3
-	let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
+	" buffer file name pattern that disables neocomplcache.
+	let g:neocomplcache_disable_caching_file_path_pattern = '\.log\|\.log\.\|.*quickrun.*\|\.jax\|Log.txt\|\.user.js'
+	" buffer file name pattern that locks neocomplcache. e.g. ku.vim or fuzzyfinder
+	let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*\|\*unite\*\|Command Line'
 	" 每次补全菜单弹出时，可以再按一个”-“键，这是补全菜单中的每个候选词
 	" 会被标上一个字母，只要再输入对应字母就可以马上完成选择。
 	let g:neocomplcache_enable_quick_match = 1
@@ -1622,7 +1625,11 @@ elseif s:autocomplete_method == 'neocomplete'
 	let g:neocomplete#enable_auto_delimiter = 1
 	" Set minimum syntax keyword length.
 	let g:neocomplete#sources#syntax#min_keyword_length = 3
-	let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
+	" buffer file name pattern that disables neocomplete.
+	let g:neocomplete#sources#buffer#disabled_pattern = '\.log\|\.log\.\|.*quickrun.*\|\.jax\|Log.txt\|\.user.js'
+	" buffer file name pattern that locks neocomplete. e.g. ku.vim or fuzzyfinder
+	let g:neocomplete#lock_buffer_name_pattern = '\*ku\*\|\*unite\*\|Command Line'
+	let g:neocomplete#sources#buffer#cache_limit_size = 300000
 
 	" Define dictionary.
 	let g:neocomplete#sources#dictionary#dictionaries = {
@@ -1793,6 +1800,8 @@ let g:tagbar_type_pgsql = {
 			\ }
 " autocmd MyAutoCmd BufReadPost *.cpp,*.c,*.h,*.hpp,*.cc,*.cxx,*.ini call tagbar#autoopen()
 autocmd MyAutoCmd BufReadPost *.cpp,*.c,*.h,*.hpp,*.cc,*.cxx call tagbar#autoopen()
+"  忽略 .user.js 和 JSON 格式文件
+autocmd MyAutoCmd BufReadPost *.user.js,*.json,*.jsonp let b:tagbar_ignore = 1
 " ]]]
 "  Unite [[[2
 let bundle = neobundle#get('unite.vim')
@@ -2259,6 +2268,10 @@ endif
 if !s:hasPython
 	let g:TagHighlightSettings['ForcedPythonVariant'] = 'compiled'
 endif
+let g:TagHighlightSettings['LanguageDetectionMethods'] =
+	\ ['Extension', 'FileType']
+let g:TagHighlightSettings['FileTypeLanguageOverrides'] =
+	\ {'tagbar':'cpp', 'javascript':'', 'json':''}
 "  ]]]
 "  Vim Indent Guide [[[2
 let g:indent_guides_start_level = 1
