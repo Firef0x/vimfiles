@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 07 Nov 2014 20:58 +0800
+"  Last Modified: 08 Nov 2014 01:29 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -279,9 +279,13 @@ if count(s:plugin_groups, 'javascript')
 					\ 'HtmlBeautify'
 					\ ],
 					\ 'filetypes':[
+					\ 'css',
 					\ 'html',
 					\ 'javascript',
-					\ 'json'
+					\ 'jinja',
+					\ 'json',
+					\ 'less',
+					\ 'mustache'
 					\ ]}}
 	endif
 endif
@@ -833,7 +837,7 @@ augroup Filetype_Specific
 	autocmd FileType markdown setlocal nolist
 	" ]]]
 	" OpenSUSE Build Service [[[3
-	autocmd BufNewFile,BufRead _service setlocal filetype=xml
+	autocmd BufNewFile,BufRead _meta,_service setlocal filetype=xml
 	" ]]]
 	" PHP [[[3
 	" PHP 生成的SQL/HTML代码高亮
@@ -2308,8 +2312,7 @@ nmap k <Plug>(accelerated_jk_gk)
 nnoremap <silent> <C-F4> :Ack<CR>
 "  ]]]
 "  开关CCTree Ctrl-F12 [[[3
-if s:hasCTags && s:hasCscope
-	nmap <C-F12> :call LoadCCTree()<CR>
+if s:hasCTags && s:hasCscope && neobundle#tap('CCTree')
 	function! LoadCCTree()
 		if filereadable('cctree.out')
 			execute "CCTreeLoadXRefDBFromDisk cctree.out"
@@ -2317,6 +2320,8 @@ if s:hasCTags && s:hasCscope
 			execute "CCTreeLoadDB cscope.out"
 		endif
 	endfunction
+	nmap <C-F12> :call LoadCCTree()<CR>
+	call neobundle#untap()
 endif
 "  ]]]
 "  开关Fugitive <Leader>g{c,d,r,w} [[[3
@@ -2334,16 +2339,22 @@ nnoremap <silent> <Leader>gg :GitGutterToggle<CR>
 "  ]]]
 "  开关NERDTree F2 [[[3
 function! ShowNerdTree()
-	execute "TagbarClose"
+	silent execute "TagbarClose"
 	execute "NERDTreeTabsToggle"
 endfunction
 nmap <F2> :call ShowNerdTree()<CR>
 " ]]]
 "  开关Tagbar F3 [[[3
-nmap <F3> :TagbarToggle<CR>
+if neobundle#tap('tagbar')
+	nmap <silent> <F3> :TagbarToggle<CR>
+	call neobundle#untap()
+endif
 " ]]]
 "  开关SrcExpl F4 [[[3
-nnoremap <silent> <F4> :SrcExplToggle<CR>
+if neobundle#tap('SrcExpl')
+	nmap <silent> <F4> :SrcExplToggle<CR>
+	call neobundle#untap()
+endif
 "  ]]]
 "  开关撤销树 F8 [[[3
 nmap <silent> <F8> :UndotreeToggle<CR>
@@ -2460,12 +2471,19 @@ nnoremap <silent> <M-s> :<C-U>SudoUpDate<CR>
 inoremap <silent> <M-s> <C-O>:SudoUpDate<CR><CR>
 vnoremap <silent> <M-s> <C-C>:SudoUpDate<CR>
 " ]]]
-"  Vim-JSBeautify 格式化javascript <Leader>ff [[[3
-augroup Filetype_Specific
-	autocmd FileType javascript nnoremap <buffer> <Leader>ff :call JsBeautify()<CR>
-	autocmd FileType html nnoremap <buffer> <Leader>ff :call HtmlBeautify()<CR>
-	autocmd FileType css nnoremap <buffer> <Leader>ff :call CSSBeautify()<CR>
-augroup END
+"  Vim-JSBeautify 格式化CSS,HTML,JavaScript <Leader>ff [[[3
+if neobundle#tap('vim-jsbeautify')
+	augroup Filetype_Specific
+		" for css or scss
+		autocmd FileType css nnoremap <buffer> <Leader>ff :call CSSBeautify()<CR>
+		autocmd FileType css vnoremap <buffer> <leader>ff :call RangeCSSBeautify()<CR>
+		autocmd FileType html nnoremap <buffer> <Leader>ff :call HtmlBeautify()<CR>
+		autocmd FileType html vnoremap <buffer> <leader>ff :call RangeHtmlBeautify()<CR>
+		autocmd FileType javascript,json nnoremap <buffer> <Leader>ff :call JsBeautify()<CR>
+		autocmd FileType javascript,json vnoremap <buffer> <leader>ff :call RangeJsBeautify()<CR>
+	augroup END
+	call neobundle#untap()
+endif
 "  ]]]
 " NeoBundle 更新所有插件  :Nbupd  [[[3
 command! -nargs=0 Nbupd Unite neobundle/update -vertical -no-start-insert
