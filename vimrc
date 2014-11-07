@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 04 Nov 2014 10:59 +0800
+"  Last Modified: 07 Nov 2014 20:58 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -743,7 +743,7 @@ set wildignore+=**/tmp/**
 " Ignore image file
 set wildignore+=*.png,*.jpg,*.gif,*.xpm,*.tiff
 " 不应该忽略.git，因为会破坏Fugitive的功能，参见 https://github.com/tpope/vim-fugitive/issues/121
-set wildignore+=*.so,*.swp,*.lock,*.db,*.zip,*/.Trash/**,*.pdf,*.xz,*.DS_Store,*/.sass-cache/**
+set wildignore+=*.so,*.swp,*.lock,*.db,*.zip,*/.Trash/**,*.pdf,*.xz,*.DS_Store,*/.sass-cache/*,*/node_modules/*
 " ]]]
 " 光标移到行尾时，自动换下一行开头 Backspace and cursor keys wrap too
 set whichwrap=b,s,h,l,<,>,[,]
@@ -1483,6 +1483,7 @@ let NERDTreeIgnore = [
 					\ '\.svn',
 					\ '\.swo$',
 					\ '\.swp$',
+					\ 'node_modules',
 					\ '^\.$',
 					\ '^\.\.$',
 					\ ]
@@ -1815,6 +1816,7 @@ let s:unite_ignores = [
 				\ '\.idea/',
 				\ '\.rvm/',
 				\ '\.svn/',
+				\ 'node_modules/',
 				\ ]
 
 function! bundle.hooks.on_source(bundle)
@@ -2114,7 +2116,7 @@ endif
 
 " let g:ctrlp_cache_dir = s:get_cache_dir("ctrlp")
 " let g:ctrlp_custom_ignore = {
-"     \ 'dir':  '\v[\/]\.(bzr|git|hg|idea|rvm|sass-cache|svn)$',
+"     \ 'dir' : '\v[\/](\.bzr|\.git|\.hg|\.idea|\.rvm|\.sass-cache|\.svn|node_modules)$',
 "     \ 'file': '\v\.(dll|exe|o|pyc|pyo|so|DS_Store)$' }
 
 " let g:ctrlp_user_command = {
