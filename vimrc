@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 08 Nov 2014 01:29 +0800
+"  Last Modified: 09 Nov 2014 19:14 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -744,10 +744,12 @@ set wildignore+=*.pyc,*.pyo,*/__pycache__/**,*.egginfo/**
 set wildignore+=*.gem
 " Ignore temp folder
 set wildignore+=**/tmp/**
+" Ignore Node.js modules
+set wildignore+=*/node_modules/**
 " Ignore image file
 set wildignore+=*.png,*.jpg,*.gif,*.xpm,*.tiff
 " 不应该忽略.git，因为会破坏Fugitive的功能，参见 https://github.com/tpope/vim-fugitive/issues/121
-set wildignore+=*.so,*.swp,*.lock,*.db,*.zip,*/.Trash/**,*.pdf,*.xz,*.DS_Store,*/.sass-cache/*,*/node_modules/*
+set wildignore+=*.so,*.swp,*.lock,*.db,*.zip,*/.Trash/**,*.pdf,*.xz,*.DS_Store,*/.sass-cache/**
 " ]]]
 " 光标移到行尾时，自动换下一行开头 Backspace and cursor keys wrap too
 set whichwrap=b,s,h,l,<,>,[,]
@@ -849,9 +851,6 @@ augroup Filetype_Specific
 	" ]]]
 	" Python 文件的一般设置，比如不要 tab 等 [[[3
 	autocmd FileType python setlocal tabstop=4 shiftwidth=4 expandtab foldmethod=indent
-	" ]]]
-	" Smali [[[3
-	autocmd BufNewFile,BufRead *.smali setlocal filetype=smali syntax=smali
 	" ]]]
 	" VimFiles [[[3
 	autocmd FileType vim noremap <buffer> <F1> <Esc>:help <C-r><C-w><CR>
