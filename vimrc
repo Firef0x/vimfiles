@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 09 Nov 2014 19:14 +0800
+"  Last Modified: 18 Nov 2014 01:04 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -119,6 +119,7 @@ if !s:isWindows
 else
 	call add(s:plugin_groups, 'windows')
 endif
+call add(s:plugin_groups, 'lint')
 if s:hasLua
 	call add(s:plugin_groups, 'lua')
 endif
@@ -136,7 +137,9 @@ if s:hasLua
 endif
 "  ]]]
 "  设置NeoBundle [[[2
-set runtimepath+=$VIMFILES/bundle/neobundle.vim/
+if has('vim_starting')
+	set runtimepath+=$VIMFILES/bundle/neobundle.vim/
+endif
 call neobundle#begin(expand("$VIMFILES/bundle/"))
 " set shellquote="\""
 " set shellxquote="\""
@@ -302,6 +305,13 @@ if count(s:plugin_groups, 'linux')
 	endif
 endif
 " ]]]
+"  代码检查 [[[2
+if count(s:plugin_groups, 'lint')
+	NeoBundle 'scrooloose/syntastic'
+	NeoBundle 'syngan/vim-vimlint',
+				\ {'depends':'ynkdir/vim-vimlparser'}
+endif
+" ]]]
 "  Lua [[[2
 if count(s:plugin_groups, 'lua')
 	" NeoBundleLazy 'luarefvim',
@@ -439,7 +449,6 @@ if count(s:plugin_groups, 'misc')
 	NeoBundle 'mhinz/vim-startify'
 	NeoBundleLazy 'openvpn',
 				\ {'autoload':{'filetypes':['openvpn']}}
-	NeoBundle 'scrooloose/syntastic'
 	NeoBundleLazy 'Shougo/vimshell.vim',
 				\ {'autoload':{'commands':[
 				\ 'VimShell',
@@ -1988,21 +1997,28 @@ nmap <Leader>sc :ScratchOpen<CR>
 let xml_use_xhtml = 1
 " ]]]
 "  Syntastic 语法检查 [[[2
-if !s:isWindows
-	" let g:syntastic_error_symbol         = '✗'
-	" let g:syntastic_style_error_symbol   = '✠'
-	" let g:syntastic_warning_symbol       = '⚠'
-	" let g:syntastic_style_warning_symbol = '≈'
-	let g:syntastic_error_symbol         = "\u2717"
-	let g:syntastic_style_error_symbol   = "\u2720"
-	let g:syntastic_warning_symbol       = "\u26a0"
-	let g:syntastic_style_warning_symbol = "\u2248"
-endif
-let g:syntastic_mode_map = { 'mode': 'passive',
-			\ 'active_filetypes': ['lua', 'php', 'sh'],
-			\ 'passive_filetypes': ['puppet'] }
+if neobundle#tap('syntastic')
+	if !s:isWindows
+		" let g:syntastic_error_symbol         = '✗'
+		" let g:syntastic_style_error_symbol   = '✠'
+		" let g:syntastic_warning_symbol       = '⚠'
+		" let g:syntastic_style_warning_symbol = '≈'
+		let g:syntastic_error_symbol         = "\u2717"
+		let g:syntastic_style_error_symbol   = "\u2720"
+		let g:syntastic_warning_symbol       = "\u26a0"
+		let g:syntastic_style_warning_symbol = "\u2248"
+	endif
+	let g:syntastic_mode_map = { 'mode': 'passive',
+				\ 'active_filetypes': ['lua', 'php', 'sh', 'vim'],
+				\ 'passive_filetypes': ['puppet'] }
 
-"   ]]]
+	"  Checkers for Syntastic [[[3
+	"  VimL
+	let g:syntastic_vim_checkers=['vimlint']
+	"  ]]]
+	call neobundle#untap()
+endif
+"  ]]]
 "  UndoTree 撤销树视图 [[[2
 let g:undotree_SplitLocation = 'botright'
 " If undotree is opened, it is likely one wants to interact with it.
@@ -2278,7 +2294,7 @@ let g:TagHighlightSettings['LanguageDetectionMethods'] =
 let g:TagHighlightSettings['FileTypeLanguageOverrides'] =
 	\ {'tagbar':'cpp', 'javascript':'', 'json':''}
 "  ]]]
-"  Vim Indent Guide [[[2
+"  Vim Indent Guide 以灰色显示缩进块 [[[2
 let g:indent_guides_start_level = 1
 let g:indent_guides_guide_size = 1
 let g:indent_guides_enable_on_vim_startup = 1
@@ -2290,6 +2306,14 @@ if s:isGUI==0
 		hi IndentGuidesEven ctermbg = 236
 	endfunction
 	autocmd MyAutoCmd VimEnter,Colorscheme * call s:indent_set_console_colors()
+endif
+"  ]]]
+"  VimLint VimL语法检查工具 [[[2
+if neobundle#tap('vim-vimlint')
+	let g:vimlint#config = {
+				\ 'quiet' : 1,
+				\ 'EVL103': 1}
+	call neobundle#untap()
 endif
 "  ]]]
 "  vimperator.vim [[[2
