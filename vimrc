@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 18 Nov 2014 01:41 +0800
+"  Last Modified: 18 Nov 2014 02:22 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -909,10 +909,10 @@ autocmd MyAutoCmd BufEnter,BufNewFile,BufRead *
 " ]]]
 " Ack/Ag 程序参数及输出格式选项 [[[2
 if executable('ag')
-	set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow
+	set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow\ --ignore\ '.hg'\ --ignore\ '.svn'\ --ignore\ '.git'\ --ignore\ '.bzr'
 	set grepformat=%f:%l:%c:%m
 elseif executable('ack')
-	set grepprg=ack\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow\ $*
+	set grepprg=ack\ --nogroup\ --column\ --smart-case\ --no-color\ --follow\ $*
 	set grepformat=%f:%l:%c:%m
 endif
 " ]]]
@@ -1819,136 +1819,157 @@ autocmd MyAutoCmd BufReadPost *.cpp,*.c,*.h,*.hpp,*.cc,*.cxx call tagbar#autoope
 autocmd MyAutoCmd BufReadPost *.user.js,*.json,*.jsonp let b:tagbar_ignore = 1
 " ]]]
 "  Unite [[[2
-let bundle = neobundle#get('unite.vim')
-				" \ '__pycache__/',
-				" \ 'tmp/',
-				" \ '\.sass-cache/',
-let s:unite_ignores = [
-				\ '\.bzr/',
-				\ '\.git/',
-				\ '\.hg/',
-				\ '\.idea/',
-				\ '\.rvm/',
-				\ '\.svn/',
-				\ 'node_modules/',
-				\ ]
+if neobundle#tap('unite.vim')
+	function! neobundle#hooks.on_source(bundle)
+		let s:unite_ignores = [
+					\ '__pycache__/',
+					\ '\.bzr/',
+					\ '\.git/',
+					\ '\.hg/',
+					\ '\.idea/',
+					\ '\.rvm/',
+					\ '\.sass-cache/',
+					\ '\.svn/',
+					\ 'node_modules/',
+					\ ]
+		" Default configuration.
+		let s:default_context = {
+					\ 'cursor_line_highlight' : 'TabLineSel',
+					\ 'direction': 'botright',
+					\ 'short_source_names' : 1,
+					\ 'start_insert': 1,
+					\ 'vertical' : 0,
+					\ }
+		if !s:isWindows
+			" let s:default_context.prompt =  '▸'
+			let s:default_context.prompt =  "\u25b8"
+			" let s:default_context.marked_icon = '✗'
+			let s:default_context.marked_icon = "\u2717"
+		endif
 
-function! bundle.hooks.on_source(bundle)
-	call unite#filters#matcher_default#use(['matcher_fuzzy'])
-	call unite#filters#sorter_default#use(['sorter_rank'])
-	call unite#custom#profile('default', 'context', {
-				\ 'start_insert': 1,
-				\ 'direction': 'botright',
-				\ })
-	call unite#custom#profile('files', 'context', {
-				\ 'smartcase': 1,
-				\ })
-	call unite#custom#source('line,outline','matchers','matcher_fuzzy')
-	call unite#custom#source('file_rec/async,file_mru,file_rec,buffer',
-				\ 'matchers',['converter_tail', 'matcher_fuzzy'])
-	call unite#custom#source('file_rec/async,file_mru',
-				\ 'converters',['converter_file_directory'])
-	call unite#custom#source('file_rec,file_rec/async,file_mru,file,buffer,grep',
-				\ 'ignore_pattern',
-				\ escape(
-				\	substitute(join(split(&wildignore, ","), '\|'),
-				\   '**/\?', '', 'g'), '.') . '\|' .
-				\ join(s:unite_ignores, '\|'))
-endfunction
+		" Custom filters. [[[3
+		call unite#filters#matcher_default#use(['matcher_fuzzy'])
+		call unite#filters#sorter_default#use(['sorter_rank'])
+		" Start in insert mode
+		call unite#custom#profile('action', 'context', {
+					\ 'start_insert' : 1
+					\ })
+		call unite#custom#profile('default', 'context', s:default_context)
+		call unite#custom#profile('files', 'context', {
+					\ 'smartcase': 1,
+					\ })
+		call unite#custom#source('line,outline','matchers','matcher_fuzzy')
+		call unite#custom#source('buffer,file_rec,file_rec/async,file_rec/git',
+					\ 'matchers',['converter_relative_word', 'matcher_fuzzy',
+					\ 'matcher_project_ignore_files'])
+		call unite#custom#source('file_mru', 'matchers',
+					\ ['matcher_project_files', 'matcher_fuzzy',
+					\ 'matcher_hide_hidden_files', 'matcher_hide_current_file'])
+		call unite#custom#source('file_rec/async,file_mru,file_rec,buffer',
+					\ 'matchers',['converter_tail', 'matcher_fuzzy'])
+		call unite#custom#source('file_rec/async,file_rec/git,file_mru',
+					\ 'converters',['converter_file_directory'])
+		call unite#custom#source('file_rec,file_rec/async,file_mru,file,buffer,grep',
+					\ 'ignore_pattern',
+					\ escape(
+					\	substitute(join(split(&wildignore, ","), '\|'),
+					\   '**/\?', '', 'g'), '.') . '\|' .
+					\ join(s:unite_ignores, '\|'))
+		unlet s:unite_ignores
+		unlet s:default_context
+		" ]]]
 
-let g:unite_data_directory = s:get_cache_dir("unite")
-" Start in insert mode
-let g:unite_enable_short_source_names = 1
-let g:unite_cursor_line_highlight = 'TabLineSel'
-" Enable history yank source
-let g:unite_source_history_yank_enable = 1
-" Open in bottom right
-let g:unite_split_rule = "botright"
-let g:unite_source_rec_max_cache_files = 5000
-if !s:isWindows
-	" let g:unite_prompt =  '▸'
-	let g:unite_prompt =  "\u25b8"
-	" let g:unite_marked_icon = '✗'
-	let g:unite_marked_icon = "\u2717"
+		let g:unite_data_directory = s:get_cache_dir("unite")
+		" Enable history yank source
+		let g:unite_source_history_yank_enable = 1
+		" Open in bottom right
+		let g:unite_split_rule = "botright"
+		let g:unite_source_rec_max_cache_files = 5000
+		" For ack.
+		if executable('ag')
+			let g:unite_source_grep_command = 'ag'
+			let g:unite_source_grep_default_opts =
+						\ '--line-numbers --nocolor --nogroup --hidden --smart-case -C4 --ignore ' .
+						\ '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.bzr'''
+			let g:unite_source_grep_recursive_opt = ''
+		elseif executable('ack')
+			let g:unite_source_grep_command = 'ack'
+			let g:unite_source_grep_default_opts = '--no-heading --no-color -C4'
+			let g:unite_source_grep_recursive_opt = ''
+		endif
+
+		let g:unite_source_file_mru_limit = 1000
+		let g:unite_cursor_line_highlight = 'TabLineSel'
+		" let g:unite_abbr_highlight = 'TabLine'
+
+		let g:unite_source_file_mru_filename_format = ':~:.'
+		let g:unite_source_file_mru_time_format = ''
+
+		function! s:unite_settings()
+			" Overwrite settings.
+			nmap <buffer> <Esc> <plug>(unite_exit)
+			imap <buffer> <Esc><Esc> <plug>(unite_exit)
+			imap <buffer> <BS> <Plug>(unite_delete_backward_path)
+			imap <buffer> <Tab> <Plug>(unite_complete)
+			imap <buffer><expr> j unite#smart_map('j', '')
+			nmap <buffer><expr><silent> <2-leftmouse>
+						\ unite#smart_map('l', unite#do_action(unite#get_current_unite().context.default_action))
+			nmap <buffer> <c-j> <Plug>(unite_loop_cursor_down)
+			nmap <buffer> <c-k> <Plug>(unite_loop_cursor_up)
+			imap <buffer> jk <Plug>(unite_insert_leave)
+		endfunction
+		autocmd MyAutoCmd FileType unite call s:unite_settings()
+	endfunction
+
+	" The prefix key
+	nmap ; [unite]
+	xmap ; [unite]
+	nnoremap [unite] <Nop>
+	xnoremap [unite] <Nop>
+
+	if s:isWindows
+		nnoremap <silent> [unite]<space>
+					\ :<C-u>Unite -buffer-name=mixed -no-split -multi-line
+					\ jump_point file_point file_rec:! file file/new buffer neomru/file bookmark<cr><c-u>
+		nnoremap <silent> [unite]f :<C-u>Unite -toggle -buffer-name=files file_rec:!<cr><c-u>
+	else
+		nnoremap <silent> [unite]<space>
+					\ :<C-u>Unite -buffer-name=mixed -no-split -multi-line
+					\ jump_point file_point file_rec/async:! file file/new buffer neomru/file bookmark<cr><c-u>
+		nnoremap <silent> [unite]f
+					\ :<C-u>Unite -toggle -buffer-name=files file_rec/async:!<cr><c-u>
+	endif
+	nnoremap <silent> [unite]n :<C-u>Unite -buffer-name=bundle neobundle<cr>
+	nnoremap <silent> [unite]*
+				\ :<C-u>UniteWithCursorWord -no-split -buffer-name=line line<cr>
+	" Quick buffer and mru
+	nnoremap <silent> [unite]b :<C-u>Unite -buffer-name=buffers buffer neomru/file<cr>
+	" Quick grep from current directory(prompt for word)
+	nnoremap <silent> [unite]/
+				\ :<C-u>Unite -auto-preview -no-empty -no-split -resume -buffer-name=search grep:.<cr>
+	nnoremap <silent> [unite]m
+				\ :<C-u>Unite -auto-resize -buffer-name=mappings mapping<cr>
+	" Quickly switch lcd
+	nnoremap <silent> [unite]d
+				\ :<C-u>Unite -buffer-name=change-cwd -default-action=lcd neomru/directory directory_rec/async<CR>
+	" Quickly most recently used
+	nnoremap <silent> [unite]e
+				\ :<C-u>Unite -buffer-name=recent neomru/file<CR>
+	" Quick registers
+	nnoremap <silent> [unite]y
+				\ :<C-u>Unite -buffer-name=register register history/yank<CR>
+	xnoremap <silent> [unite]r
+				\ d:<C-u>Unite -buffer-name=register register history/yank<CR>
+	" unite-tag
+	nnoremap <silent> [unite]t :<C-u>Unite -buffer-name=tag tag tag/file<cr>
+	" unite-outline
+	nnoremap <silent> [unite]o
+				\ :<C-u>Unite -start-insert -resume -buffer-name=outline -vertical outline<cr>
+	" unite-help
+	nnoremap <silent> [unite]h :<C-u>Unite -buffer-name=help help<cr>
+	
+	call neobundle#untap()
 endif
-" For ack.
-if executable('ag')
-	let g:unite_source_grep_command = 'ag'
-	let g:unite_source_grep_default_opts =
-				\ '--line-numbers --nocolor --nogroup --hidden --smart-case -C4'
-	let g:unite_source_grep_recursive_opt = ''
-elseif executable('ack')
-	let g:unite_source_grep_command = 'ack'
-	let g:unite_source_grep_default_opts = '--no-heading --no-color -C4'
-	let g:unite_source_grep_recursive_opt = ''
-endif
-
-let g:unite_source_file_mru_limit = 1000
-let g:unite_cursor_line_highlight = 'TabLineSel'
-" let g:unite_abbr_highlight = 'TabLine'
-
-let g:unite_source_file_mru_filename_format = ':~:.'
-let g:unite_source_file_mru_time_format = ''
-
-function! s:unite_settings()
-	nmap <buffer> <Esc> <plug>(unite_exit)
-	imap <buffer> <Esc><Esc> <plug>(unite_exit)
-	imap <buffer> <BS> <Plug>(unite_delete_backward_path)
-	imap <buffer><expr> j unite#smart_map('j', '')
-	nmap <buffer><expr><silent> <2-leftmouse>
-				\ unite#smart_map('l', unite#do_action(unite#get_current_unite().context.default_action))
-	nmap <buffer> <c-j> <Plug>(unite_loop_cursor_down)
-	nmap <buffer> <c-k> <Plug>(unite_loop_cursor_up)
-	imap <buffer> jk <Plug>(unite_insert_leave)
-endfunction
-autocmd MyAutoCmd FileType unite call s:unite_settings()
-
-" The prefix key
-nmap ; [unite]
-xmap ; [unite]
-nnoremap [unite] <Nop>
-xnoremap [unite] <Nop>
-
-if s:isWindows
-	nnoremap <silent> [unite]<space>
-				\ :<C-u>Unite -buffer-name=mixed -no-split -multi-line
-				\ jump_point file_point file_rec:! file file/new buffer neomru/file bookmark<cr><c-u>
-	nnoremap <silent> [unite]f :<C-u>Unite -toggle -buffer-name=files file_rec:!<cr><c-u>
-else
-	nnoremap <silent> [unite]<space>
-				\ :<C-u>Unite -buffer-name=mixed -no-split -multi-line
-				\ jump_point file_point file_rec/async:! file file/new buffer neomru/file bookmark<cr><c-u>
-	nnoremap <silent> [unite]f
-				\ :<C-u>Unite -toggle -buffer-name=files file_rec/async:!<cr><c-u>
-endif
-nnoremap <silent> [unite]n :<C-u>Unite -buffer-name=bundle neobundle<cr>
-nnoremap <silent> [unite]*
-			\ :<C-u>UniteWithCursorWord -no-split -buffer-name=line line<cr>
-" Quick buffer and mru
-nnoremap <silent> [unite]b :<C-u>Unite -buffer-name=buffers buffer neomru/file<cr>
-" Quick grep from current directory(prompt for word)
-nnoremap <silent> [unite]/
-			\ :<C-u>Unite -auto-preview -no-empty -no-quit -resume -buffer-name=search grep:.<cr>
-nnoremap <silent> [unite]m
-			\ :<C-u>Unite -auto-resize -buffer-name=mappings mapping<cr>
-" Quickly switch lcd
-nnoremap <silent> [unite]d
-			\ :<C-u>Unite -buffer-name=change-cwd -default-action=lcd neomru/directory directory_rec/async<CR>
-" Quickly most recently used
-nnoremap <silent> [unite]e
-			\ :<C-u>Unite -buffer-name=recent neomru/file<CR>
-" Quick registers
-nnoremap <silent> [unite]y
-			\ :<C-u>Unite -buffer-name=register register history/yank<CR>
-xnoremap <silent> [unite]r
-			\ d:<C-u>Unite -buffer-name=register register history/yank<CR>
-" unite-tag
-nnoremap <silent> [unite]t :<C-u>Unite -buffer-name=tag tag tag/file<cr>
-" unite-outline
-nnoremap <silent> [unite]o
-			\ :<C-u>Unite -start-insert -resume -buffer-name=outline -vertical outline<cr>
-" unite-help
-nnoremap <silent> [unite]h :<C-u>Unite -buffer-name=help help<cr>
 " ]]]
 "  Vim-lastmod [[[2
 " The format of the time stamp
@@ -2011,7 +2032,7 @@ if neobundle#tap('syntastic')
 		let g:syntastic_style_warning_symbol = "\u2248"
 	endif
 	let g:syntastic_mode_map = { 'mode': 'passive',
-				\ 'active_filetypes': ['lua', 'php', 'sh', 'vim'],
+				\ 'active_filetypes': ['lua', 'php', 'sh'],
 				\ 'passive_filetypes': ['puppet'] }
 
 	"  Checkers for Syntastic [[[3
@@ -2314,7 +2335,8 @@ endif
 if neobundle#tap('vim-vimlint')
 	let g:vimlint#config = {
 				\ 'quiet' : 1,
-				\ 'EVL103': 1}
+				\ 'EVL103': 1,
+				\ 'EVL105': 1}
 	call neobundle#untap()
 endif
 "  ]]]
