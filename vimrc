@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 18 Nov 2014 01:04 +0800
+"  Last Modified: 18 Nov 2014 01:41 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -155,11 +155,7 @@ if count(s:plugin_groups, 'core')
 	" vim-airline 是更轻巧的 vim-powerline 代替品
 	NeoBundle 'bling/vim-airline'
 	NeoBundleLazy 'matchit.zip',
-				\ {'autoload':{'mappings':['%', 'g%']}}
-	let matchitbundle = neobundle#get('matchit.zip')
-	function! matchitbundle.hooks.on_post_source(bundle)
-		silent! execute 'doautocmd FileType' &filetype
-	endfunction
+				\ {'autoload':{'mappings':['nxo', '%', 'g%']}}
 	NeoBundle 'Shougo/vimproc.vim',
 				\ {'build' : {
 				\     'windows' : 'tools\\update-dll-mingw',
@@ -1433,9 +1429,15 @@ highlight clear SignColumn
 highlight clear LineNr
 let g:gitgutter_realtime = 0
 "  ]]]
-"  matchit.vim 对%命令进行扩展使得能在嵌套标签和语句之间跳转 [[[2
+"  MatchIt 对%命令进行扩展使得能在嵌套标签和语句之间跳转 [[[2
 " % 正向匹配      g% 反向匹配
 " [% 定位块首     ]% 定位块尾
+if neobundle#tap('matchit.zip')
+	function! neobundle#hooks.on_post_source(bundle)
+		silent! execute 'doautocmd FileType' &filetype
+	endfunction
+	call neobundle#untap()
+endif
 " ]]]
 " mark.vim 给各种tags标记不同的颜色，便于观看调式的插件。 [[[2
 " 这样，当我输入“,hl”时，就会把光标下的单词高亮，在此单词上按“,hh”会清除该单词的高亮。如果在高亮单词外输入“,hh”，会清除所有的高亮。
