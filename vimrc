@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 18 Nov 2014 21:09 +0800
+"  Last Modified: 19 Nov 2014 03:59 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -185,7 +185,9 @@ if count(s:plugin_groups, 'autocomplete')
 					\ 'vim_version':'7.3.885'}
 	endif
 	NeoBundleLazy 'Shougo/neosnippet.vim',
-				\ {'autoload':{'insert':1,
+				\ {'autoload':{
+				\ 'insert':1,
+				\ 'filetypes':'snippet',
 				\ 'unite_sources':['neosnippet/runtime',
 				\ 'neosnippet/user',
 				\ 'snippet']},
@@ -1758,44 +1760,49 @@ let g:neomru#directory_mru_path = s:get_cache_dir("neomru/directory")
 let g:neomru#file_mru_path = s:get_cache_dir("neomru/file")
 " ]]]
 "  NeoSnippet.vim [[[2
-" Enable snipMate compatibility feature.
-let g:neosnippet#enable_snipmate_compatibility = 1
-" Tell Neosnippet about the other snippets
-let g:neosnippet#snippets_directory = $VIMFILES.'/bundle/vim-snippets/snippets'
-" Specifies directory for neosnippet cache.
-let g:neosnippet#data_directory = s:get_cache_dir("neosnippet")
-" Plugin key-mappings.
-"imap <C-k> <Plug>(neocomplcache_snippets_force_expand)
-"smap <C-k> <Plug>(neocomplcache_snippets_force_expand)
-imap <C-k> <Plug>(neosnippet_expand_or_jump)
-smap <C-k> <Plug>(neosnippet_expand_or_jump)
-imap <C-l> <Plug>(neocomplcache_snippets_force_jump)
-smap <C-l> <Plug>(neocomplcache_snippets_force_jump)
-xmap <C-k> <Plug>(neosnippet_expand_target)
+if neobundle#tap('neosnippet.vim')
+	function! neobundle#hooks.on_source(bundle)
+		" Enable snipMate compatibility feature.
+		let g:neosnippet#enable_snipmate_compatibility = 1
+		" Tell Neosnippet about the other snippets
+		let g:neosnippet#snippets_directory = $VIMFILES.'/bundle/vim-snippets/snippets'
+		" Specifies directory for neosnippet cache.
+		let g:neosnippet#data_directory = s:get_cache_dir("neosnippet")
+		" Plugin key-mappings.
+		"imap <C-k> <Plug>(neocomplcache_snippets_force_expand)
+		"smap <C-k> <Plug>(neocomplcache_snippets_force_expand)
+		imap <C-k> <Plug>(neosnippet_expand_or_jump)
+		smap <C-k> <Plug>(neosnippet_expand_or_jump)
+		imap <C-l> <Plug>(neocomplcache_snippets_force_jump)
+		smap <C-l> <Plug>(neocomplcache_snippets_force_jump)
+		xmap <C-k> <Plug>(neosnippet_expand_target)
 
-" SuperTab like snippets behavior.
-imap <expr><TAB> neosnippet#expandable_or_jumpable() ?
-			\ "\<Plug>(neosnippet_expand_or_jump)"
-			\: pumvisible() ? "\<C-n>" : "\<TAB>"
-smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
-			\ "\<Plug>(neosnippet_expand_or_jump)"
-			\: "\<TAB>"
+		" SuperTab like snippets behavior.
+		imap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+					\ "\<Plug>(neosnippet_expand_or_jump)"
+					\: pumvisible() ? "\<C-n>" : "\<TAB>"
+		smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+					\ "\<Plug>(neosnippet_expand_or_jump)"
+					\: "\<TAB>"
 
-" For snippet_complete marker.
-if has('conceal')
-	set conceallevel=2
-	" 'i' is for neosnippet
-	set concealcursor=i
-	if !s:isWindows && s:isGUI
-		" set listchars+=conceal:Δ
-		let &listchars=&listchars.",conceal:\u0394"
-	endif
+		" For snippet_complete marker.
+		if has('conceal')
+			set conceallevel=2
+			" 'i' is for neosnippet
+			set concealcursor=i
+			if !s:isWindows && s:isGUI
+				" set listchars+=conceal:Δ
+				let &listchars=&listchars.",conceal:\u0394"
+			endif
+		endif
+
+		" Disable the neosnippet preview candidate window
+		" When enabled, there can be too much visual noise
+		" especially when splits are used.
+		set completeopt-=preview
+	endfunction
+	call neobundle#untap()
 endif
-
-" Disable the neosnippet preview candidate window
-" When enabled, there can be too much visual noise
-" especially when splits are used.
-set completeopt-=preview
 " ]]]
 "  Netrw使用curl [[[2
 if executable("curl")
