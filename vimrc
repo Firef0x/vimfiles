@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 19 Nov 2014 04:23 +0800
+"  Last Modified: 19 Nov 2014 05:04 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -378,6 +378,10 @@ if count(s:plugin_groups, 'scm')
 				\ 'external_command':'git'}
 	NeoBundle 'tpope/vim-fugitive',
 				\ {'augroup':'fugitive',
+				\ 'commands':[
+				\ 'Git', 'Gdiff', 'Gstatus', 'Gwrite', 'Gcd', 'Glcd',
+				\ 'Ggrep', 'Glog', 'Gcommit', 'Gblame', 'Gbrowse'
+				\ ],
 				\ 'external_command':'git'}
 endif
 " ]]]
@@ -388,9 +392,17 @@ endif
 "  Unite 插件组 [[[2
 if count(s:plugin_groups, 'unite')
 	NeoBundleLazy 'Shougo/unite.vim',
-				\ {'autoload':{'commands':'Unite'}}
+				\ {'autoload':{
+				\ 'commands':[{
+				\ 'name':'Unite',
+				\ 'complete':'customlist,unite#complete_source'
+				\ }],
+				\ 'depends':'Shougo/neomru.vim',
+				\ }}
 	NeoBundleLazy 'Shougo/neomru.vim',
-				\ {'autoload':{'unite_sources':[
+				\ {'autoload':{
+				\ 'filetypes':'all',
+				\ 'unite_sources':[
 				\ 'neomru/file',
 				\ 'neomru/directory',
 				\ 'file_mru',
@@ -452,12 +464,14 @@ if count(s:plugin_groups, 'misc')
 				\ {'autoload':{'filetypes':['openvpn']}}
 	NeoBundleLazy 'Shougo/vimshell.vim',
 				\ {'autoload':{'commands':[
-				\ 'VimShell',
+				\ {'name':'VimShell',
+				\ 'complete':'customlist,vimshell#complete'},
 				\ 'VimShellExecute',
 				\ 'VimShellInteractive',
 				\ 'VimShellTerminal',
 				\ 'VimShellPop'
 				\ ],
+				\ 'explorer':1,
 				\ 'mappings':['<Plug>(vimshell_']}}
 	NeoBundleLazy 'dogrover/vim-pentadactyl',
 				\ {'autoload':{'filetypes':['pentadactyl']}}
@@ -465,7 +479,10 @@ if count(s:plugin_groups, 'misc')
 				\ {'autoload':{'filetypes':['vimperator']}}
 	NeoBundle 'tomasr/molokai'
 	NeoBundleLazy 'tpope/vim-markdown',
-				\ {'autoload':{'filetypes':['markdown']}}
+				\ {'autoload':{'filetypes':[
+				\ 'markdown',
+				\ 'mkd'
+				\ ]}}
 	" NeoBundle 'xieyu/vim-assist'
 
 	" 从 vim-scripts repos 中安装的脚本 [[[3
