@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 18 Nov 2014 02:22 +0800
+"  Last Modified: 18 Nov 2014 19:41 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -2352,8 +2352,13 @@ autocmd MyAutoCmd SwapExists vimperator*.tmp
 nnoremap <silent> <F9> :A<CR>
 " ]]]
 "  accelerated-jk 连续按 j/k 时加速移动光标 [[[3
-nmap j <Plug>(accelerated_jk_gj)
-nmap k <Plug>(accelerated_jk_gk)
+if neobundle#tap('accelerated-jk')
+	nmap <silent>j <Plug>(accelerated_jk_gj)
+	nmap gj j
+	nmap <silent>k <Plug>(accelerated_jk_gk)
+	nmap gk k
+	call neobundle#untap()
+endif
 " ]]]
 "  Ack  Ctrl-F4 查找光标下词语  [[[3
 nnoremap <silent> <C-F4> :Ack<CR>
