@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 19 Nov 2014 03:59 +0800
+"  Last Modified: 19 Nov 2014 04:23 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -933,6 +933,10 @@ endfunction
 autocmd MyAutoCmd BufReadPre *.nfo call s:SetFileEncodings('cp437')
 autocmd MyAutoCmd BufReadPost *.nfo call s:RestoreFileEncodings()
 " ]]]
+"  Update diff  [[[2
+" 取自 https://github.com/Shougo/shougo-s-github
+autocmd MyAutoCmd InsertLeave * if &l:diff | diffupdate | endif
+" ]]]
 " ]]]
 "  快捷键设置  [[[1
 "  设置<Leader>为逗号  [[[2
@@ -1160,7 +1164,7 @@ nmap <leader>rc :edit $MYVIMRC<CR>
 "  否则tabline排版会乱，参见https://github.com/bling/vim-airline/issues/312
 "  FIXME 似乎要AirlineRefresh两次才能完全刷新，参见https://github.com/bling/vim-airline/issues/539
 autocmd! MyAutoCmd BufWritePost $MYVIMRC
-			\ silent source $MYVIMRC | AirlineRefresh
+			\ NeoBundleClearCache | silent source $MYVIMRC | AirlineRefresh
 " ]]]
 "  切换高亮搜索关键字 <Leader>nh [[[2
 nmap <silent> <leader>nh :nohlsearch<CR>
