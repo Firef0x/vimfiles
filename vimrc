@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 22 Nov 2014 01:13 +0800
+"  Last Modified: 22 Nov 2014 03:05 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -66,6 +66,14 @@ else
 	let s:hasCscope=0
 endif
 " ]]]
+" 设置自动完成使用的插件 [[[2
+" NeoComplete 要求支持 Lua
+if s:hasLua
+	let s:autocomplete_method = 'neocomplete'
+else
+	let s:autocomplete_method = 'neocomplcache'
+endif
+"  ]]]
 "  设置AuGroup [[[2
 augroup MyAutoCmd
 	autocmd!
@@ -104,417 +112,454 @@ endfunction
 "  ]]]
 "  ]]]
 "  NeoBundle 插件管理器 [[[1
-"  初始化插件组设置 [[[2
-let s:plugin_groups = []
-call add(s:plugin_groups, 'core')
-call add(s:plugin_groups, 'autocomplete')
-call add(s:plugin_groups, 'editing')
-call add(s:plugin_groups, 'indent')
-call add(s:plugin_groups, 'javascript')
-if !s:isWindows
-	call add(s:plugin_groups, 'linux')
-	call add(s:plugin_groups, 'scm')
-	if s:isTmux
-		call add(s:plugin_groups, 'tmux')
-	endif
-else
-	call add(s:plugin_groups, 'windows')
-endif
-call add(s:plugin_groups, 'lint')
-if s:hasLua
-	call add(s:plugin_groups, 'lua')
-endif
-call add(s:plugin_groups, 'misc')
-call add(s:plugin_groups, 'navigation')
-call add(s:plugin_groups, 'php')
-call add(s:plugin_groups, 'unite')
-call add(s:plugin_groups, 'web')
-"  ]]]
-" 设置自动完成使用的插件 [[[2
-let s:autocomplete_method = 'neocomplcache'
-" Neocomplete 要求支持 Lua
-if s:hasLua
-	let s:autocomplete_method = 'neocomplete'
-endif
-"  ]]]
-"  设置NeoBundle [[[2
+"  运行路径添加 NeoBundle 目录 [[[2
 if has('vim_starting')
 	set runtimepath+=$VIMFILES/bundle/neobundle.vim/
 endif
-call neobundle#begin(expand("$VIMFILES/bundle/"))
+" ]]]
+"  开始配置 NeoBundle [[[2
+call neobundle#begin(expand("$VIMFILES/bundle"))
 " set shellquote="\""
 " set shellxquote="\""
 " set noshellslash
-
-" let vundle manage vundle
-" required!
-NeoBundleFetch 'Shougo/neobundle.vim'
 " ]]]
-" My bundles here:
-"  核心 [[[2
-if count(s:plugin_groups, 'core')
-	" vim-airline 是更轻巧的 vim-powerline 代替品
-	NeoBundle 'bling/vim-airline'
-	NeoBundleLazy 'matchit.zip',
-				\ {'autoload':{'mappings':['nxo', '%', 'g%']}}
-	NeoBundle 'Shougo/vimproc.vim',
-				\ {'build' : {
-				\     'windows' : 'tools\\update-dll-mingw',
-				\     'cygwin'  : 'make -f make_cygwin.mak',
-				\     'mac'     : 'make -f make_mac.mak',
-				\     'unix'    : 'make -f make_unix.mak',
-				\    },
-				\ }
-	NeoBundle 'tpope/vim-repeat'
-	" 包含普遍使用的 Vim 的通用配置
-	NeoBundle 'tpope/vim-sensible'
-	NeoBundle 'tpope/vim-surround'
-	NeoBundle 'tpope/vim-dispatch'
-endif
+"  载入 NeoBundle 缓存 [[[2
+if neobundle#has_cache()
+	NeoBundleLoadCache
 " ]]]
-"  自动完成 [[[2
-if count(s:plugin_groups, 'autocomplete')
-	if s:autocomplete_method == 'neocomplcache'
-		NeoBundleLazy 'Shougo/neocomplcache.vim',
-					\ {'autoload':{'insert':1}}
-	elseif s:autocomplete_method == 'neocomplete'
-		NeoBundleLazy 'Shougo/neocomplete.vim',
-					\ {'autoload':{
-					\ 'depends':'Shougo/context_filetype.vim',
-					\ 'insert':1},
-					\ 'vim_version':'7.3.885'}
+"  配置 NeoBundle [[[2
+else
+	"  使 NeoBundle 管理 NeoBundle [[[3
+	" required!
+	NeoBundleFetch 'Shougo/neobundle.vim'
+	"  ]]]
+	"  初始化插件组设置 [[[3
+	let s:plugin_groups = []
+	call add(s:plugin_groups, 'core')
+	call add(s:plugin_groups, 'autocomplete')
+	call add(s:plugin_groups, 'editing')
+	call add(s:plugin_groups, 'indent')
+	call add(s:plugin_groups, 'javascript')
+	if !s:isWindows
+		call add(s:plugin_groups, 'linux')
+		call add(s:plugin_groups, 'scm')
+		if s:isTmux
+			call add(s:plugin_groups, 'tmux')
+		endif
+	else
+		call add(s:plugin_groups, 'windows')
 	endif
-	NeoBundleLazy 'Shougo/neosnippet.vim',
-				\ {'autoload':{
-				\ 'insert':1,
-				\ 'filetypes':'snippet',
-				\ 'unite_sources':['neosnippet/runtime',
-				\ 'neosnippet/user',
-				\ 'snippet']},
-				\ 'depends': ['Shougo/context_filetype.vim',
-				\ 'Shougo/neosnippet-snippets']}
-	NeoBundle 'honza/vim-snippets'
-endif
-" ]]]
-"  文本编辑 [[[2
-if count(s:plugin_groups, 'editing')
-	" 比较指定文本块
-	NeoBundleLazy 'AndrewRadev/linediff.vim',
-				\ {'autoload':{'commands':[
-				\ 'Linediff',
-				\ 'LinediffReset'
-				\ ]}}
-	" 打散合并单行语句
-	NeoBundleLazy 'AndrewRadev/splitjoin.vim',
-				\ {'autoload':{'commands':[
-				\ 'SplitjoinJoin',
-				\ 'SplitjoinSplit'
-				\ ]}}
-	" auto-pairs 比 AutoClose 更好用
-	" NeoBundle 'AutoClose'
-	NeoBundle 'chrisbra/NrrwRgn'
-	NeoBundle 'dimasg/vim-mark'
-	" tabular 比 Align 更简单，所以替换
-	NeoBundleLazy 'godlygeek/tabular',
-				\ {'autoload':{'commands':[
-				\ 'Tabularize',
-				\ 'AddTabularPipeline'
-				\ ]}}
-	NeoBundle 'jiangmiao/auto-pairs'
-	" 自动更新 Last Modified 字符串
-	NeoBundle 'jmcantrell/vim-lastmod'
-	" TODO vim-sneak 是 vim-easymotion 的代替品，考虑是否替换
-	" NeoBundle 'justinmk/vim-sneak'
-	NeoBundleLazy 'kana/vim-scratch',
-				\ {'autoload':{'commands':[
-				\ 'ScratchClose',
-				\ 'ScratchEvaluate',
-				\ 'ScratchOpen'
-				\ ]}}
-	" rainbow 是 rainbow_parentheses.vim 的改进版，所以替换
-	" NeoBundle 'kien/rainbow_parentheses.vim'
-	NeoBundle 'Lokaltog/vim-easymotion'
-	NeoBundle 'luochen1990/rainbow'
-	" 连续按 j/k 时加速移动光标
-	NeoBundle 'rhysd/accelerated-jk'
-	NeoBundle 'rhysd/clever-f.vim'
-	NeoBundle 'terryma/vim-multiple-cursors'
-	" 在 Visual 模式下使用 */# 跳转
-	NeoBundleLazy 'thinca/vim-visualstar',
-				\ {'autoload':{'mappings':[
-				\ ['xv', '*'], ['xv', '#'], ['xv', 'g'], ['xv', 'g*']
-				\ ]}}
-	" tcomment_vim 比 nerdcommenter 更智能，所以替换
-	" NeoBundle 'scrooloose/nerdcommenter'
-	NeoBundleLazy 'tomtom/tcomment_vim',
-				\ {'autoload':{'mappings':[
-				\ ['nx', 'gc', 'gcc', 'gC']
-				\ ]}}
-endif
-" ]]]
-"  代码缩进 [[[2
-if count(s:plugin_groups, 'indent')
-	NeoBundle 'nathanaelkane/vim-indent-guides'
-endif
-" ]]]
-"  JavaScript [[[2
-if count(s:plugin_groups, 'javascript')
-	" 以下3个插件以 vim-javascript 和 javascript-libraries-syntax.vim 取代
-	" NeoBundleLazy 'JavaScript-Indent',
-	" 			\ { 'autoload' : {'filetypes':['javascript']} }
-	" NeoBundleLazy 'jQuery',
-	" 			\ { 'autoload' : {'filetypes':['javascript']} }
-	" NeoBundleLazy 'jelera/vim-javascript-syntax',
-	" 			\ {'autoload':{'filetypes':['javascript']}}
-	NeoBundleLazy 'pangloss/vim-javascript',
-				\ {'autoload':{'filetypes':['javascript']}}
-	NeoBundleLazy 'othree/javascript-libraries-syntax.vim',
-				\ {'autoload':{'filetypes':[
-				\ 'javascript',
-				\ 'coffee',
-				\ 'ls',
-				\ 'typescript'
-				\ ]}}
-	if executable('node') || executable('nodejs')
-		NeoBundleLazy 'maksimr/vim-jsbeautify',
-					\ { 'autoload' : {'commands':[
-					\ 'CSSBeautify',
-					\ 'JsBeautify',
-					\ 'HtmlBeautify'
+	call add(s:plugin_groups, 'lint')
+	if s:hasLua
+		call add(s:plugin_groups, 'lua')
+	endif
+	call add(s:plugin_groups, 'misc')
+	call add(s:plugin_groups, 'navigation')
+	call add(s:plugin_groups, 'php')
+	call add(s:plugin_groups, 'unite')
+	call add(s:plugin_groups, 'web')
+	"  ]]]
+	" My bundles here:
+	"  核心 [[[3
+	if count(s:plugin_groups, 'core')
+		" vim-airline 是更轻巧的 vim-powerline 代替品
+		NeoBundle 'bling/vim-airline'
+		NeoBundleLazy 'matchit.zip',
+					\ {'autoload':{'mappings':['nxo', '%', 'g%']}}
+		NeoBundle 'Shougo/vimproc.vim',
+					\ {'build' : {
+					\     'windows' : 'tools\\update-dll-mingw',
+					\     'cygwin'  : 'make -f make_cygwin.mak',
+					\     'mac'     : 'make -f make_mac.mak',
+					\     'unix'    : 'make -f make_unix.mak',
+					\    },
+					\ }
+		NeoBundle 'tpope/vim-repeat'
+		" 包含普遍使用的 Vim 的通用配置
+		NeoBundle 'tpope/vim-sensible'
+		NeoBundle 'tpope/vim-surround'
+		NeoBundle 'tpope/vim-dispatch'
+	endif
+	" ]]]
+	"  自动完成 [[[3
+	if count(s:plugin_groups, 'autocomplete')
+		if s:autocomplete_method == 'neocomplcache'
+			NeoBundleLazy 'Shougo/neocomplcache.vim',
+						\ {'autoload':{'insert':1}}
+		elseif s:autocomplete_method == 'neocomplete'
+			NeoBundleLazy 'Shougo/neocomplete.vim',
+						\ {'autoload':{
+						\ 'depends':'Shougo/context_filetype.vim',
+						\ 'insert':1},
+						\ 'vim_version':'7.3.885'}
+		endif
+		NeoBundleLazy 'Shougo/neosnippet.vim',
+					\ {'autoload':{
+					\ 'insert':1,
+					\ 'filetypes':'snippet',
+					\ 'unite_sources':['neosnippet/runtime',
+					\ 'neosnippet/user',
+					\ 'snippet']},
+					\ 'depends': ['Shougo/context_filetype.vim',
+					\ 'Shougo/neosnippet-snippets']}
+		NeoBundle 'honza/vim-snippets'
+	endif
+	" ]]]
+	"  文本编辑 [[[3
+	if count(s:plugin_groups, 'editing')
+		" 比较指定文本块
+		NeoBundleLazy 'AndrewRadev/linediff.vim',
+					\ {'autoload':{'commands':[
+					\ 'Linediff',
+					\ 'LinediffReset'
+					\ ]}}
+		" 打散合并单行语句
+		NeoBundleLazy 'AndrewRadev/splitjoin.vim',
+					\ {'autoload':{'commands':[
+					\ 'SplitjoinJoin',
+					\ 'SplitjoinSplit'
+					\ ]}}
+		NeoBundle 'chrisbra/NrrwRgn'
+		NeoBundle 'dimasg/vim-mark'
+		" tabular 比 Align 更简单，所以替换
+		NeoBundleLazy 'godlygeek/tabular',
+					\ {'autoload':{'commands':[
+					\ 'Tabularize',
+					\ 'AddTabularPipeline'
+					\ ]}}
+		NeoBundle 'jiangmiao/auto-pairs'
+		" 自动更新 Last Modified 字符串
+		NeoBundle 'jmcantrell/vim-lastmod'
+		" TODO vim-sneak 是 vim-easymotion 的代替品，考虑是否替换
+		" NeoBundle 'justinmk/vim-sneak'
+		NeoBundleLazy 'kana/vim-scratch',
+					\ {'autoload':{'commands':[
+					\ 'ScratchClose',
+					\ 'ScratchEvaluate',
+					\ 'ScratchOpen'
+					\ ]}}
+		" rainbow 是 rainbow_parentheses.vim 的改进版，所以替换
+		" NeoBundle 'kien/rainbow_parentheses.vim'
+		NeoBundle 'Lokaltog/vim-easymotion'
+		NeoBundle 'luochen1990/rainbow'
+		" 连续按 j/k 时加速移动光标
+		NeoBundle 'rhysd/accelerated-jk'
+		NeoBundle 'rhysd/clever-f.vim'
+		NeoBundle 'terryma/vim-multiple-cursors'
+		" 在 Visual 模式下使用 */# 跳转
+		NeoBundleLazy 'thinca/vim-visualstar',
+					\ {'autoload':{'mappings':[
+					\ ['xv', '*'], ['xv', '#'], ['xv', 'g'], ['xv', 'g*']
+					\ ]}}
+		" tcomment_vim 比 nerdcommenter 更智能，所以替换
+		" NeoBundle 'scrooloose/nerdcommenter'
+		NeoBundleLazy 'tomtom/tcomment_vim',
+					\ {'autoload':{'mappings':[
+					\ ['nx', 'gc', 'gcc', 'gC']
+					\ ]}}
+	endif
+	" ]]]
+	"  代码缩进 [[[3
+	if count(s:plugin_groups, 'indent')
+		NeoBundle 'nathanaelkane/vim-indent-guides'
+	endif
+	" ]]]
+	"  JavaScript [[[3
+	if count(s:plugin_groups, 'javascript')
+		" 以下3个插件以 vim-javascript 和 javascript-libraries-syntax.vim 取代
+		" NeoBundleLazy 'JavaScript-Indent',
+		" 			\ { 'autoload' : {'filetypes':['javascript']} }
+		" NeoBundleLazy 'jQuery',
+		" 			\ { 'autoload' : {'filetypes':['javascript']} }
+		" NeoBundleLazy 'jelera/vim-javascript-syntax',
+		" 			\ {'autoload':{'filetypes':['javascript']}}
+		NeoBundleLazy 'pangloss/vim-javascript',
+					\ {'autoload':{'filetypes':['javascript']}}
+		NeoBundleLazy 'othree/javascript-libraries-syntax.vim',
+					\ {'autoload':{'filetypes':[
+					\ 'javascript',
+					\ 'coffee',
+					\ 'ls',
+					\ 'typescript'
+					\ ]}}
+		if executable('node') || executable('nodejs')
+			NeoBundleLazy 'maksimr/vim-jsbeautify',
+						\ { 'autoload' : {'commands':[
+						\ 'CSSBeautify',
+						\ 'JsBeautify',
+						\ 'HtmlBeautify'
+						\ ],
+						\ 'filetypes':[
+						\ 'css',
+						\ 'html',
+						\ 'javascript',
+						\ 'jinja',
+						\ 'json',
+						\ 'less',
+						\ 'mustache'
+						\ ]}}
+		endif
+	endif
+	" ]]]
+	"  Linux [[[3
+	if count(s:plugin_groups, 'linux')
+		" 以 root 权限打开文件，以 SudoEdit.vim 代替 sudo.vim
+		" 参见 http://vim.wikia.com/wiki/Su-write
+		NeoBundle 'chrisbra/SudoEdit.vim'
+		" 在终端下自动开启关闭 paste 选项
+		NeoBundle 'ConradIrwin/vim-bracketed-paste'
+		if s:hasPython
+			NeoBundle 'fcitx.vim'
+		endif
+	endif
+	" ]]]
+	"  代码检查 [[[3
+	if count(s:plugin_groups, 'lint')
+		NeoBundle 'scrooloose/syntastic'
+		NeoBundle 'syngan/vim-vimlint',
+					\ {'depends':'ynkdir/vim-vimlparser'}
+	endif
+	" ]]]
+	"  Lua [[[3
+	if count(s:plugin_groups, 'lua')
+		" NeoBundleLazy 'luarefvim',
+		" 			\ {'autoload':{'filetypes':['lua']}}
+	endif
+	" ]]]
+	"  文本定位/纵览 [[[3
+	if count(s:plugin_groups, 'navigation')
+		if s:hasCTags
+			" CTags 语法高亮
+			NeoBundle 'bb:abudden/taghighlight'
+			" C Call-Tree Explorer 源码浏览工具
+			if s:hasCscope
+				NeoBundleLazy 'CCTree',
+						\ {'autoload':{'commands':[
+						\ 'CCTreeLoadDB',
+						\ 'CCTreeLoadXRefDBFromDisk'
+						\ ]}}
+			endif
+			NeoBundleLazy 'majutsushi/tagbar',
+						\ {'autoload':{'commands':[
+						\ 'TagbarClose',
+						\ 'TagbarToggle'
+						\ ]}}
+			" 增强源代码浏览
+			NeoBundleLazy 'wesleyche/SrcExpl',
+						\ {'autoload':{'commands':'SrcExplToggle'}}
+		endif
+		" 在同一文件名的.h与.c/.cpp之间切换
+		NeoBundleLazy 'a.vim',
+					\ {'autoload':{'filetypes':['c', 'cpp']}}
+		" 对三路合并时的<<< >>> === 标记语法高亮
+		NeoBundle 'ConflictDetection',
+					\ {'depends':'ingo-library'}
+		" 在三路合并时的<<< >>> === 代码块之间快速移动
+		NeoBundle 'ConflictMotions',
+					\ {'depends':['ingo-library','CountJump']}
+		" Unite 比 CtrlP 更强大，所以替换
+		" NeoBundle 'kien/ctrlp.vim'
+		NeoBundleLazy 'mbbill/undotree',
+					\ {'autoload':{'commands':'UndotreeToggle'}}
+		NeoBundle 'mileszs/ack.vim'
+		NeoBundle 'scrooloose/nerdtree'
+		NeoBundle 'Xuyuanp/nerdtree-git-plugin',
+					\ {'depends':'scrooloose/nerdtree',
+					\ 'external_command':'git'}
+		" 显示尾部多余空格
+		NeoBundle 'git@github.com:Firef0x/ShowTrailingWhitespace'
+	endif
+	" ]]]
+	"  PHP [[[3
+	if count(s:plugin_groups, 'php')
+		"press K on a function for full php manual
+		NeoBundle 'spf13/PIV'
+	endif
+	" ]]]
+	"  代码管理 [[[3
+	if count(s:plugin_groups, 'scm')
+		NeoBundle 'airblade/vim-gitgutter',
+					\ {'autoload':{'insert':1},
+					\ 'disabled':!has('signs'),
+					\ 'external_command':'git'}
+		NeoBundleLazy 'gregsexton/gitv',
+					\ {'depends':['tpope/vim-fugitive'],
+					\ 'autoload':{'commands':'Gitv'},
+					\ 'external_command':'git'}
+		NeoBundle 'tpope/vim-fugitive',
+					\ {'augroup':'fugitive',
+					\ 'commands':[
+					\ 'Git',
+					\ 'Gdiff',
+					\ 'Gstatus',
+					\ 'Gwrite',
+					\ 'Gcd',
+					\ 'Glcd',
+					\ 'Ggrep',
+					\ 'Glog',
+					\ 'Gcommit',
+					\ 'Gblame',
+					\ 'Gbrowse'
 					\ ],
-					\ 'filetypes':[
+					\ 'external_command':'git'}
+	endif
+	" ]]]
+	"  TMux [[[3
+	if count(s:plugin_groups, 'tmux')
+		NeoBundle 'christoomey/vim-tmux-navigator'
+	endif
+	"  Unite 插件组 [[[3
+	if count(s:plugin_groups, 'unite')
+		NeoBundleLazy 'Shougo/unite.vim',
+					\ {'autoload':{
+					\ 'commands':[{
+					\ 'name':'Unite',
+					\ 'complete':'customlist,unite#complete_source'
+					\ }],
+					\ 'depends':'Shougo/neomru.vim',
+					\ }}
+		NeoBundleLazy 'Shougo/neomru.vim',
+					\ {'autoload':{
+					\ 'filetypes':'all',
+					\ 'unite_sources':[
+					\ 'neomru/file',
+					\ 'neomru/directory',
+					\ 'file_mru',
+					\ 'directory_mru'
+					\ ]}}
+		NeoBundleLazy 'Shougo/unite-help',
+					\ {'autoload':{'unite_sources':'help'}}
+		NeoBundleLazy 'Shougo/unite-outline',
+					\ {'autoload':{'unite_sources':'outline'}}
+		NeoBundleLazy 'tsukkee/unite-tag',
+					\ {'autoload':{'unite_sources':['tag', 'tag/file']}}
+	endif
+	" ]]]
+	"  Web 开发 [[[3
+	if count(s:plugin_groups, 'web')
+		NeoBundleLazy 'amirh/HTML-AutoCloseTag',
+					\ {'autoload':{'filetypes':['html', 'xml']}}
+		NeoBundleLazy 'ap/vim-css-color',
+					\ {'autoload':{'filetypes':[
+					\ 'css',
+					\ 'scss',
+					\ 'sass',
+					\ 'less'
+					\ ]}}
+		NeoBundleLazy 'ariutta/Css-Pretty',
+					\ {'autoload':{'commands':'Csspretty',
+					\ 'filetypes':['css']}}
+		NeoBundleLazy 'evanmiller/nginx-vim-syntax',
+					\ {'autoload':{'filetypes':['nginx']}}
+		NeoBundleLazy 'gregsexton/MatchTag',
+					\ {'autoload':{'filetypes':[
+					\ 'html',
+					\ 'xml',
+					\ 'xsl'
+					\ ]}}
+		NeoBundleLazy 'mattn/emmet-vim',
+					\ {'autoload':{'filetypes':[
 					\ 'css',
 					\ 'html',
-					\ 'javascript',
-					\ 'jinja',
-					\ 'json',
 					\ 'less',
-					\ 'mustache'
+					\ 'mustache',
+					\ 'sass',
+					\ 'scss',
+					\ 'xml',
+					\ 'xsd',
+					\ 'xsl',
+					\ 'xslt'
 					\ ]}}
+		NeoBundleLazy 'othree/html5.vim',
+					\ {'autoload':{'filetypes':['html']}}
+		NeoBundleLazy 'othree/html5-syntax.vim',
+					\ {'autoload':{'filetypes':['html']}}
+		NeoBundleLazy 'othree/xml.vim',
+					\ {'autoload':{'filetypes':['html', 'xml']}}
 	endif
-endif
-" ]]]
-"  Linux [[[2
-if count(s:plugin_groups, 'linux')
-	" 以 root 权限打开文件，以 SudoEdit.vim 代替 sudo.vim
-	" 参见 http://vim.wikia.com/wiki/Su-write
-	NeoBundle 'chrisbra/SudoEdit.vim'
-	" 在终端下自动开启关闭 paste 选项
-	NeoBundle 'ConradIrwin/vim-bracketed-paste'
-	if s:hasPython
-		NeoBundle 'fcitx.vim'
+	"  Windows [[[3
+	if count(s:plugin_groups, 'windows') && s:hasCscope
+		" NeoBundle 'cscope-wrapper'
 	endif
-endif
-" ]]]
-"  代码检查 [[[2
-if count(s:plugin_groups, 'lint')
-	NeoBundle 'scrooloose/syntastic'
-	NeoBundle 'syngan/vim-vimlint',
-				\ {'depends':'ynkdir/vim-vimlparser'}
-endif
-" ]]]
-"  Lua [[[2
-if count(s:plugin_groups, 'lua')
-	" NeoBundleLazy 'luarefvim',
-	" 			\ {'autoload':{'filetypes':['lua']}}
-endif
-" ]]]
-"  文本定位/纵览 [[[2
-if count(s:plugin_groups, 'navigation')
-	if s:hasCTags
-		" CTags 语法高亮
-		NeoBundle 'bb:abudden/taghighlight'
-		" C Call-Tree Explorer 源码浏览工具
-		if s:hasCscope
-			NeoBundleLazy 'CCTree',
+	" ]]]
+	"  杂项 [[[3
+	if count(s:plugin_groups, 'misc')
+		" 使用 VimShell 暂时取代
+		" NeoBundle 'Conque-Shell'
+		NeoBundle 'asins/vimcdoc'
+		NeoBundleLazy 'git@github.com:Firef0x/PKGBUILD.vim',
+					\ {'autoload':{'filetypes':['PKGBUILD']}}
+		NeoBundleLazy 'git@github.com:Firef0x/vim-smali',
+					\ {'autoload':{'filetypes':['smali']}}
+		NeoBundle 'lilydjwg/colorizer'
+		NeoBundle 'mhinz/vim-startify'
+		NeoBundleLazy 'openvpn',
+					\ {'autoload':{'filetypes':['openvpn']}}
+		NeoBundleLazy 'Shougo/vimshell.vim',
 					\ {'autoload':{'commands':[
-					\ 'CCTreeLoadDB',
-					\ 'CCTreeLoadXRefDBFromDisk'
+					\ {'name':'VimShell',
+					\ 'complete':'customlist,vimshell#complete'},
+					\ 'VimShellExecute',
+					\ 'VimShellInteractive',
+					\ 'VimShellTerminal',
+					\ 'VimShellPop'
+					\ ],
+					\ 'explorer':1,
+					\ 'mappings':['<Plug>(vimshell_']}}
+		NeoBundleLazy 'dogrover/vim-pentadactyl',
+					\ {'autoload':{'filetypes':['pentadactyl']}}
+		NeoBundleLazy 'superbrothers/vim-vimperator',
+					\ {'autoload':{'filetypes':['vimperator']}}
+		NeoBundle 'tomasr/molokai'
+		NeoBundleLazy 'tpope/vim-markdown',
+					\ {'autoload':{'filetypes':[
+					\ 'markdown',
+					\ 'mkd'
 					\ ]}}
-		endif
-		NeoBundleLazy 'majutsushi/tagbar',
-					\ {'autoload':{'commands':[
-					\ 'TagbarClose',
-					\ 'TagbarToggle'
-					\ ]}}
-		" 增强源代码浏览
-		NeoBundleLazy 'wesleyche/SrcExpl',
-					\ {'autoload':{'commands':'SrcExplToggle'}}
-	endif
-	" 在同一文件名的.h与.c/.cpp之间切换
-	NeoBundleLazy 'a.vim',
-				\ {'autoload':{'filetypes':['c', 'cpp']}}
-	" 对三路合并时的<<< >>> === 标记语法高亮
-	NeoBundle 'ConflictDetection',
-				\ {'depends':'ingo-library'}
-	" 在三路合并时的<<< >>> === 代码块之间快速移动
-	NeoBundle 'ConflictMotions',
-				\ {'depends':['ingo-library','CountJump']}
-	" Unite 比 CtrlP 更强大，所以替换
-	" NeoBundle 'kien/ctrlp.vim'
-	NeoBundleLazy 'mbbill/undotree',
-				\ {'autoload':{'commands':'UndotreeToggle'}}
-	NeoBundle 'mileszs/ack.vim'
-	NeoBundle 'scrooloose/nerdtree'
-	NeoBundle 'Xuyuanp/nerdtree-git-plugin',
-				\ {'depends':'scrooloose/nerdtree',
-				\ 'external_command':'git'}
-	" 显示尾部多余空格
-	NeoBundle 'git@github.com:Firef0x/ShowTrailingWhitespace'
-endif
-" ]]]
-"  PHP [[[2
-if count(s:plugin_groups, 'php')
-	"press K on a function for full php manual
-	NeoBundle 'spf13/PIV'
-endif
-" ]]]
-"  代码管理 [[[2
-if count(s:plugin_groups, 'scm')
-	NeoBundle 'airblade/vim-gitgutter',
-				\ {'autoload':{'insert':1},
-				\ 'disabled':!has('signs'),
-				\ 'external_command':'git'}
-	NeoBundleLazy 'gregsexton/gitv',
-				\ {'depends':['tpope/vim-fugitive'],
-				\ 'autoload':{'commands':'Gitv'},
-				\ 'external_command':'git'}
-	NeoBundle 'tpope/vim-fugitive',
-				\ {'augroup':'fugitive',
-				\ 'commands':[
-				\ 'Git', 'Gdiff', 'Gstatus', 'Gwrite', 'Gcd', 'Glcd',
-				\ 'Ggrep', 'Glog', 'Gcommit', 'Gblame', 'Gbrowse'
-				\ ],
-				\ 'external_command':'git'}
-endif
-" ]]]
-"  TMux [[[2
-if count(s:plugin_groups, 'tmux')
-	NeoBundle 'christoomey/vim-tmux-navigator'
-endif
-"  Unite 插件组 [[[2
-if count(s:plugin_groups, 'unite')
-	NeoBundleLazy 'Shougo/unite.vim',
-				\ {'autoload':{
-				\ 'commands':[{
-				\ 'name':'Unite',
-				\ 'complete':'customlist,unite#complete_source'
-				\ }],
-				\ 'depends':'Shougo/neomru.vim',
-				\ }}
-	NeoBundleLazy 'Shougo/neomru.vim',
-				\ {'autoload':{
-				\ 'filetypes':'all',
-				\ 'unite_sources':[
-				\ 'neomru/file',
-				\ 'neomru/directory',
-				\ 'file_mru',
-				\ 'directory_mru'
-				\ ]}}
-	NeoBundleLazy 'Shougo/unite-help',
-				\ {'autoload':{'unite_sources':'help'}}
-	NeoBundleLazy 'Shougo/unite-outline',
-				\ {'autoload':{'unite_sources':'outline'}}
-	NeoBundleLazy 'tsukkee/unite-tag',
-				\ {'autoload':{'unite_sources':['tag', 'tag/file']}}
-endif
-" ]]]
-"  Web开发 [[[2
-if count(s:plugin_groups, 'web')
-	NeoBundleLazy 'amirh/HTML-AutoCloseTag',
-				\ {'autoload':{'filetypes':['html', 'xml']}}
-	NeoBundleLazy 'ap/vim-css-color',
-				\ {'autoload':{'filetypes':[
-				\ 'css',
-				\ 'scss',
-				\ 'sass',
-				\ 'less'
-				\ ]}}
-	NeoBundleLazy 'ariutta/Css-Pretty',
-				\ {'autoload':{'commands':'Csspretty',
-				\ 'filetypes':['css']}}
-	NeoBundleLazy 'evanmiller/nginx-vim-syntax',
-				\ {'autoload':{'filetypes':['nginx']}}
-	NeoBundleLazy 'gregsexton/MatchTag',
-				\ {'autoload':{'filetypes':[ 'html', 'xml', 'xsl']}}
-	NeoBundleLazy 'mattn/emmet-vim',
-				\ {'autoload':{'filetypes':['html', 'xml', 'xsl', 'xslt',
-				\ 'xsd', 'css', 'sass', 'scss', 'less', 'mustache']}}
-	NeoBundleLazy 'othree/html5.vim',
-				\ {'autoload':{'filetypes':['html']}}
-	NeoBundleLazy 'othree/html5-syntax.vim',
-				\ {'autoload':{'filetypes':['html']}}
-	NeoBundleLazy 'othree/xml.vim',
-				\ {'autoload':{'filetypes':['html', 'xml']}}
-endif
-"  Windows [[[2
-if count(s:plugin_groups, 'windows') && s:hasCscope
-	NeoBundle 'cscope-wrapper'
-endif
-" ]]]
-"  杂项 [[[2
-if count(s:plugin_groups, 'misc')
-	" 使用 VimShell 暂时取代
-	" NeoBundle 'Conque-Shell'
-	NeoBundle 'asins/vimcdoc'
-	NeoBundleLazy 'git@github.com:Firef0x/PKGBUILD.vim',
-				\ {'autoload':{'filetypes':['PKGBUILD']}}
-	NeoBundleLazy 'git@github.com:Firef0x/vim-smali',
-				\ {'autoload':{'filetypes':['smali']}}
-	NeoBundle 'lilydjwg/colorizer'
-	NeoBundle 'mhinz/vim-startify'
-	NeoBundleLazy 'openvpn',
-				\ {'autoload':{'filetypes':['openvpn']}}
-	NeoBundleLazy 'Shougo/vimshell.vim',
-				\ {'autoload':{'commands':[
-				\ {'name':'VimShell',
-				\ 'complete':'customlist,vimshell#complete'},
-				\ 'VimShellExecute',
-				\ 'VimShellInteractive',
-				\ 'VimShellTerminal',
-				\ 'VimShellPop'
-				\ ],
-				\ 'explorer':1,
-				\ 'mappings':['<Plug>(vimshell_']}}
-	NeoBundleLazy 'dogrover/vim-pentadactyl',
-				\ {'autoload':{'filetypes':['pentadactyl']}}
-	NeoBundleLazy 'superbrothers/vim-vimperator',
-				\ {'autoload':{'filetypes':['vimperator']}}
-	NeoBundle 'tomasr/molokai'
-	NeoBundleLazy 'tpope/vim-markdown',
-				\ {'autoload':{'filetypes':[
-				\ 'markdown',
-				\ 'mkd'
-				\ ]}}
-	" NeoBundle 'xieyu/vim-assist'
+		" NeoBundle 'xieyu/vim-assist'
 
-	" 从 vim-scripts repos 中安装的脚本 [[[3
-	" 保存时自动创建空文件夹
-	NeoBundle 'auto_mkdir'
-	" 在单独的窗口管理缓冲区
-	NeoBundle 'bufexplorer.zip'
-	NeoBundle 'mbbill/fencview'
-	" PO (Portable Object, gettext)
-	NeoBundleLazy 'po.vim--gray',
-				\ {'autoload':{'filetypes':['po']}}
-	" 重命名当前文件
-	NeoBundle 'Rename'
-	" STL语法高亮
-	NeoBundleLazy 'STL-improved',
-				\ {'autoload':{'filetypes':['c', 'cpp']}}
-	" Ctrl-V选择区域，然后按:B执行命令，或按:S查找匹配字符串
-	NeoBundle 'vis'
-	" Make a column of increasing or decreasing numbers
-	NeoBundle 'VisIncr'
+		" 从 vim-scripts 仓库中安装的脚本 [[[4
+		" 保存时自动创建空文件夹
+		NeoBundle 'auto_mkdir'
+		" 在单独的窗口管理缓冲区
+		NeoBundle 'bufexplorer.zip'
+		" 自动识别并设定文件编码
+		NeoBundle 'mbbill/fencview'
+		" PO (Portable Object, gettext)
+		NeoBundleLazy 'po.vim--gray',
+					\ {'autoload':{'filetypes':['po']}}
+		" 重命名当前文件
+		NeoBundle 'Rename'
+		" STL语法高亮
+		NeoBundleLazy 'STL-improved',
+					\ {'autoload':{'filetypes':['c', 'cpp']}}
+		" Ctrl-V 选择区域，然后按 :B 执行命令，或按 :S 查找匹配字符串
+		NeoBundle 'vis'
+		" Make a column of increasing or decreasing numbers
+		NeoBundle 'VisIncr'
+		" ]]]
+	endif
+	" ]]]
+	"  保存 NeoBundle 缓存 [[[3
+	NeoBundleSaveCache
 	" ]]]
 endif
 " ]]]
-"  使用NeoBundle关闭，结束时开始 [[[2
+"  运行路径添加 bundle 目录 [[[2
+NeoBundleLocal $VIMFILES/bundle
+" ]]]
+"  结束配置 NeoBundle [[[2
 call neobundle#end()
-"  针对不同的文件类型加载对应的插件
+" ]]]
+"  针对不同的文件类型加载对应的插件 [[[2
 filetype plugin indent on     " required!
 " ]]]
-"  NeoBundle帮助 [[[2
+"  NeoBundle 插件安装检查 [[[2
+if !has('vim_starting')
+	NeoBundleCheck
+endif
+" ]]]
+"  NeoBundle 帮助 [[[2
 " non github repos
 " NeoBundle 'git://git.wincent.com/command-t.git'
 " ...
@@ -524,15 +569,13 @@ filetype plugin indent on     " required!
 " :NeoBundleInstall(!)    - install(update) bundles
 " :NeoBundleSearch(!) foo - search(or refresh cache first) for foo
 " :NeoBundleClean(!)      - confirm(or auto-approve) removal of unused bundles
-" Installation check.
-NeoBundleCheck
 "
 " see :h neobundle for more details or wiki for faq
 " note: comments after bundle command are not allowed..
 " ]]]
 " ]]]
 "  以下为自己的自定义设置  [[[1
-"  以下设置在Vim全屏运行时source vimrc的时候不能再执行 [[[2
+"  以下设置在 Vim 全屏运行时 source vimrc 的时候不能再执行 [[[2
 "  否则会退出全屏
 if !exists('g:VimrcIsLoad')
 	"  设置语言编码 [[[3
@@ -586,11 +629,11 @@ if has('arabic')
 endif
 " ]]]
 "  图形与终端  [[[2
-"  以下设置在Vim全屏运行时source vimrc的时候不能再执行
+"  以下设置在 Vim 全屏运行时 source vimrc 的时候不能再执行
 "  否则会退出全屏
 if !exists('g:VimrcIsLoad')
 	" 设置字体  [[[3
-	" 设置显示字体和大小。guifontwide为等宽汉字字体。(干扰Airline，暂不设置)
+	" 设置显示字体和大小。guifontwide 为等宽汉字字体。(干扰 Airline，暂不设置)
 	if s:isWindows
 		" set guifont=Consolas\ for\ Powerline\ FixedD:h12
 		" 雅黑 Consolas Powerline 混合字体，取自 https://github.com/Jackson-soft/Vim/tree/master/user_fonts
@@ -682,7 +725,7 @@ if !exists('g:VimrcIsLoad')
 			unlet color_exit
 		endif
 	elseif has('win32') && exists('$CONEMUBUILD')
-		" 在Windows的ConEmu终端下开启256色
+		" 在 Windows 的 ConEmu 终端下开启256色
 		set term=xterm
 		set t_Co=256
 		let &t_AB="\e[48;5;%dm"
@@ -708,7 +751,7 @@ set nowrap "不自动换行
 set shiftwidth=4  " 设定 << 和 >> 命令移动时的宽度为 4
 set softtabstop=4  " 设置按BackSpace的时候可以一次删除掉4个空格
 set tabstop=4 "tab = 4 spaces
-" [Disabled]自动切换当前目录为当前文件所在的目录(与Fugitive冲突，因而禁用)
+" [Disabled]自动切换当前目录为当前文件所在的目录(与 Fugitive 冲突，因而禁用)
 " set autochdir
 " 搜索时忽略大小写，但在有一个或以上大写字母时仍大小写敏感
 set ignorecase
@@ -731,7 +774,7 @@ if has('persistent_undo')
 	" 保证撤销缓存目录存在
 	call EnsureExists(&undodir)
 endif
-" 设置光标之下的最少行数(暂时使用vim-sensible中的设置，不在此处设置)
+" 设置光标之下的最少行数(暂时使用 vim-sensible 中的设置，不在此处设置)
 " set scrolloff=3
 " 将命令输出重定向到文件的字符串不要包含标准错误
 set shellredir=>
@@ -753,7 +796,7 @@ catch /.*/
 endtry
 " ]]]
 " Display unprintable characters [[[2
-" 不在Windows和Mac下使用Unicode符号
+" 不在 Windows 和 Mac 下使用 Unicode 符号
 " 参见 https://github.com/tpope/vim-sensible/issues/44
 " 和   https://github.com/tpope/vim-sensible/issues/57
 if !s:isWindows && s:isGUI
@@ -763,7 +806,7 @@ if !s:isWindows && s:isGUI
 	set showbreak=↪
 endif
 " ]]]
-"  开启Wild菜单 [[[2
+"  开启 Wild 菜单 [[[2
 set wildmode=list:longest,full  " Command <Tab> completion, list matches, then longest common part, then all.
 "  Tab 键的自动完成忽略这些，影响代码提示 [[[3
 " Ignore compiled files
@@ -778,7 +821,7 @@ set wildignore+=**/tmp/**
 set wildignore+=*/node_modules/**
 " Ignore image file
 set wildignore+=*.png,*.jpg,*.gif,*.xpm,*.tiff
-" 不应该忽略.git，因为会破坏Fugitive的功能，参见 https://github.com/tpope/vim-fugitive/issues/121
+" 不应该忽略.git，因为会破坏 Fugitive 的功能，参见 https://github.com/tpope/vim-fugitive/issues/121
 set wildignore+=*.so,*.swp,*.lock,*.db,*.zip,*/.Trash/**,*.pdf,*.xz,*.DS_Store,*/.sass-cache/**
 " ]]]
 " 光标移到行尾时，自动换下一行开头 Backspace and cursor keys wrap too
@@ -1390,9 +1433,6 @@ if executable('ag')
 	let g:ackprg = "ag --nocolor --column --hidden --nogroup --smart-case"
 endif
 "  ]]]
-"-------------------------[Disabled]AutoClose--------------------------"  [[[2
-" let g:AutoClosePairs = {'(': ')', '{': '}', '[': ']', '"': '"', "'": "'", '`': '`'}
-" ]]]
 "-------------------------Auto-Pairs------------------------------"  [[[2
 " System Shortcuts:
 "        <CR>  : Insert new indented line after return if cursor in blank brackets or quotes.
