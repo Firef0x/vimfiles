@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 22 Nov 2014 00:26 +0800
+"  Last Modified: 22 Nov 2014 01:13 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -2043,17 +2043,22 @@ let g:lastmod_lines=7
 let g:lastmod_suffix=" +0800"
 " ]]]
 "  VimShell <Leader>sh [[[2
-if s:isWindows
-	let g:vimshell_prompt =  '$'
-else
-	" let g:vimshell_prompt =  '▸'
-	let g:vimshell_prompt =  "\u25b8"
+if neobundle#tap('vimshell.vim')
+	nmap <Leader>sh :VimShell -split<CR>
+	function! neobundle#hooks.on_source(bundle)
+		if s:isWindows
+			let g:vimshell_prompt =  '$'
+		else
+			" let g:vimshell_prompt =  '▸'
+			let g:vimshell_prompt =  "\u25b8"
+		endif
+		let g:vimshell_user_prompt = 'fnamemodify(getcwd(), ":~")'
+		let g:vimshell_data_directory = s:get_cache_dir("vimshell")
+		let g:vimshell_editor_command = 'vim'
+		let g:vimshell_vimshrc_path = $VIMFILES.'/vimshrc'
+	endfunction
+	call neobundle#untap()
 endif
-let g:vimshell_user_prompt = 'fnamemodify(getcwd(), ":~")'
-nmap <Leader>sh :VimShell -split<CR>
-let g:vimshell_data_directory = s:get_cache_dir("vimshell")
-let g:vimshell_editor_command = 'vim'
-let g:vimshell_vimshrc_path = $VIMFILES.'/vimshrc'
 " ]]]
 "  Vim-Scratch <Leader>sc [[[2
 let g:scratch_buffer_name="[Scratch]"
