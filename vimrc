@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 22 Nov 2014 04:25 +0800
+"  Last Modified: 22 Nov 2014 04:56 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -227,6 +227,17 @@ else
 					\ 'Tabularize',
 					\ 'AddTabularPipeline'
 					\ ]}}
+		NeoBundleLazy 'gorkunov/smartpairs.vim',
+					\ {'autoload':{
+					\ 'commands':[
+					\ 'SmartPairs',
+					\ 'SmartPairsI',
+					\ 'SmartPairsA'
+					\ ],
+					\ 'mappings':[
+					\ [ 'n', 'viv' ],
+					\ [ 'v', 'v' ]]
+					\ }}
 		NeoBundle 'jiangmiao/auto-pairs'
 		" 自动更新 Last Modified 字符串
 		NeoBundle 'jmcantrell/vim-lastmod'
@@ -2120,6 +2131,8 @@ let xml_use_xhtml = 1
 " ]]]
 "  Syntastic 语法检查 [[[2
 if neobundle#tap('syntastic')
+	" 光标跳转到第一个错误处
+	let g:syntastic_auto_jump = 2
 	if !s:isWindows
 		" let g:syntastic_error_symbol         = '✗'
 		" let g:syntastic_style_error_symbol   = '✠'
