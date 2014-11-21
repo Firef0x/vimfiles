@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 22 Nov 2014 03:05 +0800
+"  Last Modified: 22 Nov 2014 04:25 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -1616,16 +1616,20 @@ if s:autocomplete_method == 'neocomplcache'
 			let g:neocomplcache_enable_quick_match = 1
 			let g:neocomplcache_dictionary_filetype_lists = {
 						\ 'default'    : '',
-						\ 'vimshell'   : $HOME.'/.vimshell_hist',
-						\ 'scheme'     : $HOME.'/.gosh_completions',
 						\ 'bash'       : $HOME.'/.bash_history',
-						\ 'c'          : $VIMFILES.'/dict/c.dict',
-						\ 'cpp'        : $VIMFILES.'/dict/cpp.dict',
+						\ 'c'          : $VIMFILES.'/dict/c.txt',
+						\ 'cpp'        : $VIMFILES.'/dict/c.txt',
 						\ 'css'        : $VIMFILES.'/dict/css.txt',
-						\ 'php'        : $VIMFILES.'/dict/php.txt',
+						\ 'java'       : $VIMFILES.'/dict/java.txt',
 						\ 'javascript' : $VIMFILES.'/dict/javascript.txt',
-						\ 'lua'        : $VIMFILES.'/dict/lua.dict',
-						\ 'vim'        : $VIMFILES.'/dict/vim.dict'
+						\ 'lua'        : $VIMFILES.'/dict/lua.txt',
+						\ 'php'        : $VIMFILES.'/dict/php.txt',
+						\ 'python'     : $VIMFILES.'/dict/python.txt',
+						\ 'ruby'       : $VIMFILES.'/dict/ruby.txt',
+						\ 'scheme'     : $HOME.'/.gosh_completions',
+						\ 'vim'        : $VIMFILES.'/dict/vim.txt',
+						\ 'vimshell'   : s:get_cache_dir("vimshell").'/command-history',
+						\ 'zsh'        : $VIMFILES.'/dict/zsh.txt'
 						\ }
 
 			" Define keyword.
@@ -1725,16 +1729,20 @@ elseif s:autocomplete_method == 'neocomplete'
 			" Define dictionary.
 			let g:neocomplete#sources#dictionary#dictionaries = {
 						\ 'default'    : '',
-						\ 'vimshell'   : $HOME.'/.vimshell_hist',
-						\ 'scheme'     : $HOME.'/.gosh_completions',
 						\ 'bash'       : $HOME.'/.bash_history',
-						\ 'c'          : $VIMFILES.'/dict/c.dict',
-						\ 'cpp'        : $VIMFILES.'/dict/cpp.dict',
+						\ 'c'          : $VIMFILES.'/dict/c.txt',
+						\ 'cpp'        : $VIMFILES.'/dict/c.txt',
 						\ 'css'        : $VIMFILES.'/dict/css.txt',
-						\ 'php'        : $VIMFILES.'/dict/php.txt',
+						\ 'java'       : $VIMFILES.'/dict/java.txt',
 						\ 'javascript' : $VIMFILES.'/dict/javascript.txt',
-						\ 'lua'        : $VIMFILES.'/dict/lua.dict',
-						\ 'vim'        : $VIMFILES.'/dict/vim.dict'
+						\ 'lua'        : $VIMFILES.'/dict/lua.txt',
+						\ 'php'        : $VIMFILES.'/dict/php.txt',
+						\ 'python'     : $VIMFILES.'/dict/python.txt',
+						\ 'ruby'       : $VIMFILES.'/dict/ruby.txt',
+						\ 'scheme'     : $HOME.'/.gosh_completions',
+						\ 'vim'        : $VIMFILES.'/dict/vim.txt',
+						\ 'vimshell'   : s:get_cache_dir("vimshell").'/command-history',
+						\ 'zsh'        : $VIMFILES.'/dict/zsh.txt'
 						\ }
 
 			" Define keyword.
