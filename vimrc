@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 19 Nov 2014 05:04 +0800
+"  Last Modified: 22 Nov 2014 00:26 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -333,7 +333,10 @@ if count(s:plugin_groups, 'navigation')
 					\ ]}}
 		endif
 		NeoBundleLazy 'majutsushi/tagbar',
-					\ {'autoload':{'commands':'TagbarToggle'}}
+					\ {'autoload':{'commands':[
+					\ 'TagbarClose',
+					\ 'TagbarToggle'
+					\ ]}}
 		" 增强源代码浏览
 		NeoBundleLazy 'wesleyche/SrcExpl',
 					\ {'autoload':{'commands':'SrcExplToggle'}}
@@ -347,15 +350,15 @@ if count(s:plugin_groups, 'navigation')
 	" 在三路合并时的<<< >>> === 代码块之间快速移动
 	NeoBundle 'ConflictMotions',
 				\ {'depends':['ingo-library','CountJump']}
-	NeoBundle 'jistr/vim-nerdtree-tabs',
-				\ {'depends':['scrooloose/nerdtree'],
-				\ 'autoload':{'commands':'NERDTreeTabsToggle'}}
 	" Unite 比 CtrlP 更强大，所以替换
 	" NeoBundle 'kien/ctrlp.vim'
 	NeoBundleLazy 'mbbill/undotree',
 				\ {'autoload':{'commands':'UndotreeToggle'}}
 	NeoBundle 'mileszs/ack.vim'
 	NeoBundle 'scrooloose/nerdtree'
+	NeoBundle 'Xuyuanp/nerdtree-git-plugin',
+				\ {'depends':'scrooloose/nerdtree',
+				\ 'external_command':'git'}
 	" 显示尾部多余空格
 	NeoBundle 'git@github.com:Firef0x/ShowTrailingWhitespace'
 endif
@@ -865,7 +868,7 @@ augroup Filetype_Specific
 	" Markdown [[[3
 	autocmd FileType markdown setlocal nolist
 	" ]]]
-	" OpenSUSE Build Service [[[3
+	" openSUSE Build Service [[[3
 	autocmd BufNewFile,BufRead _meta,_service setlocal filetype=xml
 	" ]]]
 	" PHP [[[3
@@ -1507,6 +1510,8 @@ let NERDChristmasTree = 1
 let NERDTreeAutoCenter = 1
 " 指定书签文件
 let NERDTreeBookmarksFile = s:get_cache_dir("NERDTreeBookmarks")
+" 同时改变当前工作目录
+let NERDTreeChDirMode = 2
 " 排除 . .. 文件
 let NERDTreeIgnore = [
 					\ '__pycache__',
@@ -1542,8 +1547,6 @@ let NERDTreeShowLineNumbers = 0
 let NERDTreeWinPos = 'left'
 " 窗口宽度
 let NERDTreeWinSize = 31
-" 启动时不默认打开NERDTreeTabs
-let g:nerdtree_tabs_open_on_gui_startup = 0
 " ]]]
 "  NeoComplcache [[[2
 if s:autocomplete_method == 'neocomplcache'
@@ -2435,7 +2438,7 @@ nnoremap <silent> <Leader>gg :GitGutterToggle<CR>
 "  开关NERDTree F2 [[[3
 function! ShowNerdTree()
 	silent execute "TagbarClose"
-	execute "NERDTreeTabsToggle"
+	execute "NERDTreeToggle"
 endfunction
 nmap <F2> :call ShowNerdTree()<CR>
 " ]]]
