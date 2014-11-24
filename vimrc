@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 22 Nov 2014 04:56 +0800
+"  Last Modified: 24 Nov 2014 23:40 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -60,10 +60,22 @@ else
 endif
 " ]]]
 "  判定当前是否有Cscope [[[2
-if has('cscope') && executable('cscope')
+if has('cscope')
 	let s:hasCscope=1
+	if executable('gtags-cscope')
+		let s:hasGtagsCscopeExe=1
+	else
+		let s:hasGtagsCscopeExe=0
+	endif
+	if executable('cscope')
+		let s:hasCscopeExe=1
+	else
+		let s:hasCscopeExe=0
+	endif
 else
 	let s:hasCscope=0
+	let s:hasCscopeExe=0
+	let s:hasGtagsCscopeExe=0
 endif
 " ]]]
 " 设置自动完成使用的插件 [[[2
@@ -489,7 +501,7 @@ else
 					\ {'autoload':{'filetypes':['html', 'xml']}}
 	endif
 	"  Windows [[[3
-	if count(s:plugin_groups, 'windows') && s:hasCscope
+	if count(s:plugin_groups, 'windows') && s:hasCscope && s:hasCscopeExe
 		" NeoBundle 'cscope-wrapper'
 	endif
 	" ]]]
@@ -1482,7 +1494,7 @@ let g:bufExplorerDefaultHelp = 0  " 不显示默认帮助信息
 let g:bufExplorerSortBy = 'mru' " 使用最近使用的排列方式
 " ]]]
 "  cscope-wrapper  [[[2
-if s:isWindows && s:hasCscope
+if s:isWindows && s:hasCscope && s:hasCscopeExe && executable('cswrapper')
 	set csprg=cswrapper.exe
 endif
 " ]]]
@@ -2476,7 +2488,7 @@ endif
 nnoremap <silent> <C-F4> :Ack<CR>
 "  ]]]
 "  开关CCTree Ctrl-F12 [[[3
-if s:hasCTags && s:hasCscope && neobundle#tap('CCTree')
+if neobundle#tap('CCTree')
 	function! LoadCCTree()
 		if filereadable('cctree.out')
 			execute "CCTreeLoadXRefDBFromDisk cctree.out"
@@ -2652,61 +2664,83 @@ endif
 " NeoBundle 更新所有插件  :Nbupd  [[[3
 command! -nargs=0 Nbupd Unite neobundle/update -vertical -no-start-insert
 "  ]]]
-"  Vim辅助工具设置  [[[1
-"  cscope 设置 [[[2
+"  Vim 辅助工具设置  [[[1
+"  Cscope 设置 [[[2
 " (取自 https://github.com/lilydjwg/dotvim )
 if s:hasCscope
-	" 设置 [[[3
-	set cscopetagorder=1
-	set cscopetag
-	set cscopequickfix=s-,c-,d-,i-,t-,e-
-
-	" add any database in current directory
-	function! Cscope_Add()
-		set nocsverb
-		if filereadable("cscope.out")
-			cs add cscope.out
-		endif
-		set csverb
-	endfunction
-
-	"  调用这个函数就可以用cscope生成数据库，并添加到vim中
-	function! Cscope_DoTag()
-		if s:isWindows
-			silent! execute "Dispatch! dir /b *.c,*.cpp,*.h,*.java,*.cs >> cscope.files"
-		else
-			silent! execute "Dispatch! find . -name '*.h' -o -name '*.c' -o -name '*.cpp' -o -name '*.java' -o -name '*.cs' >> cscope.files"
-		endif
-		silent! execute "Dispatch! cscope -bkq"
-		call Cscope_Add()
-		silent! execute "Dispatch! ccglue -S cscope.out -o cctree.out"
-	endfunction
-
-	autocmd MyAutoCmd BufRead *.c,*.cpp,*.h,*.java,*.cs call Cscope_Add()
-
-	" 映射 [[[3
-	" 查找C语言符号，即查找函数名、宏、枚举值等出现的地方
-	nmap css :cs find s <C-R>=expand("<cword>")<CR><CR>
-	" 查找函数、宏、枚举等定义的位置，类似ctags所提供的功能
-	nmap csg :cs find g <C-R>=expand("<cword>")<CR><CR>
-	" 查找本函数调用的函数
-	nmap csd :cs find d <C-R>=expand("<cword>")<CR><CR>
-	" 查找调用本函数的函数
-	nmap csc :cs find c <C-R>=expand("<cword>")<CR><CR>
-	" 查找指定的字符串
-	nmap cst :cs find t <C-R>=expand("<cword>")<CR><CR>
-	" 查找egrep模式，相当于egrep功能，但查找速度快多了
-	nmap cse :cs find e <C-R>=expand("<cword>")<CR><CR>
-	" 查找并打开文件，类似vim的find功能
-	nmap csf :cs find f <C-R>=expand("<cfile>")<CR><CR>
-	" 查找包含本文件的文件
-	nmap csi :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
-	" 生成新的数据库
-	nmap csn :call Cscope_DoTag()<CR>
-
-	" 自己来输入命令
-	nmap cs<Space> :cs find 
+	" support GNU Global [[[3
+	let s:tags_files = []
+	if s:hasGtagsCscopeExe
+		call add(s:tags_files, ['GTAGS', 'gtags-cscope'])
+	endif
+	if s:hasCscopeExe
+		call add(s:tags_files, ['cscope.out', 'cscope'])
+	endif
 	" ]]]
+	if !empty(s:tags_files)
+		" settings and autocmd [[[3
+		set cscopetagorder=1
+		set cscopetag
+		set cscopequickfix=s-,c-,d-,i-,t-,e-
+
+		" add any database in current directory
+		function! Cscope_Add()
+			cd %:h
+			try
+				for [filename, prgname] in s:tags_files
+					let db = findfile(filename, '.;')
+					if !empty(db)
+						let &cscopeprg = prgname
+						set nocscopeverbose
+						exec "cs add" db expand('%:p:h')
+						set cscopeverbose
+						break
+					endif
+				endfor
+			finally
+				silent cd -
+			endtry
+		endfunction
+
+		autocmd MyAutoCmd BufRead *.c,*.cpp,*.h,*.java,*.cs call Cscope_Add()
+
+		"  调用这个函数就可以用 Cscope 生成数据库，并添加到 Vim 中
+		function! Cscope_DoTag()
+			lcd %:p:h
+			if s:isWindows
+				silent! execute "Dispatch! dir /b *.c,*.cpp,*.h,*.java,*.cs >> cscope.files"
+			else
+				silent! execute "Dispatch! find . -name '*.h' -o -name '*.c' -o -name '*.cpp' -o -name '*.java' -o -name '*.cs' >> cscope.files"
+			endif
+			silent! execute "Dispatch! cscope -bkq"
+			call Cscope_Add()
+			silent! execute "Dispatch! ccglue -S cscope.out -o cctree.out"
+		endfunction
+		" ]]]
+		" 映射 [[[3
+		" 查找C语言符号，即查找函数名、宏、枚举值等出现的地方
+		nmap css :cs find s <C-R>=expand("<cword>")<CR><CR>
+		" 查找函数、宏、枚举等定义的位置，类似ctags所提供的功能
+		nmap csg :cs find g <C-R>=expand("<cword>")<CR><CR>
+		" 查找本函数调用的函数
+		nmap csd :cs find d <C-R>=expand("<cword>")<CR><CR>
+		" 查找调用本函数的函数
+		nmap csc :cs find c <C-R>=expand("<cword>")<CR><CR>
+		" 查找指定的字符串
+		nmap cst :cs find t <C-R>=expand("<cword>")<CR><CR>
+		" 查找egrep模式，相当于egrep功能，但查找速度快多了
+		nmap cse :cs find e <C-R>=expand("<cword>")<CR><CR>
+		" 查找并打开文件，类似vim的find功能
+		nmap csf :cs find f <C-R>=expand("<cfile>")<CR><CR>
+		" 查找包含本文件的文件
+		nmap csi :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+		" 生成新的数据库
+		nmap csn :call Cscope_DoTag()<CR>
+
+		" 自己来输入命令
+		nmap cs<Space> :cs find 
+		" ]]]
+	endif
 endif
 " ]]]
 "  Win平台下窗口全屏组件 gvimfullscreen.dll [[[2
