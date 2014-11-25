@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 24 Nov 2014 23:40 +0800
+"  Last Modified: 25 Nov 2014 22:45 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -862,8 +862,21 @@ set showmatch
 set tags+=$VIMFILES/tags/cpp/stl.tags  " 增加C++ STL Tags
 set tags+=$VIMFILES/tags/perl/cpan.tags  " 增加Perl CPAN Tags
 source $VIMRUNTIME/ftplugin/man.vim
-" 使得注释换行时自动加上前导的空格和星号
-set formatoptions=tcqroj
+" ]]]
+"  设置自动排版选项  [[[2
+" 'formatoptions' 控制 Vim 如何对文本进行排版
+" r 在插入模式按回车时，自动插入当前注释前导符。
+" o 在普通模式按 'o' 或者 'O' 时，自动插入当前注释前导符。
+" 2 在对文本排版时，将段落第二行而非第一行的缩进距离应用到其后的行上。
+" m 可以在任何值高于 255 的多字节字符上分行。这对亚洲文本尤其有用，因为每
+"   个字符都是单独的单位。
+" B 在连接行时，不要在两个多字节字符之间插入空格。
+" 1 不要在单字母单词后分行。如有可能，在它之前分行。
+" j 在合适的场合，连接行时删除注释前导符。
+" (使用 vim-sensible 中的设置，不在此处设置)
+set formatoptions+=ro2mB1
+" t 使用 'textwidth' 自动回绕文本
+set formatoptions-=t
 " ]]]
 " 自动关联系统剪贴板(即+、*寄存器) [[[2
 if has('clipboard')
