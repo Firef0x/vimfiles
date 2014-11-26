@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 25 Nov 2014 22:45 +0800
+"  Last Modified: 26 Nov 2014 11:51 +0800
 "  准备工作 [[[1
 "  引用Example设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -931,14 +931,13 @@ augroup Filetype_Specific
 	" ]]]
 	" CSS [[[3
 	autocmd FileType css setlocal smartindent noexpandtab foldmethod=indent "tabstop=2 shiftwidth=2
-	autocmd FileType css set dictionary=$VIMFILES/dict/css.txt
 	autocmd BufNewFile,BufRead *.scss setlocal ft=scss
 	" 删除一条CSS中无用空格
 	autocmd FileType css vnoremap <leader>co J:s/\s*\([{:;,]\)\s*/\1/g<CR>:let @/=''<cr>
 	autocmd FileType css nnoremap <leader>co :s/\s*\([{:;,]\)\s*/\1/g<CR>:let @/=''<cr>
 	" ]]]
 	" Javascript [[[3
-	autocmd FileType javascript set dictionary=$VIMFILES/dict/javascript.txt
+	autocmd FileType javascript setlocal dictionary+=$VIMFILES/dict/node.txt
 	" Javascript Code Modules(Mozilla)
 	autocmd BufNewFile,BufRead *.jsm setlocal filetype=javascript
 	" jQuery syntax
@@ -954,7 +953,6 @@ augroup Filetype_Specific
 	" PHP 生成的SQL/HTML代码高亮
 	autocmd FileType php let php_sql_query=1
 	autocmd FileType php let php_htmlInStrings=1
-	autocmd FileType php set dictionary=$VIMFILES/dict/php.txt
 	" PHP Twig 模板引擎语法
 	" autocmd BufNewFile,BufRead *.twig set syntax=twig
 	" ]]]
@@ -1511,6 +1509,10 @@ if s:isWindows && s:hasCscope && s:hasCscopeExe && executable('cswrapper')
 	set csprg=cswrapper.exe
 endif
 " ]]]
+"  dictfile.vim 自动设置 'dict' 选项 [[[2
+"  设置词典目录 (取自 https://github.com/bling/dotvim )
+let g:dictfilePrefix = $VIMFILES . "/dict/"
+"  ]]]
 "  EasyMotion  [[[2
 let EasyMotion_leader_key = '<Leader><Leader>'
 let EasyMotion_keys = 'abcdefghijklmnopqrstuvwxyz'
@@ -1650,6 +1652,8 @@ if s:autocomplete_method == 'neocomplcache'
 			" 每次补全菜单弹出时，可以再按一个”-“键，这是补全菜单中的每个候选词
 			" 会被标上一个字母，只要再输入对应字母就可以马上完成选择。
 			let g:neocomplcache_enable_quick_match = 1
+
+			" Define dictionary.
 			let g:neocomplcache_dictionary_filetype_lists = {
 						\ 'default'    : '',
 						\ 'bash'       : $HOME.'/.bash_history',
@@ -1657,7 +1661,7 @@ if s:autocomplete_method == 'neocomplcache'
 						\ 'cpp'        : $VIMFILES.'/dict/c.txt',
 						\ 'css'        : $VIMFILES.'/dict/css.txt',
 						\ 'java'       : $VIMFILES.'/dict/java.txt',
-						\ 'javascript' : $VIMFILES.'/dict/javascript.txt',
+						\ 'javascript' : $VIMFILES.'/dict/javascript.txt'.','.$VIMFILES.'/dict/node.txt',
 						\ 'lua'        : $VIMFILES.'/dict/lua.txt',
 						\ 'php'        : $VIMFILES.'/dict/php.txt',
 						\ 'python'     : $VIMFILES.'/dict/python.txt',
@@ -1770,7 +1774,7 @@ elseif s:autocomplete_method == 'neocomplete'
 						\ 'cpp'        : $VIMFILES.'/dict/c.txt',
 						\ 'css'        : $VIMFILES.'/dict/css.txt',
 						\ 'java'       : $VIMFILES.'/dict/java.txt',
-						\ 'javascript' : $VIMFILES.'/dict/javascript.txt',
+						\ 'javascript' : $VIMFILES.'/dict/javascript.txt'.','.$VIMFILES.'/dict/node.txt',
 						\ 'lua'        : $VIMFILES.'/dict/lua.txt',
 						\ 'php'        : $VIMFILES.'/dict/php.txt',
 						\ 'python'     : $VIMFILES.'/dict/python.txt',
