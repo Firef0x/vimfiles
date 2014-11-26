@@ -1,7 +1,7 @@
 scriptencoding utf-8
-"  Last Modified: 26 Nov 2014 11:51 +0800
+"  Last Modified: 26 Nov 2014 23:39 +0800
 "  准备工作 [[[1
-"  引用Example设置 [[[2
+"  引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
 	runtime vimrc_example.vim
 endif
@@ -31,35 +31,35 @@ else
 	let s:isColor=0
 endif
 " ]]]
-"  判定当前终端是否Tmux [[[2
+"  判定当前终端是否 Tmux [[[2
 if exists('$TMUX')
 	let s:isTmux=1
 else
 	let s:isTmux=0
 endif
 " ]]]
-"  判定当前是否支持Lua [[[2
+"  判定当前是否支持 Lua [[[2
 if has('lua')
 	let s:hasLua=1
 else
 	let s:hasLua=0
 endif
 " ]]]
-"  判定当前是否支持Python2或3 [[[2
+"  判定当前是否支持 Python 2或3 [[[2
 if has('python') || has('python3')
 	let s:hasPython=1
 else
 	let s:hasPython=0
 endif
 " ]]]
-"  判定当前是否有CTags [[[2
+"  判定当前是否有 CTags [[[2
 if executable('ctags')
 	let s:hasCTags=1
 else
 	let s:hasCTags=0
 endif
 " ]]]
-"  判定当前是否有Cscope [[[2
+"  判定当前是否有 Cscope [[[2
 if has('cscope')
 	let s:hasCscope=1
 	if executable('gtags-cscope')
@@ -78,7 +78,7 @@ else
 	let s:hasGtagsCscopeExe=0
 endif
 " ]]]
-" 设置自动完成使用的插件 [[[2
+"  设置自动完成使用的插件 [[[2
 " NeoComplete 要求支持 Lua
 if s:hasLua
 	let s:autocomplete_method = 'neocomplete'
@@ -86,12 +86,12 @@ else
 	let s:autocomplete_method = 'neocomplcache'
 endif
 "  ]]]
-"  设置AuGroup [[[2
+"  设置 AuGroup [[[2
 augroup MyAutoCmd
 	autocmd!
 augroup END
 "  ]]]
-"  设置缓存目录 (取自 https://github.com/bling/dotvim )[[[2
+"  设置缓存目录 (取自 https://github.com/bling/dotvim ) [[[2
 let s:cache_dir = $VIMFILES."/.cache"
 "  ]]]
 "  ]]]
@@ -154,6 +154,7 @@ else
 	call add(s:plugin_groups, 'javascript')
 	if !s:isWindows
 		call add(s:plugin_groups, 'linux')
+		" FIXME Windows 下的 GitGutter 似乎有点问题
 		call add(s:plugin_groups, 'scm')
 		if s:isTmux
 			call add(s:plugin_groups, 'tmux')
@@ -248,6 +249,13 @@ else
 					\ ],
 					\ 'mappings':[
 					\ [ 'n', 'viv' ],
+					\ [ 'n', 'vav' ],
+					\ [ 'n', 'civ' ],
+					\ [ 'n', 'cav' ],
+					\ [ 'n', 'div' ],
+					\ [ 'n', 'dav' ],
+					\ [ 'n', 'yiv' ],
+					\ [ 'n', 'yav' ],
 					\ [ 'v', 'v' ]]
 					\ }}
 		NeoBundle 'jiangmiao/auto-pairs'
@@ -804,7 +812,7 @@ set shellredir=>
 " 使用管道
 set noshelltemp
 " ]]]
-"   设置加密选项  [[[2
+"  设置加密选项  [[[2
 "  (取自 https://github.com/lilydjwg/dotvim )
 try
 	" Vim 7.4.399+
@@ -818,7 +826,7 @@ catch /.*/
 	endtry
 endtry
 " ]]]
-" Display unprintable characters [[[2
+"  显示部分 list 模式下的特殊字符 [[[2
 " 不在 Windows 和 Mac 下使用 Unicode 符号
 " 参见 https://github.com/tpope/vim-sensible/issues/44
 " 和   https://github.com/tpope/vim-sensible/issues/57
@@ -851,6 +859,7 @@ set wildignore+=*.so,*.swp,*.lock,*.db,*.zip,*/.Trash/**,*.pdf,*.xz,*.DS_Store,*
 set whichwrap=b,s,h,l,<,>,[,]
 " ]]]
 "  设置代码相关选项  [[[2
+" ( autoindent 使用 vim-sensible 中的设置，不在此处设置)
 " 打开自动 C 程序缩进
 set cindent
 " 智能自动缩进
@@ -1018,7 +1027,7 @@ elseif executable('ack')
 	set grepformat=%f:%l:%c:%m
 endif
 " ]]]
-" 能够漂亮地显示.NFO文件  [[[2
+" 能够漂亮地显示 .NFO 文件  [[[2
 function! s:SetFileEncodings(encodings)
 	let b:myfileencodingsbak=&fileencodings
 	let &fileencodings=a:encodings
@@ -1036,10 +1045,10 @@ autocmd MyAutoCmd InsertLeave * if &l:diff | diffupdate | endif
 " ]]]
 " ]]]
 "  快捷键设置  [[[1
-"  设置<Leader>为逗号  [[[2
+"  设置 <Leader> 为逗号  [[[2
 let mapleader=","
 let g:mapleader = ","
-"  Alt组合键不映射到菜单上  [[[2
+"  Alt 组合键不映射到菜单上  [[[2
 set winaltkeys=no
 " ]]]
 "  用空格键来开关折叠  [[[2
@@ -1152,7 +1161,7 @@ function! Do_OneFileMake()
 	execute "cwindow"
 endfunction
 map <F5> :w <CR>:call Do_OneFileMake()<CR>
-" 进行make的设置
+" 进行 make 的设置
 function! Do_make()
 	setlocal makeprg=make
 	execute "Make"
@@ -1171,7 +1180,7 @@ map <C-F6> :silent make clean<CR>
 nnoremap <leader>v <C-w>v<C-w>l
 nnoremap <leader>s <C-w>s
 " ]]]
-"  窗口分割时重映射为<Ctrl-hjkl>,切换的时候会变得非常方便.   [[[2
+"  窗口分割时重映射为 <Ctrl-hjkl>，切换的时候会变得非常方便.   [[[2
 nmap <C-h> :wincmd h<CR>
 nmap <C-j> :wincmd j<CR>
 nmap <C-k> :wincmd k<CR>
@@ -1183,7 +1192,7 @@ imap <A-j> <Down>
 imap <A-k> <Up>
 imap <A-l> <Right>
 " ]]]
-"  插入模式下按jk代替Esc [[[2
+"  插入模式下按 jk 代替 Esc [[[2
 inoremap jk <Esc>
 " ]]]
 "  Alt+左右方向键切换buffer [[[2
@@ -1242,25 +1251,25 @@ nnoremap <silent> <C-i> <C-i>zz
 vnoremap < <gv
 vnoremap > >gv
 " ]]]
-"  将Y映射为复制到行尾 [[[2
+"  将 Y 映射为复制到行尾 [[[2
 nnoremap Y y$
 " ]]]
-"  允许在Visual模式下按 . 重复执行操作 [[[2
+"  允许在 Visual 模式下按 . 重复执行操作 [[[2
 vnoremap . :normal .<CR>
 " ]]]
-"  切换Quickfix <Shift-F12> [[[2
+"  切换 Quickfix <Shift-F12> [[[2
 " nmap <F11> :cnext<CR>
 " nmap <S-F11> :cprevious<CR>
 if executable('ctags')
 	nmap <S-F12> :Dispatch ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR>:UpdateTypesFile<CR>
 endif
 " ]]]
-"  编辑vim配置文件并在保存时加载 <Leader>rc [[[2
+"  编辑 Vim 配置文件并在保存时加载 <Leader>rc [[[2
 nmap <leader>rc :edit $MYVIMRC<CR>
-"  加载完之后需要执行AirlineRefresh来刷新，
-"  否则tabline排版会乱，参见https://github.com/bling/vim-airline/issues/312
-"  FIXME 似乎要AirlineRefresh两次才能完全刷新，参见https://github.com/bling/vim-airline/issues/539
-autocmd! MyAutoCmd BufWritePost $MYVIMRC
+"  加载完之后需要执行 AirlineRefresh 来刷新，
+"  否则 tabline 排版会乱，参见 https://github.com/bling/vim-airline/issues/312
+"  FIXME 似乎要 AirlineRefresh 两次才能完全刷新，参见 https://github.com/bling/vim-airline/issues/539
+autocmd MyAutoCmd BufWritePost $MYVIMRC
 			\ NeoBundleClearCache | silent source $MYVIMRC | AirlineRefresh
 " ]]]
 "  切换高亮搜索关键字 <Leader>nh [[[2
@@ -1285,11 +1294,11 @@ else
 	imap <S-ScrollWheelUp> <ScrollWheelLeft>
 endif
 " ]]]
-"  删除打开在Windows下的文件里的 ^M <Leader>mm [[[2
+"  删除打开在 Windows 下的文件里的 ^M <Leader>mm [[[2
 " use it when the encodings gets messed up
 noremap <Leader>mm mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
 " ]]]
-" 修复部分错按大写按键 [[[2
+"  修复部分错按大写按键 [[[2
 if has('user_commands')
 	command! -bang -nargs=* -complete=file E e<bang> <args>
 	command! -bang -nargs=* -complete=file W w<bang> <args>
@@ -1388,7 +1397,6 @@ function! OpenURL()
     echo '打开URL：' . s:url
     if s:isWindows
       " start 不是程序，所以无效。并且，cmd 只能使用双引号
-      " call system("start '" . s:url . "'")
       " call system("cmd /q /c start \"" . s:url . "\"")
       call system("E:\\PortableApps\\firefox\\firefox.exe \"" . s:url . "\"")
     elseif has("mac")
@@ -1417,13 +1425,16 @@ function! GetHexChar()
 endfunction
 nmap <silent> <Leader>% :call GetHexChar()<CR>
 " ]]]
-" 删除所有未显示且无修改的缓冲区以减少内存占用 :BufClean [[[2
+"  删除所有未显示且无修改的缓冲区以减少内存占用 :BufClean [[[2
 if has('user_commands')
 	command! BufClean call cleanbufs()
 endif
 " ]]]
-"  以下为Lilydjwg的设置  [[[1
-"  删除所有未显示且无修改的缓冲区以减少内存占用[[[2
+" ]]]
+"  以下为 Lilydjwg 的设置  [[[1
+"  (取自 https://github.com/lilydjwg/dotvim )
+"  函数 [[[2
+"  删除所有未显示且无修改的缓冲区以减少内存占用 [[[3
 function! s:cleanbufs()
 	for bufNr in filter(range(1, bufnr('$')),
 	\ 'buflisted(v:val) && !bufloaded(v:val)')
@@ -1431,7 +1442,7 @@ function! s:cleanbufs()
 	endfor
 endfunction
 " ]]]
-"  切换显示行号/相对行号 [[[2
+"  切换显示行号/相对行号 [[[3
 function! s:toggle_number()
 	if &nu && &rnu
 		setlocal nornu
@@ -1444,7 +1455,7 @@ function! s:toggle_number()
 	endif
 endfunction
 " ]]]
-"  退格删除自动缩进 [[[2
+"  退格删除自动缩进 [[[3
 function! Lilydjwg_checklist_bs(pat)
 	" 退格可清除自动出来的列表符号
 	if getline('.') =~ a:pat
@@ -1458,6 +1469,7 @@ function! Lilydjwg_checklist_bs(pat)
 		return "\<BS>"
 	endif
 endfunction
+" ]]]
 " ]]]
 " ]]]
 "  以下为插件的设置 [[[1
@@ -1526,7 +1538,7 @@ let g:user_emmet_mode = 'a'
 let g:use_emmet_complete_tag = 1
 let g:user_emmet_settings = {'lang': "zh-cn"}
 " ]]]
-"  Fugitive/GitGutter Vim内快捷Git命令操作&显示当前文件增改删行 [[[2
+"  Fugitive/GitGutter Vim 内快捷 Git 命令操作&显示当前文件增改删行 [[[2
 autocmd MyAutoCmd BufReadPost fugitive://* setlocal bufhidden=delete
 " SignColumn should match background for
 " things like vim-gitgutter
@@ -1546,7 +1558,7 @@ if neobundle#tap('matchit.zip')
 	call neobundle#untap()
 endif
 " ]]]
-" mark.vim 给各种tags标记不同的颜色，便于观看调式的插件。 [[[2
+" mark.vim 给各种 tags 标记不同的颜色，便于观看调式的插件。 [[[2
 " 这样，当我输入“,hl”时，就会把光标下的单词高亮，在此单词上按“,hh”会清除该单词的高亮。如果在高亮单词外输入“,hh”，会清除所有的高亮。
 " 你也可以使用virsual模式选中一段文本，然后按“,hl”，会高亮你所选中的文本；或者你可以用“,hr”来输入一个正则表达式，这会高亮所有符合这个正则表达式的文本。
 nmap <silent> <leader>hl <plug>MarkSet
@@ -1916,7 +1928,7 @@ if neobundle#tap('neosnippet.vim')
 	call neobundle#untap()
 endif
 " ]]]
-"  Netrw使用curl [[[2
+"  Netrw 使用 curl [[[2
 if executable("curl")
 	let g:netrw_http_cmd = "curl"
 	let g:netrw_http_xcmd = "-L --compressed -o"
@@ -2188,7 +2200,7 @@ let g:undotree_SplitLocation = 'botright'
 " If undotree is opened, it is likely one wants to interact with it.
 let g:undotree_SetFocusWhenToggle = 1
 " ]]]
-"  PO (Portable Object gettext翻译)  [[[2
+"  PO (Portable Object -- gettext 翻译)  [[[2
 " Actions			                           Key mappings
 " -------------------------------------------------------
 " Move to a string (transl. or untransl) forward      \m
@@ -2415,7 +2427,7 @@ let g:CCTreeUseUTF8Symbols = 1 "为了在终端模式下显示符号
 "1) 将鼠标移动到要解析的函数上面ctrl+\组合键后，按>键，就可以看到该函数调用的函数的结果
 "2) 将鼠标移动到要解析的函数上面ctrl+\组合键后，按<键，就可以看到调用该函数的函数的结果
 "  ]]]
-"  SrcExpl -- 增强源代码浏览，其功能就像Windows中的 Source Insight [[[2
+"  SrcExpl -- 增强源代码浏览，其功能就像 Windows 中的 Source Insight [[[2
 " :SrcExpl                                   "打开浏览窗口
 " :SrcExplClose                              "关闭浏览窗口
 " :SrcExplToggle                             "打开/闭浏览窗口
@@ -2760,14 +2772,14 @@ if s:hasCscope
 	endif
 endif
 " ]]]
-"  Win平台下窗口全屏组件 gvimfullscreen.dll [[[2
+"  Windows 平台下窗口全屏组件 gvimfullscreen.dll [[[2
 " (取自 https://github.com/asins/vim )
 " 用于 Windows gVim 全屏窗口，可用 F11 切换
 " 全屏后再隐藏菜单栏、工具栏、滚动条效果更好
 " <Leader>btm 降低窗口透明度
 " <Leader>tm  增加窗口透明度
 " Alt + R     切换Vim是否总在最前面显示
-" Vim启动的时候自动使用当前颜色的背景色以去除Vim的白色边框
+" Vim 启动的时候自动使用当前颜色的背景色以去除 Vim 的白色边框
 if s:isGUI && has('gui_win32') && has('libcall')
 	let g:MyVimLib = 'gvimfullscreen.dll'
 	"  切换全屏函数 [[[3
@@ -2810,13 +2822,14 @@ if s:isGUI && has('gui_win32') && has('libcall')
 	autocmd GUIEnter * call libcallnr(g:MyVimLib, 'SetAlpha', g:VimAlpha)
 endif
 " ]]]
-"  source vimrc 时让一些设置不再执行 [[[1
-"  并记录 source vimrc 的次数
+"  加载 Vim 配置文件时让一些设置不再执行 [[[1
+"  并记录加载 Vim 配置文件的次数
 if !exists("g:VimrcIsLoad")
 	let g:VimrcIsLoad = 1
 else
 	let g:VimrcIsLoad = g:VimrcIsLoad + 1
 endif
 " ]]]
-"  Vim Modeline [[[1
+"  Vim Modeline: [[[1
 " vim:fdm=marker:fmr=[[[,]]]
+" ]]]
