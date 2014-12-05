@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 26 Nov 2014 23:39 +0800
+"  Last Modified: 06 Dec 2014 01:08 +0800
 "  准备工作 [[[1
 "  引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -1094,7 +1094,7 @@ vnoremap <silent> <C-S> <C-C>:UpDate<CR>
 function! Do_OneFileMake()
 	if expand("%:p:h")!=getcwd()
 		echohl WarningMsg
-					\| echo "Fail to make! This file is not in the current dir! Press <F7> to redirect to the dir of this file."
+					\| echo "Fail to make! This file is not in the current directory!"
 					\| echohl None
 		return
 	endif
@@ -1114,9 +1114,9 @@ function! Do_OneFileMake()
 	endif
 	if &filetype=="c"
 		if s:isWindows==1
-			setlocal makeprg=gcc\ -o\ %<.exe\ %
+			setlocal makeprg=gcc\ -Wall\ -Wconversion\ -o\ %<.exe\ %
 		else
-			setlocal makeprg=gcc\ -o\ %<\ %
+			setlocal makeprg=gcc\ -Wall\ -Wconversion\ -o\ %<\ %
 		endif
 	elseif &filetype=="cpp"
 		if s:isWindows==1
@@ -1124,8 +1124,8 @@ function! Do_OneFileMake()
 		else
 			setlocal makeprg=g++\ -o\ %<\ %
 		endif
-		"elseif &filetype=="cs"
-		"setlocal makeprg=csc\ \/nologo\ \/out:%<.exe\ %
+	" elseif &filetype=="cs"
+		" setlocal makeprg=csc\ \/nologo\ \/out:%<.exe\ %
 	endif
 	if(s:isWindows==1)
 		let outfilename=substitute(sourcefileename,'\(\.[^.]*\)' ,'.exe','g')
@@ -1148,27 +1148,76 @@ function! Do_OneFileMake()
 			return
 		endif
 	endif
+	" Use Dispatch Make
 	execute "Make"
 	setlocal makeprg=make
-	execute "normal :"
-	if filereadable(outfilename)
-		if(s:isWindows==1)
-			execute "!".toexename
-		else
-			execute "!./".toexename
+	if getqflist() == [] "compile successfully and no warning
+		let l:flag = 0
+		silent execute "cclose"
+		execute "normal :"
+		if filereadable(outfilename)
+			if(s:isWindows==1)
+				execute "!".toexename
+			else
+				execute "!./".toexename
+			endif
 		endif
+	else
+		for l:inx in getqflist()
+			for l:val in values(l:inx)
+				if l:val =~ 'error'
+					let l:flag = 1
+					break
+				elseif l:val =~ 'warning'
+					let l:flag = 2
+				else
+					let l:flag = 0
+				endif
+			endfor
+			if l:val =~ 'error'
+				break
+			endif
+		endfor
 	endif
-	execute "cwindow"
+	if l:flag == 1
+		" Use Dispatch Copen
+		execute "Copen"
+	elseif l:flag == 2
+		let l:select = input('There are warnings! [r]un or [s]olve? ')
+		if l:select == 'r'
+			execute "normal :"
+			if filereadable(outfilename)
+				if(s:isWindows==1)
+					execute "!".toexename
+				else
+					execute "!./".toexename
+				endif
+			endif
+			execute "cwindow"
+		elseif l:select == 's'
+			" Use Dispatch Copen
+			execute "Copen"
+		else
+			echohl WarningMsg
+						\| echo "Input error!"
+						\| echohl None
+		endif
+	else
+		execute "cwindow"
+	endif
 endfunction
-map <F5> :w <CR>:call Do_OneFileMake()<CR>
+map <F5> :UpDate <CR>:call Do_OneFileMake()<CR>
+" ]]]
+"  一键执行 make 或 make clean 命令 F6/Ctrl-F6 [[[2
 " 进行 make 的设置
 function! Do_make()
 	setlocal makeprg=make
+	" Use Dispatch Make
 	execute "Make"
 	execute "cwindow"
 endfunction
 map <F6> :call Do_make()<CR>
-map <C-F6> :silent make clean<CR>
+map <C-F6> :Make clean<CR>
 " ]]]
 "  [Disabled]上下移动一行文字[[[2
 "nmap <C-j> mz:m+<cr>`z
