@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 17 Dec 2014 17:00 +0800
+"  Last Modified: 18 Dec 2014 23:54 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -267,6 +267,20 @@ function! GetHexChar()
   endif
   let str = substitute(chars, '%', '\\x', 'g')
   exe 'echo "'. str . '"'
+endfunction
+" ]]]
+"      打开 NERDTree，使用当前文件目录或者当前目录 [[[3
+function! NERDTreeOpen()
+	silent execute "TagbarClose"
+	if exists("t:NERDTreeBufName")
+		NERDTreeToggle
+	else
+		try
+			NERDTree `=expand('%:h')`
+		catch /E121/
+			NERDTree `=getcwd()`
+		endtry
+	endif
 endfunction
 " ]]]
 "    (以下取自 http://wyw.dcweb.cn/vim/_vimrc.html ) [[[2
@@ -1258,6 +1272,11 @@ endif
 " ]]]
 " ]]]
 "  以下为插件的设置 [[[1
+"    2html.vim [[[2
+" (以下取自 https://github.com/lilydjwg/dotvim )
+" 使用XHTML格式
+let use_xhtml = 1
+" ]]]
 "    Ack.vim [[[2
 " Ag 比 Ack 速度要快
 if neobundle#tap('ack.vim') && s:hasAg
@@ -1414,7 +1433,14 @@ endif
 let g:html_indent_inctags = "html,body,head,tbody,p,li,dd,marquee,header,nav,article,section"
 let g:html_indent_script1 = "inc"
 let g:html_indent_style1 = "inc"
-"  ]]]
+" ]]]
+"    Linediff [[[2
+if neobundle#tap('linediff.vim')
+	function! neobundle#hooks.on_source(bundle)
+		let g:linediff_buffer_type = 'scratch'
+	endfunction
+	call neobundle#untap()
+endif
 "    mark.vim 给各种 tags 标记不同的颜色，便于观看调式的插件。 [[[2
 " 这样，当我输入“,hl”时，就会把光标下的单词高亮，在此单词上按“,hh”会清除该单词的高亮。如果在高亮单词外输入“,hh”，会清除所有的高亮。
 " 你也可以使用virsual模式选中一段文本，然后按“,hl”，会高亮你所选中的文本；或者你可以用“,hr”来输入一个正则表达式，这会高亮所有符合这个正则表达式的文本。
@@ -2501,7 +2527,11 @@ if has('user_commands')
 	" ]]]
 	"    :NBU NeoBundle 更新所有插件 [[[2
 	command! -nargs=0 NBU Unite neobundle/update -vertical -no-start-insert
-	"  ]]]
+	" ]]]
+	"    :SQuote 将中文引号替换为英文引号 [[[2
+	" (以下取自 https://github.com/lilydjwg/dotvim )
+	command! -range=% -bar SQuote <line1>,<line2>s/“\|”\|″/"/ge|<line1>,<line2>s/‘\|’\|′/'/ge
+	" ]]]
 	"    :SudoUpDate SudoEdit.vim 以 root 权限保存文件 [[[2
 	" If the current buffer has never been saved, it will have no name,
 	" call the file browser to save it, otherwise just save it.
@@ -2695,17 +2725,13 @@ inoremap <silent> <M-l> <Right>
 "      Fx 相关 [[[3
 "        开关 NERDTree F2 [[[4
 if neobundle#tap('nerdtree')
-	function! ShowNerdTree()
-		silent execute "TagbarClose"
-		execute "NERDTreeToggle"
-	endfunction
-	nmap <silent> <F2> :call ShowNerdTree()<CR>
+	nnoremap <silent> <F2> :call NERDTreeOpen()<CR>
 	call neobundle#untap()
 endif
 " ]]]
 "        开关 Tagbar F3 [[[4
 if neobundle#tap('tagbar')
-	nmap <silent> <F3> :TagbarToggle<CR>
+	nnoremap <silent> <F3> :TagbarToggle<CR>
 	call neobundle#untap()
 endif
 " ]]]
@@ -2930,27 +2956,57 @@ nnoremap <silent> <C-l> :wincmd l<CR>
 " ]]]
 " ]]]
 "      其它开头的 [[[3
-"        Surround 快捷键 cS/ds/vs/ys [[[4
+"        Surround 快捷键 cS/ds/gS/vs/ys [[[4
 "          示例 [[[5
-"   Old text                  Command     New text ~
-"   "Hello *world!"           ds"         Hello world!
-"   [123+4*56]/2              cs])        (123+456)/2
-"   "Look ma, I'm *HTML!"     cs"<q>      <q>Look ma, I'm HTML!</q>
-"   if *x>3 {                 ysW(        if ( x>3 ) {
-"   my $str = *whee!;         vlllls'     my $str = 'whee!';
+"   Old text                  Command     New text
+"
 "   "Hello *world!"           ds"         Hello world!
 "   (123+4*56)/2              ds)         123+456/2
 "   <div>Yo!*</div>           dst         Yo!
+"
+"   "Hello *world!"           cS"'        'Hello world!'
+"   "Hello *world!"           cS"<q>      <q>Hello world!</q>
+"   (123+4*56)/2              cS)]        [123+456]/2
+"   (123+4*56)/2              cS)[        [ 123+456 ]/2
+"   <div>Yo!*</div>           cSt<p>      <p>Yo!</p>
+"   [123+4*56]/2              cS])        (123+456)/2
+"   "Look ma, I'm *HTML!"     cS"<q>      <q>Look ma, I'm HTML!</q>
+"
+"   if *x>3 {                 ysW(        if ( x>3 ) {
 "   Hello w*orld!             ysiw)       Hello (world)!
-"   注：  原 cs 和 cscope 的冲突了
+"
+" As a special case, *yss* operates on the current line, ignoring leading
+" whitespace.
+"       Hello w*orld!         yssB            {Hello world!}
+"
+"   my $str = *whee!;         vlllls'     my $str = 'whee!';
+"
+" 注：原 cs 和 cscope 的冲突了，更改为 cS
 " ]]]
+"          键映射 [[[5
+" (以下取自 https://github.com/lilydjwg/dotvim )
 if neobundle#tap('vim-surround')
-	augroup MyAutoCmd
-		autocmd VimEnter * silent! nunmap cs
-		autocmd VimEnter * nmap cS <Plug>Csurround
-	augroup END
+	let g:surround_no_mappings = 1
+	" original
+	nmap ds  <Plug>Dsurround
+	nmap ys  <Plug>Ysurround
+	nmap yS  <Plug>YSurround
+	nmap yss <Plug>Yssurround
+	nmap ySs <Plug>YSsurround
+	nmap ySS <Plug>YSsurround
+	xmap S   <Plug>VSurround
+	xmap gS  <Plug>VgSurround
+	imap <C-G>s <Plug>Isurround
+	imap <C-G>S <Plug>ISurround
+	" mine
+	" 比起 c，我更喜欢用 s
+	xmap c <Plug>Vsurround
+	xmap C <Plug>VSurround
+	" cs is for cscope
+	nmap cS <Plug>Csurround
 	call neobundle#untap()
 endif
+" ]]]
 " ]]]
 "        accelerated-jk 连续按 j/k 时加速移动光标 [[[4
 if neobundle#tap('accelerated-jk')
@@ -3042,6 +3098,9 @@ nnoremap <silent> <Space> @=((foldclosed(line('.')) < 0) ? 'zc':'zo')<CR>
 " <Leader>x<              Keep our changes, delete the rest.
 " <Leader>x|              Keep the change base, delete the rest.
 " <Leader>x>              Keep their changes, delete the rest."
+" ]]]
+"        将当前缓冲区置为未修改 -+ [[[4
+nmap <silent> -+ :set nomodified<CR>
 " ]]]
 " ]]]
 " ]]]
