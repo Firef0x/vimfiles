@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 19 Dec 2014 23:53 +0800
+"  Last Modified: 20 Dec 2014 04:15 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -1369,6 +1369,7 @@ endif
 " " r -- the nearest ancestor that contains one of these directories or files: `.git/` `.hg/` `.svn/` `.bzr/` `_darcs/`
 " let g:ctrlp_follow_symlinks = 1
 
+" 设置缓存目录
 " let g:ctrlp_cache_dir = s:get_cache_dir("ctrlp")
 " let g:ctrlp_custom_ignore = {
 "     \ 'dir' : '\v[\/](\.bzr|\.git|\.hg|\.idea|\.rvm|\.sass-cache|\.svn|node_modules)$',
@@ -2002,6 +2003,7 @@ endif
 " ]]]
 "    Startify 起始页 [[[2
 if neobundle#tap('vim-startify')
+	" 设置会话文件目录
 	let g:startify_session_dir = s:get_cache_dir("sessions")
 	let g:startify_change_to_vcs_root = 1
 	let g:startify_show_sessions = 1
@@ -2108,6 +2110,8 @@ endif
 "    Unite [[[2
 if neobundle#tap('unite.vim')
 	function! neobundle#hooks.on_source(bundle)
+		"  定义配置变量 [[[3
+		" Set up some custom ignores
 		let s:unite_ignores = [
 					\ '__pycache__/',
 					\ '\.bzr/',
@@ -2133,8 +2137,9 @@ if neobundle#tap('unite.vim')
 			" let s:default_context.marked_icon = '✗'
 			let s:default_context.marked_icon = "\u2717"
 		endif
+		" ]]]
 
-		" Custom filters. [[[3
+		"  Custom filters. [[[3
 		call unite#filters#matcher_default#use(['matcher_fuzzy'])
 		call unite#filters#sorter_default#use(['sorter_rank'])
 		" Start in insert mode
@@ -2166,6 +2171,8 @@ if neobundle#tap('unite.vim')
 		unlet s:default_context
 		" ]]]
 
+		"  设置选项 [[[3
+		" 设置缓存目录
 		let g:unite_data_directory = s:get_cache_dir("unite")
 		" Enable history yank source
 		let g:unite_source_history_yank_enable = 1
@@ -2191,7 +2198,9 @@ if neobundle#tap('unite.vim')
 
 		let g:unite_source_file_mru_filename_format = ':~:.'
 		let g:unite_source_file_mru_time_format = ''
+		" ]]]
 
+		"  Unite 内部键映射 [[[3
 		function! s:unite_settings()
 			" Overwrite settings.
 			nmap <buffer> <Esc> <plug>(unite_exit)
@@ -2206,8 +2215,10 @@ if neobundle#tap('unite.vim')
 			imap <buffer> jk <Plug>(unite_insert_leave)
 		endfunction
 		autocmd Filetype_Specific FileType unite call s:unite_settings()
+		" ]]]
 	endfunction
 
+	"  全局键映射 [[[3
 	" The prefix key
 	nmap ; [unite]
 	xmap ; [unite]
@@ -2254,6 +2265,7 @@ if neobundle#tap('unite.vim')
 				\ :<C-u>Unite -start-insert -resume -buffer-name=outline -vertical outline<cr>
 	" unite-help
 	nnoremap <silent> [unite]h :<C-u>Unite -buffer-name=help help<cr>
+	" ]]]
 
 	call neobundle#untap()
 endif
@@ -2371,7 +2383,7 @@ if neobundle#tap('vim-lastmod')
 	call neobundle#untap()
 endif
 " ]]]
-"    VimLint VimL语法检查工具 [[[2
+"    VimLint VimL 语法检查工具 [[[2
 if neobundle#tap('vim-vimlint')
 	let g:vimlint#config = {
 				\ 'quiet' : 1,
@@ -2399,6 +2411,7 @@ if neobundle#tap('vimshell.vim')
 			let g:vimshell_prompt =  "\u25b8"
 		endif
 		let g:vimshell_user_prompt = 'fnamemodify(getcwd(), ":~")'
+		" 设置缓存目录
 		let g:vimshell_data_directory = s:get_cache_dir("vimshell")
 		let g:vimshell_editor_command = 'vim'
 		let g:vimshell_vimshrc_path = $VIMFILES.'/vimshrc'
@@ -2856,7 +2869,7 @@ nmap <silent> <Leader>bt :call SetAlpha(10)<cr>
 "        关闭窗口或卸载缓冲区 <Leader>c [[[4
 nmap <silent> <Leader>c :call CloseWindowOrKillBuffer()<CR>
 " ]]]
-"        Vim-JSBeautify 格式化CSS,HTML,JavaScript <Leader>ff [[[4
+"        Vim-JSBeautify 格式化 CSS,HTML,JavaScript <Leader>ff [[[4
 if neobundle#tap('vim-jsbeautify')
 	augroup Filetype_Specific
 		" for css or scss
@@ -2882,9 +2895,10 @@ if neobundle#tap('vim-fugitive')
 	call neobundle#untap()
 endif
 " ]]]
-"        开关GitGutter <Leader>gg [[[4
+"        开关GitGutter <Leader>g{g,l} [[[4
 if neobundle#tap('vim-gitgutter')
 	nnoremap <silent> <Leader>gg :GitGutterToggle<CR>
+	nnoremap <silent> <Leader>gl :GitGutterLineHighlightsToggle<CR>
 	call neobundle#untap()
 endif
 " ]]]
@@ -2894,6 +2908,12 @@ if neobundle#tap('gitv')
 	nnoremap <silent> <Leader>gV :Gitv!<CR>
 	call neobundle#untap()
 endif
+" ]]]
+"        GitGutter 操作改动块 <Leader>h{p,r,s} [[[4
+" 映射          命令                         描述
+" <Leader>hp    <Plug>GitGutterPreviewHunk   Preview a hunk's changes
+" <Leader>hr    <Plug>GitGutterRevertHunk    Revert the hunk
+" <Leader>hs    <Plug>GitGutterStageHunk     Stage the hunk
 " ]]]
 "        删除打开在 Windows 下的文件里的 ^M <Leader>m [[[4
 " use it when the encodings gets messed up
@@ -3079,7 +3099,13 @@ nnoremap <silent> Y y$
 "        用空格键来开关折叠  [[[4
 nnoremap <silent> <Space> @=((foldclosed(line('.')) < 0) ? 'zc':'zo')<CR>
 " ]]]
+"        GitGutter 跳转到改动块 ]c [c [[[4
+" 映射       命令                           描述
+" ]c         <Plug>GitGutterNextHunk        jump to next hunk (change)
+" [c         <Plug>GitGutterPreviewHunk     jump to previous hunk (change)
+" ]]]
 "        ConflictMotions 快捷键 ]{x,X} [{x,X} [[[4
+" 映射                    描述
 " ]x                      Go to [count] next start of a conflict.
 " ]X                      Go to [count] next end of a conflict.
 " [x                      Go to [count] previous start of a conflict.
