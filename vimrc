@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 20 Dec 2014 04:15 +0800
+"  Last Modified: 20 Dec 2014 05:03 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -886,7 +886,6 @@ else
 					\ {'autoload':{'filetypes':['pentadactyl']}}
 		NeoBundleLazy 'superbrothers/vim-vimperator',
 					\ {'autoload':{'filetypes':['vimperator']}}
-		NeoBundle 'tomasr/molokai'
 		NeoBundleLazy 'tpope/vim-markdown',
 					\ {'autoload':{'filetypes':[
 					\ 'markdown',
@@ -894,7 +893,12 @@ else
 					\ ]}}
 		" NeoBundle 'xieyu/vim-assist'
 
-		" 从 vim-scripts 仓库中安装的脚本 [[[4
+		"  主题及配色 [[[4
+		NeoBundle 'crusoexia/vim-monokai'
+		NeoBundle 'tomasr/molokai'
+		" ]]]
+
+		"  从 vim-scripts 仓库中安装的脚本 [[[4
 		" 保存时自动创建空文件夹
 		NeoBundle 'auto_mkdir'
 		" 在单独的窗口管理缓冲区
@@ -1022,7 +1026,8 @@ if !exists('g:VimrcIsLoad')
 	endif
 	" ]]]
 	" 设置配色方案  [[[3
-	let colorscheme = 'molokai'
+	" let colorscheme = 'molokai'
+	let colorscheme = 'monokai'
 	" (以下取自 https://github.com/lilydjwg/dotvim )
 	if s:isGUI
 		" 有些终端不能改变大小
@@ -1037,7 +1042,7 @@ if !exists('g:VimrcIsLoad')
 		" 原为double，为了更好地显示airline，改为single
 		set ambiwidth=single
 		"开启molokai终端256色配色
-		let g:rehash256=1
+		" let g:rehash256=1
 		" 防止退出时终端乱码
 		" 这里两者都需要。只前者标题会重复，只后者会乱码
 		set t_fs=(B
@@ -2389,6 +2394,13 @@ if neobundle#tap('vim-vimlint')
 				\ 'quiet' : 1,
 				\ 'EVL103': 1,
 				\ 'EVL105': 1}
+	call neobundle#untap()
+endif
+" ]]]
+"    Vim-Monokai 配色 [[[2
+if neobundle#tap('vim-monokai')
+	" A less bright Nerdtree
+	let g:monokai_zentree = 1
 	call neobundle#untap()
 endif
 " ]]]
