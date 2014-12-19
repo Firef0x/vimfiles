@@ -1764,29 +1764,13 @@ endif
 "    NeoSnippet.vim [[[2
 if neobundle#tap('neosnippet.vim')
 	function! neobundle#hooks.on_source(bundle)
+		"  设置选项 [[[3
 		" Enable snipMate compatibility feature.
 		let g:neosnippet#enable_snipmate_compatibility = 1
 		" Tell Neosnippet about the other snippets
 		let g:neosnippet#snippets_directory = $VIMFILES.'/bundle/vim-snippets/snippets'
 		" Specifies directory for neosnippet cache.
 		let g:neosnippet#data_directory = s:get_cache_dir("neosnippet")
-		" Plugin key-mappings.
-		"imap <C-k> <Plug>(neocomplcache_snippets_force_expand)
-		"smap <C-k> <Plug>(neocomplcache_snippets_force_expand)
-		imap <C-k> <Plug>(neosnippet_expand_or_jump)
-		smap <C-k> <Plug>(neosnippet_expand_or_jump)
-		imap <C-l> <Plug>(neocomplcache_snippets_force_jump)
-		smap <C-l> <Plug>(neocomplcache_snippets_force_jump)
-		xmap <C-k> <Plug>(neosnippet_expand_target)
-
-		" SuperTab like snippets behavior.
-		imap <expr><TAB> neosnippet#expandable_or_jumpable() ?
-					\ "\<Plug>(neosnippet_expand_or_jump)"
-					\: pumvisible() ? "\<C-n>" : "\<TAB>"
-		smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
-					\ "\<Plug>(neosnippet_expand_or_jump)"
-					\: "\<TAB>"
-
 		" For snippet_complete marker.
 		if has('conceal')
 			set conceallevel=2
@@ -1797,11 +1781,29 @@ if neobundle#tap('neosnippet.vim')
 				let &listchars=&listchars.",conceal:\u0394"
 			endif
 		endif
-
 		" Disable the neosnippet preview candidate window
 		" When enabled, there can be too much visual noise
 		" especially when splits are used.
 		set completeopt-=preview
+		" ]]]
+
+		"  键映射 [[[3
+		" Plugin key-mappings.
+		imap <silent> <C-k> <Plug>(neosnippet_expand_or_jump)
+		smap <silent> <C-k> <Plug>(neosnippet_expand_or_jump)
+		xmap <silent> <C-k> <Plug>(neosnippet_expand_target)
+		imap <silent> <C-l> <Plug>(neosnippet_jump_or_expand)
+		smap <silent> <C-l> <Plug>(neosnippet_jump_or_expand)
+		xmap <silent> <C-l> <Plug>(neosnippet_start_unite_snippet_target)
+
+		" SuperTab like snippets behavior.
+		imap <expr> <TAB> neosnippet#expandable_or_jumpable() ?
+					\ "\<Plug>(neosnippet_expand_or_jump)"
+					\: pumvisible() ? "\<C-n>" : "\<TAB>"
+		smap <expr> <TAB> neosnippet#expandable_or_jumpable() ?
+					\ "\<Plug>(neosnippet_expand_or_jump)"
+					\: "\<TAB>"
+		" ]]]
 	endfunction
 	call neobundle#untap()
 endif
