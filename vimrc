@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 20 Dec 2014 05:03 +0800
+"  Last Modified: 26 Dec 2014 01:39 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -1933,62 +1933,50 @@ if neobundle#tap('rainbow')
 	\			  'brown',
 	\			  'lightblue',
 	\			  'lightyellow',
-	\			  'darkgreen',
-	\			  'lightmagenta',
 	\			  'lightcyan',
+	\			  'lightmagenta',
+	\			  'darkgreen',
 	\			  'darkred',
 	\			  'brown',
+	\			  'Darkblue',
 	\			  'gray',
 	\			  'black',
 	\			  'darkmagenta',
-	\			  'Darkblue',
 	\			  'darkgreen',
 	\			  'darkcyan',
 	\			  'darkred',
-	\			  'red',
 	\			  ],
 	\	'operators': '_,_',
-	\	'parentheses': [['(',')'], ['\[','\]'], ['{','}']],
+	\	'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
 	\	'separately': {
 	\		'*': {},
 	\		'cpp': {
-	\			'parentheses': [['(', ')'], ['\[', '\]'], ['{', '}'],
-	\			['\v%(<operator\_s*)@<!%(%(\i|^\_s*|template\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!)', '\v%(-)@<!\>']],
+	\			'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold', 'start=/\v%(<operator\_s*)@<!%(%(\i|^\_s*|template\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!)/ end=/\v%(-)@<!\>/ fold'],
 	\		},
 	\		'cs': {
-	\			'parentheses': [['(', ')'], ['\[', '\]'], ['{', '}'],
-	\			['\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!', '\v%(-)@<!\>']],
+	\			'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold', 'start=/\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!/ end=/\v%(-)@<!\>/ fold'],
 	\		},
 	\		'css': 0,
 	\		'html': {
-	\			'parentheses': [['(',')'], ['\[','\]'], ['{','}'],
-	\			['\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>','</\z1>']],
+	\			'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold'],
 	\		},
 	\		'java': {
-	\			'parentheses': [['(', ')'], ['\[', '\]'], ['{', '}'],
-	\			['\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!', '\v%(-)@<!\>']],
+	\			'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold', 'start=/\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!/ end=/\v%(-)@<!\>/ fold'],
 	\		},
 	\		'php': {
 	\			'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold', 'start=/(/ end=/)/ containedin=@htmlPreproc contains=@phpClTop', 'start=/\[/ end=/\]/ containedin=@htmlPreproc contains=@phpClTop', 'start=/{/ end=/}/ containedin=@htmlPreproc contains=@phpClTop'],
 	\		},
-	\		'rust': {
-	\			'parentheses': [['(', ')'], ['\[', '\]'], ['{', '}'],
-	\			['\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!', '\v%(-)@<!\>']],
-	\		},
-	\		'stylus': 0,
 	\		'tex': {
-	\			'parentheses': [['(',')'], ['\[','\]'], ['\\begin{.*}','\\end{.*}']],
+	\			'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/'],
 	\		},
 	\		'vim': {
-	\			'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/', 'start=/(/ end=/)/ containedin=vimFuncBody', 'start=/\[/ end=/\]/ containedin=vimFuncBody', 'start=/{/ end=/}/ containedin=vimFuncBody'],
+	\			'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/ fold', 'start=/(/ end=/)/ containedin=vimFuncBody', 'start=/\[/ end=/\]/ containedin=vimFuncBody', 'start=/{/ end=/}/ fold containedin=vimFuncBody'],
 	\		},
 	\		'xhtml': {
-	\			'parentheses': [['(',')'], ['\[','\]'], ['{','}'],
-	\			['\v\<\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'))?)*\>','</\z1>']],
+	\			'parentheses': ['start=/\v\<\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'))?)*\>/ end=#</\z1># fold'],
 	\		},
 	\		'xml': {
-	\			'parentheses': [['(',')'], ['\[','\]'], ['{','}'],
-	\			['\v\<\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'))?)*\>','</\z1>']],
+	\			'parentheses': ['start=/\v\<\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'))?)*\>/ end=#</\z1># fold'],
 	\		},
 	\	}
 	\}
