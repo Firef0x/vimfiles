@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 27 Dec 2014 15:37 +0800
+"  Last Modified: 28 Dec 2014 02:03 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -256,6 +256,7 @@ function! OpenURL()
   endif
   unlet s:url
 endfunction
+" ]]]
 "      %xx -> 对应的字符(到消息) [[[3
 function! GetHexChar()
   let chars = GetPatternAtCursor('\(%[[:xdigit:]]\{2}\)\+')
@@ -282,6 +283,25 @@ function! NERDTreeOpen()
 		endtry
 	endif
 endfunction
+" ]]]
+" ]]]
+"    (以下取自 https://github.com/Shougo/shougo-s-github ) [[[2
+"      切换选项开关 [[[3
+function! ToggleOption(option_name)
+	execute 'setlocal' a:option_name.'!'
+	execute 'setlocal' a:option_name.'?'
+endfunction
+" ]]]
+"      切换变量开关 [[[3
+function! ToggleVariable(variable_name)
+	if eval(a:variable_name)
+		execute 'let' a:variable_name.' = 0'
+	else
+		execute 'let' a:variable_name.' = 1'
+	endif
+	echo printf('%s = %s', a:variable_name, eval(a:variable_name))
+endfunction
+" ]]]
 " ]]]
 "    (以下取自 http://wyw.dcweb.cn/vim/_vimrc.html ) [[[2
 "      设置文件编码 [[[3
@@ -463,6 +483,7 @@ function! SwitchBuffer(direction)
 		endif
 	endif
 endfunction
+" ]]]
 " ]]]
 " ]]]
 "  NeoBundle.vim 插件管理器 [[[1
@@ -2829,10 +2850,10 @@ endif
 "nmap <F4> :execute IO()<CR>
 " ]]]
 "        一键编译单个源文件 F5 [[[4
-nmap <silent> <F5> :UpDate <CR>:call Do_OneFileMake()<CR>
+nmap <silent> <F5> :<C-U>UpDate <CR>:call Do_OneFileMake()<CR>
 " ]]]
 "        一键执行 make 或 make clean 命令 F6/<Ctrl-F6> [[[4
-nmap <silent> <F6> :call Do_make()<CR>
+nmap <silent> <F6> :<C-U>call Do_make()<CR>
 nmap <silent> <C-F6> :Make clean<CR>
 " ]]]
 "        开关撤销树 Undotree F8 [[[4
@@ -2851,7 +2872,7 @@ if neobundle#tap('a.vim')
 endif
 " ]]]
 "        切换全屏 Vim F11 [[[4
-noremap <silent> <F11> :call ToggleFullScreen()<cr>
+noremap <silent> <F11> :<C-U>call ToggleFullScreen()<cr>
 " ]]]
 "        Ack 查找光标下词语 <Ctrl-F4> [[[4
 if neobundle#tap('ack.vim')
@@ -2872,7 +2893,7 @@ if neobundle#tap('CCTree')
 			execute "CCTreeLoadDB cscope.out"
 		endif
 	endfunction
-	nmap <silent> <C-F12> :call LoadCCTree()<CR>
+	nmap <silent> <C-F12> :<C-U>call LoadCCTree()<CR>
 	call neobundle#untap()
 endif
 " ]]]
@@ -2885,10 +2906,10 @@ endif
 " ]]]
 "      <Leader> 开头 [[[3
 "        降低Vim窗体的透明度 <Leader>bt [[[4
-nmap <silent> <Leader>bt :call SetAlpha(10)<cr>
+nmap <silent> <Leader>bt :<C-U>call SetAlpha(10)<cr>
 " ]]]
 "        关闭窗口或卸载缓冲区 <Leader>c [[[4
-nmap <silent> <Leader>c :call CloseWindowOrKillBuffer()<CR>
+nmap <silent> <Leader>c :<C-U>call CloseWindowOrKillBuffer()<CR>
 " ]]]
 "        Vim-JSBeautify 格式化 CSS,HTML,JavaScript <Leader>ff [[[4
 if neobundle#tap('vim-jsbeautify')
@@ -2907,7 +2928,7 @@ if neobundle#tap('vim-jsbeautify')
 endif
 " ]]]
 "        格式化全文 <Leader>ff [[[4
-nmap <silent> <Leader>ff :call FullFormat()<CR>
+nmap <silent> <Leader>ff :<C-U>call FullFormat()<CR>
 " ]]]
 "        开关Fugitive <Leader>g{c,d,r,w} [[[4
 if neobundle#tap('vim-fugitive')
@@ -2945,13 +2966,13 @@ nnoremap <silent> <Leader>m mmHmt:%s/<C-V><CR>//ge<CR>'tzt'm
 " ]]]
 "        取消高亮搜索关键字 <Leader>nh [[[4
 " 同时取消 vim-mark 插件的高亮关键字
-nmap <silent> <Leader>nh :nohlsearch<CR>:Mark<CR>
+nmap <silent> <Leader>nh :<C-U>nohlsearch<CR>:Mark<CR>
 " ]]]
 "        切换绝对/相对行号 <Leader>nu [[[4
-nnoremap <Leader>nu :call <SID>toggle_number()<CR>
+nnoremap <Leader>nu :<C-U>call <SID>toggle_number()<CR>
 " ]]]
 "        打开 Vim 配置文件 <Leader>rc [[[4
-nmap <silent> <Leader>rc :edit $MYVIMRC<CR>
+nmap <silent> <Leader>rc :<C-U>edit $MYVIMRC<CR>
 " ]]]
 "        Vim-Scratch <Leader>sc [[[4
 if neobundle#tap('vim-scratch')
@@ -2987,7 +3008,7 @@ if neobundle#tap('splitjoin.vim')
 endif
 " ]]]
 "        增加Vim窗体的透明度 <Leader>tm [[[4
-nmap <silent> <Leader>tm :call SetAlpha(-10)<cr>
+nmap <silent> <Leader>tm :<C-U>call SetAlpha(-10)<cr>
 " ]]]
 "        ShowTrailingWhitespace 开关显示尾部多余空格 <Leader>tr [[[4
 if neobundle#tap('ShowTrailingWhitespace')
@@ -2998,6 +3019,9 @@ if neobundle#tap('ShowTrailingWhitespace')
 	call neobundle#untap()
 endif
 " ]]]
+"        切换高亮光标所在的屏幕列 <Leader>uc [[[4
+nnoremap <silent> <Leader>uc :<C-U>call ToggleOption('cursorcolumn')<CR>
+" ]]]
 "        打开光标下的链接 <Leader>ur [[[4
 " (以下取自 https://github.com/lilydjwg/dotvim )
 nmap <silent> <Leader>ur :call OpenURL()<CR>
@@ -3007,12 +3031,11 @@ nnoremap <silent> <Leader>vs <C-w>v<C-w>l
 nnoremap <silent> <Leader>sp <C-w>s
 " ]]]
 "        切换自动换行 <Leader>wr [[[4
-nnoremap <silent> <Leader>wr
-			\ :execute &wrap==1 ? 'setlocal nowrap' : 'setlocal wrap'<CR>
+nnoremap <silent> <Leader>wr :<C-U>call ToggleOption('wrap')<CR>
 " ]]]
 "        去掉行末空格并调整缩进 <Leader><Space> [[[4
 " (以下取自 https://github.com/bling/dotvim )
-nmap <silent> <Leader><Space> :call StripTrailingWhitespace()<CR>
+nmap <silent> <Leader><Space> :<C-U>call StripTrailingWhitespace()<CR>
 " ]]]
 "        %xx -> 对应的字符(到消息) <Leader>% [[[4
 " (以下取自 https://github.com/lilydjwg/dotvim )
@@ -3025,11 +3048,11 @@ nmap <silent> <Leader>% :call GetHexChar()<CR>
 " nmap <M-n> :CtrlPBuffer<CR>
 " ]]]
 "        切换 Vim 是否在最前面显示 <Alt-R> [[[4
-nmap <silent> <M-r> :call SwitchVimTopMostMode()<cr>
+nmap <silent> <M-r> :<C-U>call SwitchVimTopMostMode()<cr>
 " ]]]
 "        切换左右缓冲区 <Alt-左右方向键> [[[4
-nnoremap <silent> <M-left> :call SwitchBuffer(0)<CR>
-nnoremap <silent> <M-right> :call SwitchBuffer(1)<CR>
+nnoremap <silent> <M-left> :<C-U>call SwitchBuffer(0)<CR>
+nnoremap <silent> <M-right> :<C-U>call SwitchBuffer(1)<CR>
 " ]]]
 "        窗口分割时重映射为 <Ctrl-{h,j,k,l}>，切换的时候会变得非常方便 [[[4
 nnoremap <silent> <C-h> :wincmd h<CR>
@@ -3188,8 +3211,8 @@ nnoremap <silent> <Space> @=((foldclosed(line('.')) < 0) ? 'zc':'zo')<CR>
 " <Leader>x|              Keep the change base, delete the rest.
 " <Leader>x>              Keep their changes, delete the rest."
 " ]]]
-"        将当前缓冲区置为未修改 -+ [[[4
-nmap <silent> -+ :set nomodified<CR>
+"        切换当前缓冲区修改选项 -= [[[4
+nnoremap <silent> -= :<C-U>call ToggleOption('modified')<CR>
 " ]]]
 " ]]]
 " ]]]
