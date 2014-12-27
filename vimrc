@@ -1016,7 +1016,8 @@ if !exists('g:VimrcIsLoad')
 	" 设置显示字体和大小。guifontwide 为等宽汉字字体。(干扰 Airline，暂不设置)
 	if s:isWindows
 		" set guifont=Consolas\ for\ Powerline\ FixedD:h12
-		" 雅黑 Consolas Powerline 混合字体，取自 https://github.com/Jackson-soft/Vim/tree/master/user_fonts
+		" 雅黑 Consolas Powerline 混合字体
+		" 该字体取自 https://github.com/Jackson-soft/Vim/tree/master/user_fonts
 		set guifont=YaHei_Consolas_Hybrid:h12
 	elseif (s:isGUI || s:isColor)
 		set guifont=Inconsolata\ for\ Powerline\ Medium\ 12
@@ -1188,7 +1189,8 @@ catch /.*/
 endtry
 " ]]]
 "    开启 Wild 菜单 [[[2
-set wildmode=list:longest,full  " Command <Tab> completion, list matches, then longest common part, then all.
+" Command <Tab> completion, list matches, then longest common part, then all.
+set wildmode=list:longest,full
 "      Tab 键的自动完成忽略这些，影响代码提示 [[[3
 " Ignore compiled files
 set wildignore=*.o,*.obj,*~,*.class
@@ -1202,7 +1204,8 @@ set wildignore+=**/tmp/**
 set wildignore+=*/node_modules/**
 " Ignore image file
 set wildignore+=*.png,*.jpg,*.gif,*.xpm,*.tiff
-" 不应该忽略.git，因为会破坏 Fugitive 的功能，参见 https://github.com/tpope/vim-fugitive/issues/121
+" 不应该忽略.git，因为会破坏 Fugitive 的功能
+" 参见 https://github.com/tpope/vim-fugitive/issues/121
 set wildignore+=*.so,*.swp,*.lock,*.db,*.zip,*/.Trash/**,*.pdf,*.xz,*.DS_Store,*/.sass-cache/**
 " ]]]
 " 光标移到行尾时，自动换下一行开头 Backspace and cursor keys wrap too
@@ -1300,9 +1303,11 @@ endif
 
 " Fly Mode
 " --------
-" Fly Mode will always force closed-pair jumping instead of inserting. only for ")", "}", "]"
+" Fly Mode will always force closed-pair jumping instead of inserting.
+" only for ")", "}", "]"
 
-" If jumps in mistake, could use AutoPairsBackInsert(Default Key: `<M-b>`) to jump back and insert closed pair.
+" If jumps in mistake, could use AutoPairsBackInsert(Default Key: `<M-b>`)
+" to jump back and insert closed pair.
 
 " the most situation maybe want to insert single closed pair in the string, eg ")"
 
@@ -1334,7 +1339,8 @@ endif
 " ]]]
 "    CCTree.Vim C Call-Tree Explorer 源码浏览工具 关系树 (赞) [[[2
 " (以下取自 http://blog.csdn.net/qrsforever/article/details/6365651 )
-"1. 除了cscope ctags 程序的安装,还需安装强力胶 ccglue(ctags-cscope glue): http://sourceforge.net/projects/ccglue/files/src/
+"1. 除了cscope ctags 程序的安装,还需安装强力胶 ccglue(ctags-cscope glue):
+" http://sourceforge.net/projects/ccglue/files/src/
 " (1) ./configure && make && make install
 " (2) $ccglue -S cscope.out -o cctree.out 或 $ccglue -S cscope1.out cscope2.out -o cctree.out
 " (3) :CCTreeLoadXRefDBFromDisk cctree.out
@@ -1354,7 +1360,8 @@ endif
 " (5) map xxx :CCTreeUnLoadDB "卸载所有的数据库
 "3. 设置
 if neobundle#tap('CCTree')
-	let g:CCTreeDisplayMode = 2 " 当设置为垂直显示时, 模式为3最合适. (1-minimum width, 2-little space, 3-wide)
+	" 当设置为垂直显示时, 模式为3最合适. (1-minimum width, 2-little space, 3-wide)
+	let g:CCTreeDisplayMode = 2
 	let g:CCTreeUseUTF8Symbols = 1 "为了在终端模式下显示符号
 	let g:CCTreeWindowMinWidth = 40 " 最小窗口
 	let g:CCTreeWindowVertical = 1 " 水平分割,垂直显示
@@ -1371,7 +1378,8 @@ endif
 " ]]]
 "    [Disabled]CtrlP [[[2
 " let g:ctrlp_working_path_mode = 'ra'
-" " r -- the nearest ancestor that contains one of these directories or files: `.git/` `.hg/` `.svn/` `.bzr/` `_darcs/`
+" " r -- the nearest ancestor that contains one of these directories or files:
+" " `.git/` `.hg/` `.svn/` `.bzr/` `_darcs/`
 " let g:ctrlp_follow_symlinks = 1
 
 " 设置缓存目录
@@ -2226,12 +2234,15 @@ if neobundle#tap('unite.vim')
 	if s:isWindows
 		nnoremap <silent> [unite]<Space>
 					\ :<C-u>Unite -buffer-name=mixed -no-split -multi-line
-					\ jump_point file_point file_rec:! file file/new buffer neomru/file bookmark<cr><c-u>
-		nnoremap <silent> [unite]f :<C-u>Unite -toggle -buffer-name=files file_rec:!<cr><c-u>
+					\ jump_point file_point file_rec:! file file/new buffer
+					\ neomru/file bookmark<cr><c-u>
+		nnoremap <silent> [unite]f :<C-u>Unite -toggle -buffer-name=files
+					\ file_rec:!<cr><c-u>
 	else
 		nnoremap <silent> [unite]<Space>
 					\ :<C-u>Unite -buffer-name=mixed -no-split -multi-line
-					\ jump_point file_point file_rec/async:! file file/new buffer neomru/file bookmark<cr><c-u>
+					\ jump_point file_point file_rec/async:! file file/new
+					\ buffer neomru/file bookmark<cr><c-u>
 		nnoremap <silent> [unite]f
 					\ :<C-u>Unite -toggle -buffer-name=files file_rec/async:!<cr><c-u>
 	endif
@@ -2242,12 +2253,14 @@ if neobundle#tap('unite.vim')
 	nnoremap <silent> [unite]b :<C-u>Unite -buffer-name=buffers buffer neomru/file<cr>
 	" Quick grep from current directory(prompt for word)
 	nnoremap <silent> [unite]/
-				\ :<C-u>Unite -auto-preview -no-empty -no-split -resume -buffer-name=search grep:.<cr>
+				\ :<C-u>Unite -auto-preview -no-empty -no-split -resume
+				\ -buffer-name=search grep:.<cr>
 	nnoremap <silent> [unite]m
 				\ :<C-u>Unite -auto-resize -buffer-name=mappings mapping<cr>
 	" Quickly switch lcd
 	nnoremap <silent> [unite]d
-				\ :<C-u>Unite -buffer-name=change-cwd -default-action=lcd neomru/directory directory_rec/async<CR>
+				\ :<C-u>Unite -buffer-name=change-cwd -default-action=lcd
+				\ neomru/directory directory_rec/async<CR>
 	" Quickly most recently used
 	nnoremap <silent> [unite]e
 				\ :<C-u>Unite -buffer-name=recent neomru/file<CR>
@@ -2553,9 +2566,11 @@ augroup MyAutoCmd
 				\| endif
 " ]]]
 "      保存 Vim 配置文件后加载 [[[3
-"  加载完之后需要执行 AirlineRefresh 来刷新，
-"  否则 tabline 排版会乱，参见 https://github.com/bling/vim-airline/issues/312
-"  FIXME 似乎要 AirlineRefresh 两次才能完全刷新，参见 https://github.com/bling/vim-airline/issues/539
+" 加载完之后需要执行 AirlineRefresh 来刷新，否则 tabline 排版会乱
+" 参见 https://github.com/bling/vim-airline/issues/312
+"
+" FIXME 似乎要 AirlineRefresh 两次才能完全刷新
+" 参见 https://github.com/bling/vim-airline/issues/539
 	autocmd BufWritePost $MYVIMRC
 				\ NeoBundleClearCache | silent source $MYVIMRC | AirlineRefresh
 " ]]]
@@ -2863,7 +2878,8 @@ endif
 " ]]]
 "        切换 Quickfix <Shift-F12> [[[4
 if s:hasCTags
-	nmap <silent> <S-F12> :Dispatch ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR>:UpdateTypesFile<CR>
+	nmap <silent> <S-F12> :Dispatch ctags -R --c++-kinds=+p --fields=+iaS
+				\ --extra=+q .<CR>:UpdateTypesFile<CR>
 endif
 " ]]]
 " ]]]
@@ -2882,8 +2898,10 @@ if neobundle#tap('vim-jsbeautify')
 		autocmd FileType css vnoremap <buffer> <Leader>ff :call RangeCSSBeautify()<CR>
 		autocmd FileType html nnoremap <buffer> <Leader>ff :call HtmlBeautify()<CR>
 		autocmd FileType html vnoremap <buffer> <Leader>ff :call RangeHtmlBeautify()<CR>
-		autocmd FileType javascript,json nnoremap <buffer> <Leader>ff :call JsBeautify()<CR>
-		autocmd FileType javascript,json vnoremap <buffer> <Leader>ff :call RangeJsBeautify()<CR>
+		autocmd FileType javascript,json nnoremap <buffer> <Leader>ff
+					\ :call JsBeautify()<CR>
+		autocmd FileType javascript,json vnoremap <buffer> <Leader>ff
+					\ :call RangeJsBeautify()<CR>
 	augroup END
 	call neobundle#untap()
 endif
@@ -2973,7 +2991,8 @@ nmap <silent> <Leader>tm :call SetAlpha(-10)<cr>
 " ]]]
 "        ShowTrailingWhitespace 开关显示尾部多余空格 <Leader>tr [[[4
 if neobundle#tap('ShowTrailingWhitespace')
-	nnoremap <silent> <Leader>tr :<C-u>call ShowTrailingWhitespace#Toggle(0)<Bar>echo
+	nnoremap <silent> <Leader>tr
+				\ :<C-U>call ShowTrailingWhitespace#Toggle(0)<Bar>echo
 				\ (ShowTrailingWhitespace#IsSet() ? 'Show trailing whitespace'
 				\ : 'Not showing trailing whitespace')<CR>
 	call neobundle#untap()
@@ -2988,7 +3007,8 @@ nnoremap <silent> <Leader>vs <C-w>v<C-w>l
 nnoremap <silent> <Leader>sp <C-w>s
 " ]]]
 "        切换自动换行 <Leader>wr [[[4
-nnoremap <silent> <Leader>wr :execute &wrap==1 ? 'setlocal nowrap' : 'setlocal wrap'<CR>
+nnoremap <silent> <Leader>wr
+			\ :execute &wrap==1 ? 'setlocal nowrap' : 'setlocal wrap'<CR>
 " ]]]
 "        去掉行末空格并调整缩进 <Leader><Space> [[[4
 " (以下取自 https://github.com/bling/dotvim )
