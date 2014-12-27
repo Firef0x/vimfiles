@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 28 Dec 2014 03:01 +0800
+"  Last Modified: 28 Dec 2014 03:35 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -29,7 +29,7 @@ endif
 " ]]]
 "      判定当前终端是否256色 [[[3
 if (s:isWindows==0 && s:isGUI==0 &&
-	\ (&term =~ "256color" || &term =~ "xterm" || &term =~ "fbterm"))
+			\ (&term =~ "256color" || &term =~ "xterm" || &term =~ "fbterm"))
 	let s:isColor=1
 else
 	let s:isColor=0
@@ -178,7 +178,7 @@ endfunction
 "      删除所有未显示且无修改的缓冲区以减少内存占用 [[[3
 function! s:cleanbufs()
 	for bufNr in filter(range(1, bufnr('$')),
-	\ 'buflisted(v:val) && !bufloaded(v:val)')
+				\ 'buflisted(v:val) && !bufloaded(v:val)')
 		execute bufNr . 'bdelete'
 	endfor
 endfunction
@@ -213,61 +213,61 @@ endfunction
 " ]]]
 "      取得光标处的匹配 [[[3
 function! GetPatternAtCursor(pat)
-  let col = col('.') - 1
-  let line = getline('.')
-  let ebeg = -1
-  let cont = match(line, a:pat, 0)
-  while (ebeg >= 0 || (0 <= cont) && (cont <= col))
-    let contn = matchend(line, a:pat, cont)
-    if (cont <= col) && (col < contn)
-      let ebeg = match(line, a:pat, cont)
-      let elen = contn - ebeg
-      break
-    else
-      let cont = match(line, a:pat, contn)
-    endif
-  endwhile
-  if ebeg >= 0
-    return strpart(line, ebeg, elen)
-  else
-    return ""
-  endif
+	let col = col('.') - 1
+	let line = getline('.')
+	let ebeg = -1
+	let cont = match(line, a:pat, 0)
+	while (ebeg >= 0 || (0 <= cont) && (cont <= col))
+		let contn = matchend(line, a:pat, cont)
+		if (cont <= col) && (col < contn)
+			let ebeg = match(line, a:pat, cont)
+			let elen = contn - ebeg
+			break
+		else
+			let cont = match(line, a:pat, contn)
+		endif
+	endwhile
+	if ebeg >= 0
+		return strpart(line, ebeg, elen)
+	else
+		return ""
+	endif
 endfunction
 " ]]]
 "      用火狐打开链接 [[[3
 function! OpenURL()
-  let s:url = GetPatternAtCursor('\v%(https?|ftp)://[^]''" \t\r\n>*。，\`)]*')
-  if s:url == ""
-    echohl WarningMsg
-    echomsg '在光标处未发现URL！'
-    echohl None
-  else
-    echo '打开URL：' . s:url
-    if s:isWindows
-      " start 不是程序，所以无效。并且，cmd 只能使用双引号
-      " call system("cmd /q /c start \"" . s:url . "\"")
-      call system("E:\\PortableApps\\firefox\\firefox.exe \"" . s:url . "\"")
-    elseif has("mac")
-      call system("open '" . s:url . "'")
-    else
-      " call system("gnome-open " . s:url)
-      call system("setsid firefox '" . s:url . "' &")
-    endif
-  endif
-  unlet s:url
+	let s:url = GetPatternAtCursor('\v%(https?|ftp)://[^]''" \t\r\n>*。，\`)]*')
+	if s:url == ""
+		echohl WarningMsg
+		echomsg '在光标处未发现URL！'
+		echohl None
+	else
+		echo '打开URL：' . s:url
+		if s:isWindows
+			" start 不是程序，所以无效。并且，cmd 只能使用双引号
+			" call system("cmd /q /c start \"" . s:url . "\"")
+			call system("E:\\PortableApps\\firefox\\firefox.exe \"" . s:url . "\"")
+		elseif has("mac")
+			call system("open '" . s:url . "'")
+		else
+			" call system("gnome-open " . s:url)
+			call system("setsid firefox '" . s:url . "' &")
+		endif
+	endif
+	unlet s:url
 endfunction
 " ]]]
 "      %xx -> 对应的字符(到消息) [[[3
 function! GetHexChar()
-  let chars = GetPatternAtCursor('\(%[[:xdigit:]]\{2}\)\+')
-  if chars == ''
-    echohl WarningMsg
-    echo '在光标处未发现%表示的十六进制字符串！'
-    echohl None
-    return
-  endif
-  let str = substitute(chars, '%', '\\x', 'g')
-  exe 'echo "'. str . '"'
+	let chars = GetPatternAtCursor('\(%[[:xdigit:]]\{2}\)\+')
+	if chars == ''
+		echohl WarningMsg
+		echo '在光标处未发现%表示的十六进制字符串！'
+		echohl None
+		return
+	endif
+	let str = substitute(chars, '%', '\\x', 'g')
+	exe 'echo "'. str . '"'
 endfunction
 " ]]]
 "      打开 NERDTree，使用当前文件目录或者当前目录 [[[3
@@ -498,12 +498,12 @@ call neobundle#begin(expand("$VIMFILES/bundle"))
 " set shellxquote="\""
 " set noshellslash
 " ]]]
-"    载入 NeoBundle 缓存 [[[2
 if neobundle#has_cache()
+	"  载入 NeoBundle 缓存 [[[2
 	NeoBundleLoadCache
-" ]]]
-"    配置 NeoBundle [[[2
+	" ]]]
 else
+	"  配置 NeoBundle [[[2
 	"  使 NeoBundle 管理 NeoBundle [[[3
 	" required!
 	NeoBundleFetch 'Shougo/neobundle.vim'
@@ -728,10 +728,10 @@ else
 			" C Call-Tree Explorer 源码浏览工具
 			if s:hasCscope
 				NeoBundleLazy 'CCTree',
-						\ {'autoload':{'commands':[
-						\ 'CCTreeLoadDB',
-						\ 'CCTreeLoadXRefDBFromDisk'
-						\ ]}}
+							\ {'autoload':{'commands':[
+							\ 'CCTreeLoadDB',
+							\ 'CCTreeLoadXRefDBFromDisk'
+							\ ]}}
 			endif
 			NeoBundleLazy 'majutsushi/tagbar',
 						\ {'autoload':{'commands':[
@@ -944,8 +944,8 @@ else
 	"  保存 NeoBundle 缓存 [[[3
 	NeoBundleSaveCache
 	" ]]]
+	" ]]]
 endif
-" ]]]
 "    运行路径添加 bundle 目录 [[[2
 NeoBundleLocal $VIMFILES/bundle
 " ]]]
@@ -1511,15 +1511,16 @@ if neobundle#tap('matchit.zip')
 	call neobundle#untap()
 endif
 " ]]]
-"    NeoComplcache [[[2
+"    自动完成插件 [[[2
 if s:autocomplete_method == 'neocomplcache'
+	"  NeoComplcache [[[3
 	if neobundle#tap('neocomplcache.vim')
 		" Disable AutoComplPop.
 		let g:acp_enableAtStartup = 0
 		" Use neocomplcachd.
 		let g:neocomplcache_enable_at_startup = 1
 		function! neobundle#hooks.on_source(bundle)
-			"  设置选项 [[[3
+			"  设置选项 [[[4
 			" Use smartcase.
 			let g:neocomplcache_enable_smart_case = 1
 			" Use camel case completion.
@@ -1541,7 +1542,7 @@ if s:autocomplete_method == 'neocomplcache'
 			let g:neocomplcache_enable_quick_match = 1
 			" ]]]
 
-			"  Define dictionary. [[[3
+			"  Define dictionary. [[[4
 			let g:neocomplcache_dictionary_filetype_lists = {
 						\ 'default'    : '',
 						\ 'bash'       : $HOME.'/.bash_history',
@@ -1561,14 +1562,14 @@ if s:autocomplete_method == 'neocomplcache'
 						\ }
 			" ]]]
 
-			"  Define keyword. [[[3
+			"  Define keyword. [[[4
 			if !exists('g:neocomplcache_keyword_patterns')
 				let g:neocomplcache_keyword_patterns = {}
 			endif
 			let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
 			" ]]]
 
-			"  键映射 [[[3
+			"  键映射 [[[4
 			" Plugin key-mappings.
 			"imap <C-k>     <Plug>(neocomplcache_snippets_expand)
 			"smap <C-k>     <Plug>(neocomplcache_snippets_expand)
@@ -1608,7 +1609,7 @@ if s:autocomplete_method == 'neocomplcache'
 			"inoremap <expr> <CR>  neocomplcache#smart_close_popup() . "\<CR>"
 			" ]]]
 
-			"  设置全能补全 [[[3
+			"  设置全能补全 [[[4
 			" Enable omni completion.
 			augroup Filetype_Specific
 				autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
@@ -1638,16 +1639,16 @@ if s:autocomplete_method == 'neocomplcache'
 		endfunction
 		call neobundle#untap()
 	endif
-"------------------NeoComplcache---------------------------------  ]]]
-"    NeoComplete [[[2
+	"------------------NeoComplcache---------------------------------  ]]]
 elseif s:autocomplete_method == 'neocomplete'
+	"  NeoComplete [[[3
 	if neobundle#tap('neocomplete.vim')
 		" Disable AutoComplPop.
 		let g:acp_enableAtStartup = 0
 		" Use neocomplete.
 		let g:neocomplete#enable_at_startup = 1
 		function! neobundle#hooks.on_source(bundle)
-			"  设置选项 [[[3
+			"  设置选项 [[[4
 			" Use smartcase.
 			let g:neocomplete#enable_smart_case = 1
 			" Use camel case completion.
@@ -1673,7 +1674,7 @@ elseif s:autocomplete_method == 'neocomplete'
 			let g:neocomplete#fallback_mappings = ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
 			" ]]]
 
-			"  Define dictionary. [[[3
+			"  Define dictionary. [[[4
 			let g:neocomplete#sources#dictionary#dictionaries = {
 						\ 'default'    : '',
 						\ 'bash'       : $HOME.'/.bash_history',
@@ -1693,14 +1694,14 @@ elseif s:autocomplete_method == 'neocomplete'
 						\ }
 			" ]]]
 
-			"  Define keyword. [[[3
+			"  Define keyword. [[[4
 			if !exists('g:neocomplete#keyword_patterns')
 				let g:neocomplete#keyword_patterns = {}
 			endif
 			let g:neocomplete#keyword_patterns['default'] = '\h\w*'
 			" ]]]
 
-			"  键映射 [[[3
+			"  键映射 [[[4
 			" Plugin key-mappings.
 			inoremap <expr> <C-g>     neocomplete#undo_completion()
 			inoremap <expr> <C-l>     neocomplete#complete_common_string()
@@ -1753,7 +1754,7 @@ elseif s:autocomplete_method == 'neocomplete'
 			"inoremap <expr> <TAB>  pumvisible() ? "\<Down>" : "\<C-x>\<C-u>"
 			" ]]]
 
-			"  设置全能补全 [[[3
+			"  设置全能补全 [[[4
 			" Enable omni completion.
 			augroup Filetype_Specific
 				autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
@@ -1783,6 +1784,7 @@ elseif s:autocomplete_method == 'neocomplete'
 		endfunction
 		call neobundle#untap()
 	endif
+	" ]]]
 endif
 " ]]]
 "    NeoMRU.vim [[[2
@@ -1865,24 +1867,24 @@ if neobundle#tap('nerdtree')
 	let NERDTreeChDirMode = 2
 	" 排除 . .. 文件
 	let NERDTreeIgnore = [
-						\ '__pycache__',
-						\ '\.DS_Store',
-						\ '\.bzr',
-						\ '\.class',
-						\ '\.git',
-						\ '\.hg',
-						\ '\.idea',
-						\ '\.pyc',
-						\ '\.pyo',
-						\ '\.rvm',
-						\ '\.sass-cache',
-						\ '\.svn',
-						\ '\.swo$',
-						\ '\.swp$',
-						\ 'node_modules',
-						\ '^\.$',
-						\ '^\.\.$',
-						\ ]
+				\ '__pycache__',
+				\ '\.DS_Store',
+				\ '\.bzr',
+				\ '\.class',
+				\ '\.git',
+				\ '\.hg',
+				\ '\.idea',
+				\ '\.pyc',
+				\ '\.pyo',
+				\ '\.rvm',
+				\ '\.sass-cache',
+				\ '\.svn',
+				\ '\.swo$',
+				\ '\.swp$',
+				\ 'node_modules',
+				\ '^\.$',
+				\ '^\.\.$',
+				\ ]
 	" 指定鼠标模式(1.双击打开 2.单目录双文件 3.单击打开)
 	let NERDTreeMouseMode = 2
 	let NERDTreeQuitOnOpen = 1
@@ -1957,58 +1959,58 @@ if neobundle#tap('rainbow')
 	" 'parentheses': 描述哪些模式将被当作括号处理,每一组括号由两个vim正则表达式描述
 	" 'separately': 针对文件类型(由&ft决定)作不同的配置,未被设置的文件类型使用'*'下的配置
 	let g:rainbow_conf = {
-	\	'guifgs': ['RoyalBlue3', 'DarkOrange3', 'SeaGreen3', 'firebrick3', 'DarkOrchid3'],
-	\	'ctermfgs': [
-	\			  'brown',
-	\			  'lightblue',
-	\			  'lightyellow',
-	\			  'lightcyan',
-	\			  'lightmagenta',
-	\			  'darkgreen',
-	\			  'darkred',
-	\			  'brown',
-	\			  'Darkblue',
-	\			  'gray',
-	\			  'black',
-	\			  'darkmagenta',
-	\			  'darkgreen',
-	\			  'darkcyan',
-	\			  'darkred',
-	\			  ],
-	\	'operators': '_,_',
-	\	'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
-	\	'separately': {
-	\		'*': {},
-	\		'cpp': {
-	\			'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold', 'start=/\v%(<operator\_s*)@<!%(%(\i|^\_s*|template\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!)/ end=/\v%(-)@<!\>/ fold'],
-	\		},
-	\		'cs': {
-	\			'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold', 'start=/\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!/ end=/\v%(-)@<!\>/ fold'],
-	\		},
-	\		'css': 0,
-	\		'html': {
-	\			'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold'],
-	\		},
-	\		'java': {
-	\			'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold', 'start=/\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!/ end=/\v%(-)@<!\>/ fold'],
-	\		},
-	\		'php': {
-	\			'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold', 'start=/(/ end=/)/ containedin=@htmlPreproc contains=@phpClTop', 'start=/\[/ end=/\]/ containedin=@htmlPreproc contains=@phpClTop', 'start=/{/ end=/}/ containedin=@htmlPreproc contains=@phpClTop'],
-	\		},
-	\		'tex': {
-	\			'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/'],
-	\		},
-	\		'vim': {
-	\			'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/ fold', 'start=/(/ end=/)/ containedin=vimFuncBody', 'start=/\[/ end=/\]/ containedin=vimFuncBody', 'start=/{/ end=/}/ fold containedin=vimFuncBody'],
-	\		},
-	\		'xhtml': {
-	\			'parentheses': ['start=/\v\<\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'))?)*\>/ end=#</\z1># fold'],
-	\		},
-	\		'xml': {
-	\			'parentheses': ['start=/\v\<\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'))?)*\>/ end=#</\z1># fold'],
-	\		},
-	\	}
-	\}
+				\	'guifgs': ['RoyalBlue3', 'DarkOrange3', 'SeaGreen3', 'firebrick3', 'DarkOrchid3'],
+				\	'ctermfgs': [
+				\			  'brown',
+				\			  'lightblue',
+				\			  'lightyellow',
+				\			  'lightcyan',
+				\			  'lightmagenta',
+				\			  'darkgreen',
+				\			  'darkred',
+				\			  'brown',
+				\			  'Darkblue',
+				\			  'gray',
+				\			  'black',
+				\			  'darkmagenta',
+				\			  'darkgreen',
+				\			  'darkcyan',
+				\			  'darkred',
+				\			  ],
+				\	'operators': '_,_',
+				\	'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
+				\	'separately': {
+				\		'*': {},
+				\		'cpp': {
+				\			'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold', 'start=/\v%(<operator\_s*)@<!%(%(\i|^\_s*|template\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!)/ end=/\v%(-)@<!\>/ fold'],
+				\		},
+				\		'cs': {
+				\			'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold', 'start=/\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!/ end=/\v%(-)@<!\>/ fold'],
+				\		},
+				\		'css': 0,
+				\		'html': {
+				\			'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold'],
+				\		},
+				\		'java': {
+				\			'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold', 'start=/\v%(\i|^\_s*)@<=\<[<#=]@!|\<@<!\<[[:space:]<#=]@!/ end=/\v%(-)@<!\>/ fold'],
+				\		},
+				\		'php': {
+				\			'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold', 'start=/(/ end=/)/ containedin=@htmlPreproc contains=@phpClTop', 'start=/\[/ end=/\]/ containedin=@htmlPreproc contains=@phpClTop', 'start=/{/ end=/}/ containedin=@htmlPreproc contains=@phpClTop'],
+				\		},
+				\		'tex': {
+				\			'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/'],
+				\		},
+				\		'vim': {
+				\			'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/ fold', 'start=/(/ end=/)/ containedin=vimFuncBody', 'start=/\[/ end=/\]/ containedin=vimFuncBody', 'start=/{/ end=/}/ fold containedin=vimFuncBody'],
+				\		},
+				\		'xhtml': {
+				\			'parentheses': ['start=/\v\<\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'))?)*\>/ end=#</\z1># fold'],
+				\		},
+				\		'xml': {
+				\			'parentheses': ['start=/\v\<\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'))?)*\>/ end=#</\z1># fold'],
+				\		},
+				\	}
+				\}
 	call neobundle#untap()
 endif
 " ]]]
@@ -2115,9 +2117,9 @@ if neobundle#tap('taghighlight')
 		let g:TagHighlightSettings['ForcedPythonVariant'] = 'compiled'
 	endif
 	let g:TagHighlightSettings['LanguageDetectionMethods'] =
-		\ ['Extension', 'FileType']
+				\ ['Extension', 'FileType']
 	let g:TagHighlightSettings['FileTypeLanguageOverrides'] =
-		\ {'tagbar':'cpp', 'javascript':'', 'json':''}
+				\ {'tagbar':'cpp', 'javascript':'', 'json':''}
 	call neobundle#untap()
 endif
 " ]]]
@@ -2537,7 +2539,7 @@ augroup Filetype_Specific
 	" (以下取自 https://github.com/lilydjwg/dotvim )
 	if exists("*fnameescape")
 		autocmd BufNewFile,BufRead ?\+.pacsave,?\+.pacnew
-			\ exe "doau filetypedetect BufRead " . fnameescape(expand("<afile>:r"))
+					\ exe "doau filetypedetect BufRead " . fnameescape(expand("<afile>:r"))
 	elseif &verbose > 0
 		echomsg "Warning: some filetypes will not be recognized because this version of vim does not have fnameescape()"
 	endif
@@ -2574,25 +2576,28 @@ augroup END " Filetype_Specific
 " ]]]
 "    默认自动命令组 [[[2
 augroup MyAutoCmd
-"      当打开一个新缓冲区时，自动切换目录为当前编辑文件所在目录 [[[3
+	"  当打开一个新缓冲区时，自动切换目录为当前编辑文件所在目录 [[[3
 	autocmd BufEnter,BufNewFile,BufRead *
 				\ if bufname("") !~ "^\[A-Za-z0-9\]*://" && expand("%:p") !~ "^sudo:"
-				\| silent! lcd %:p:h
-				\| endif
-" ]]]
-"      保存 Vim 配置文件后加载 [[[3
-" 加载完之后需要执行 AirlineRefresh 来刷新，否则 tabline 排版会乱
-" 参见 https://github.com/bling/vim-airline/issues/312
-"
-" FIXME 似乎要 AirlineRefresh 两次才能完全刷新
-" 参见 https://github.com/bling/vim-airline/issues/539
+				\|    silent! lcd %:p:h
+				\|endif
+	" ]]]
+	"  保存 Vim 配置文件后加载 [[[3
+	" 加载完之后需要执行 AirlineRefresh 来刷新，否则 tabline 排版会乱
+	" 参见 https://github.com/bling/vim-airline/issues/312
+	"
+	" FIXME 似乎要 AirlineRefresh 两次才能完全刷新
+	" 参见 https://github.com/bling/vim-airline/issues/539
 	autocmd BufWritePost $MYVIMRC
 				\ NeoBundleClearCache | silent source $MYVIMRC | AirlineRefresh
-" ]]]
-"      自动更新 diff [[[3
-" (以下取自 https://github.com/Shougo/shougo-s-github )
-	autocmd InsertLeave * if &l:diff | diffupdate | endif
-" ]]]
+	" ]]]
+	"  自动更新 diff [[[3
+	" (以下取自 https://github.com/Shougo/shougo-s-github )
+	autocmd InsertLeave *
+				\ if &l:diff
+				\|    diffupdate
+				\|endif
+	" ]]]
 augroup END
 " ]]]
 " ]]]
@@ -2604,11 +2609,12 @@ if has('user_commands')
 	" ]]]
 	"    :Delete 删除当前文件 [[[2
 	" (以下取自 https://github.com/lilydjwg/dotvim )
-	command! -nargs=0 Delete   if delete(expand('%'))
-					\|	  echohl WarningMsg
-					\|	  echo "删除当前文件失败!"
-					\|	  echohl None
-					\|endif
+	command! -nargs=0 Delete
+				\ if delete(expand('%'))
+				\|    echohl WarningMsg
+				\|    echo "删除当前文件失败!"
+				\|    echohl None
+				\|endif
 	" ]]]
 	"    :NBU NeoBundle 更新所有插件 [[[2
 	command! -nargs=0 NBU Unite neobundle/update -vertical -no-start-insert
@@ -2620,22 +2626,24 @@ if has('user_commands')
 	"    :SudoUpDate SudoEdit.vim 以 root 权限保存文件 [[[2
 	" If the current buffer has never been saved, it will have no name,
 	" call the file browser to save it, otherwise just save it.
-	command! -nargs=0 -bar SudoUpDate if &modified
-									\|    if !empty(bufname('%'))
-									\|        exe 'SudoWrite'
-									\|    endif
-									\|endif
+	command! -nargs=0 -bar SudoUpDate
+				\ if &modified
+				\|    if !empty(bufname('%'))
+				\|        exe 'SudoWrite'
+				\|    endif
+				\|endif
 	" ]]]
 	"    :UpDate 保存文件 [[[2
 	" If the current buffer has never been saved, it will have no name,
 	" call the file browser to save it, otherwise just save it.
-	command! -nargs=0 -bar UpDate if &modified
-								\|    if empty(bufname('%'))
-								\|        browse confirm write
-								\|    else
-								\|        confirm write
-								\|    endif
-								\|endif
+	command! -nargs=0 -bar UpDate
+				\ if &modified
+				\|    if empty(bufname('%'))
+				\|        browse confirm write
+				\|    else
+				\|        confirm write
+				\|    endif
+				\|endif
 	" ]]]
 	"    修复部分错按大写按键 [[[2
 	command! -bang -nargs=* -complete=file E e<bang> <args>
