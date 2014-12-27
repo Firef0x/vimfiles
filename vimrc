@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 28 Dec 2014 02:03 +0800
+"  Last Modified: 28 Dec 2014 03:01 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -1303,7 +1303,7 @@ endif
 "  以下为插件的设置 [[[1
 "    2html.vim [[[2
 " (以下取自 https://github.com/lilydjwg/dotvim )
-" 使用XHTML格式
+" 使用 XHTML 格式
 let use_xhtml = 1
 " ]]]
 "    Ack.vim [[[2
@@ -1347,9 +1347,6 @@ endif
 " ]]]
 "    BufExplorer [[[2
 " 快速轻松的在缓存中切换（相当于另一种多个文件间的切换方式）
-" <Leader>be 在当前窗口显示缓存列表并打开选定文件
-" <Leader>bs 水平分割窗口显示缓存列表，并在缓存列表窗口中打开选定文件
-" <Leader>bv 垂直分割窗口显示缓存列表，并在缓存列表窗口中打开选定文件
 if neobundle#tap('bufexplorer.zip')
 	let g:bufExplorerDefaultHelp = 0  " 不显示默认帮助信息
 	let g:bufExplorerFindActive = 0
@@ -1506,8 +1503,6 @@ if neobundle#tap('vim-mark')
 endif
 " ]]]
 "    MatchIt 对%命令进行扩展使得能在嵌套标签和语句之间跳转 [[[2
-" % 正向匹配      g% 反向匹配
-" [% 定位块首     ]% 定位块尾
 if neobundle#tap('matchit.zip')
 	" (以下取自 https://github.com/Shougo/neobundle.vim/issues/153 )
 	function! neobundle#hooks.on_post_source(bundle)
@@ -2390,19 +2385,18 @@ endif
 "    Vim-Lastmod 自动更新最后修改时间 [[[2
 " The format of the time stamp
 "
-" syntax - format - example
-" %a - Day - Sat
-" %Y - YYYY - 2005
-" %b - Mon - Sep (3 digit month)
-" %m - mm - 09 (2 digit month)
-" %d - dd - 10
-" %H - HH - 15 (hour upto 24)
-" %I - HH - 12 (hour upto 12)
-" %M - MM - 50 (minute)
-" %X - HH:MM:SS - (12:29:34)
-" %p - AM/PM
-" %z %Z - TimeZone - UTC
-"
+" Syntax - Format   - Example
+" %a     - Day      - Sat
+" %Y     - YYYY     - 2005
+" %b     - Mon      - Sep (3 digit month)
+" %m     - mm       - 09 (2 digit month)
+" %d     - dd       - 10
+" %H     - HH       - 15 (hour upto 24)
+" %I     - HH       - 12 (hour upto 12)
+" %M     - MM       - 50 (minute)
+" %X     - HH:MM:SS - (12:29:34)
+" %p     - AM/PM
+" %z %Z  - TimeZone - UTC
 if neobundle#tap('vim-lastmod')
 	if s:isWindows
 		language time english
@@ -2426,7 +2420,7 @@ endif
 " ]]]
 "    Vim-Monokai 配色 [[[2
 if neobundle#tap('vim-monokai')
-	" A less bright Nerdtree
+	" A less bright NERDTree
 	let g:monokai_zentree = 1
 	call neobundle#untap()
 endif
@@ -2740,9 +2734,11 @@ endif
 " (以下取自 https://github.com/asins/vim )
 " 用于 Windows gVim 全屏窗口，可用 F11 切换
 " 全屏后再隐藏菜单栏、工具栏、滚动条效果更好
-" <Leader>btm 降低窗口透明度
-" <Leader>tm  增加窗口透明度
-" Alt + R     切换Vim是否总在最前面显示
+"
+" 映射          描述
+" <Leader>bt    降低窗口透明度
+" <Leader>tm    增加窗口透明度
+" Alt-R         切换Vim是否总在最前面显示
 " Vim 启动的时候自动使用当前颜色的背景色以去除 Vim 的白色边框
 if s:isGUI && has('gui_win32') && has('libcall')
 	let g:MyVimLib = 'gvimfullscreen.dll'
@@ -2750,6 +2746,7 @@ if s:isGUI && has('gui_win32') && has('libcall')
 	function! ToggleFullScreen()
 		call libcall(g:MyVimLib, 'ToggleFullScreen', 1)
 	endfunction
+	" ]]]
 	"  设置透明度函数 (Alpha值 默认:245 范围:180~255) [[[3
 	let g:VimAlpha = 245
 	function! SetAlpha(alpha)
@@ -2762,7 +2759,8 @@ if s:isGUI && has('gui_win32') && has('libcall')
 		endif
 		call libcall(g:MyVimLib, 'SetAlpha', g:VimAlpha)
 	endfunction
-	"  切换总在最前面显示函数 [[[3
+	" ]]]
+	"  切换总在最前面显示函数 (默认禁用) [[[3
 	let g:VimTopMost = 0
 	function! SwitchVimTopMostMode()
 		if g:VimTopMost == 0
@@ -2772,10 +2770,11 @@ if s:isGUI && has('gui_win32') && has('libcall')
 		endif
 		call libcall(g:MyVimLib, 'EnableTopMost', g:VimTopMost)
 	endfunction
-	"  默认设置透明
+	" ]]]
+	"  默认设置透明 [[[3
 	autocmd GUIEnter * call libcallnr(g:MyVimLib, 'SetAlpha', g:VimAlpha)
+	" ]]]
 endif
-" ]]]
 " ]]]
 " ]]]
 "  快捷键设置 [[[1
@@ -2905,6 +2904,13 @@ endif
 " ]]]
 " ]]]
 "      <Leader> 开头 [[[3
+"        打开BufExplorer <Leader>b{e,s,v} [[[4
+" 快速轻松的在缓存中切换（相当于另一种多个文件间的切换方式）
+" 映射          描述
+" <Leader>be    在当前窗口显示缓存列表并打开选定文件
+" <Leader>bs    水平分割窗口显示缓存列表，并在缓存列表窗口中打开选定文件
+" <Leader>bv    垂直分割窗口显示缓存列表，并在缓存列表窗口中打开选定文件
+" ]]]
 "        降低Vim窗体的透明度 <Leader>bt [[[4
 nmap <silent> <Leader>bt :<C-U>call SetAlpha(10)<cr>
 " ]]]
@@ -3330,6 +3336,13 @@ if has('clipboard')
 		inoremap <silent> <MiddleMouse> <C-R>*
 	endif
 endif
+" ]]]
+"      MatchIt 对%命令进行扩展使得能在嵌套标签和语句之间跳转 % g% [% ]% [[[3
+" 映射     描述
+" %        正向匹配
+" g%       反向匹配
+" [%       定位块首
+" ]%       定位块尾
 " ]]]
 " ]]]
 " ]]]
