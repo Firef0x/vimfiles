@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 26 Dec 2014 01:39 +0800
+"  Last Modified: 27 Dec 2014 15:37 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -1447,26 +1447,31 @@ if neobundle#tap('linediff.vim')
 	endfunction
 	call neobundle#untap()
 endif
-"    mark.vim 给各种 tags 标记不同的颜色，便于观看调式的插件。 [[[2
-" 这样，当我输入“,hl”时，就会把光标下的单词高亮，在此单词上按“,hh”会清除该单词的高亮。如果在高亮单词外输入“,hh”，会清除所有的高亮。
-" 你也可以使用virsual模式选中一段文本，然后按“,hl”，会高亮你所选中的文本；或者你可以用“,hr”来输入一个正则表达式，这会高亮所有符合这个正则表达式的文本。
-" 你可以在高亮文本上使用“,#”或“,*”来上下搜索高亮文本。在使用了“,#”或“,*”后，就可以直接输入“#”或“*”来继续查找该高亮文本，直到你又用“#”或“*”查找了其它文本。
-" <silent>* 当前MarkWord的下一个     <silent># 当前MarkWord的上一个
-" <silent>/ 所有MarkWords的下一个    <silent>? 所有MarkWords的上一个
+"    mark.vim 给各种 tags 标记不同的颜色，便于观看调试的插件。 [[[2
+" (以下取自 http://easwy.com/blog/archives/advanced-vim-skills-syntax-on-colorscheme/ )
+" 当我输入“,hl”时，就会把光标下的单词高亮，在此单词上按“,hh”会清除该单词的高亮。
+" 如果在高亮单词外输入“,hh”，会清除所有的高亮。
+" 你也可以使用virsual模式选中一段文本，然后按“,hl”，会高亮你所选中的文本；或者
+" 你可以用“,hx”来输入一个正则表达式，这会高亮所有符合这个正则表达式的文本。
+"
+" 你可以在高亮文本上使用“,#”或“,*”来上下搜索高亮文本。在使用了“,#”或“,*”后，就
+" 可以直接输入“#”或“*”来继续查找该高亮文本，直到你又用“#”或“*”查找了其它文本。
+" <Leader>* 当前MarkWord的下一个     <Leader># 当前MarkWord的上一个
+" <Leader>/ 所有MarkWords的下一个    <Leader>? 所有MarkWords的上一个
+"
+" 如果你在启动vim后重新执行了colorscheme命令，或者载入了会话文件，那么mark插件
+" 的颜色就会被清掉，解决的办法是重新source一下mark插件。或者像我一样，把mark插
+" 件定义的highlight组加入到你自己的colorscheme文件中。
 if neobundle#tap('vim-mark')
-	" 自动居中 [[[3
+	"  默认高亮配色 [[[3
 	augroup MyAutoCmd
-		autocmd VimEnter * nmap <silent> * <Plug>MarkSearchNext<Esc>zz
-		autocmd VimEnter * nmap <silent> # <Plug>MarkSearchPrev<Esc>zz
+		autocmd ColorScheme * highlight def MarkWord1  ctermbg=Cyan     ctermfg=Black  guibg=#8CCBEA    guifg=Black
+		autocmd ColorScheme * highlight def MarkWord2  ctermbg=Green    ctermfg=Black  guibg=#A4E57E    guifg=Black
+		autocmd ColorScheme * highlight def MarkWord3  ctermbg=Yellow   ctermfg=Black  guibg=#FFDB72    guifg=Black
+		autocmd ColorScheme * highlight def MarkWord4  ctermbg=Red      ctermfg=Black  guibg=#FF7272    guifg=Black
+		autocmd ColorScheme * highlight def MarkWord5  ctermbg=Magenta  ctermfg=Black  guibg=#FFB3FF    guifg=Black
+		autocmd ColorScheme * highlight def MarkWord6  ctermbg=Blue     ctermfg=Black  guibg=#9999FF    guifg=Black
 	augroup END
-	" ]]]
-	" 默认高亮配色 [[[3
-	highlight def MarkWord1  ctermbg=Cyan     ctermfg=Black  guibg=#8CCBEA    guifg=Black
-	highlight def MarkWord2  ctermbg=Green    ctermfg=Black  guibg=#A4E57E    guifg=Black
-	highlight def MarkWord3  ctermbg=Yellow   ctermfg=Black  guibg=#FFDB72    guifg=Black
-	highlight def MarkWord4  ctermbg=Red      ctermfg=Black  guibg=#FF7272    guifg=Black
-	highlight def MarkWord5  ctermbg=Magenta  ctermfg=Black  guibg=#FFB3FF    guifg=Black
-	highlight def MarkWord6  ctermbg=Blue     ctermfg=Black  guibg=#9999FF    guifg=Black
 	" ]]]
 	call neobundle#untap()
 endif
@@ -2920,8 +2925,9 @@ endif
 " (以下取自 https://github.com/amix/vimrc )
 nnoremap <silent> <Leader>m mmHmt:%s/<C-V><CR>//ge<CR>'tzt'm
 " ]]]
-"        切换高亮搜索关键字 <Leader>nh [[[4
-nmap <silent> <Leader>nh :nohlsearch<CR>
+"        取消高亮搜索关键字 <Leader>nh [[[4
+" 同时取消 vim-mark 插件的高亮关键字
+nmap <silent> <Leader>nh :nohlsearch<CR>:Mark<CR>
 " ]]]
 "        切换绝对/相对行号 <Leader>nu [[[4
 nnoremap <Leader>nu :call <SID>toggle_number()<CR>
@@ -3234,16 +3240,36 @@ if neobundle#tap('tabular')
 	call neobundle#untap()
 endif
 " ]]]
-"      mark.vim 给各种 tags 标记不同的颜色 <Leader>h{h,l,r} [[[3
-" 这样，当我输入“,hl”时，就会把光标下的单词高亮，在此单词上按“,hh”会清除该单词的高亮。如果在高亮单词外输入“,hh”，会清除所有的高亮。
-" 你也可以使用virsual模式选中一段文本，然后按“,hl”，会高亮你所选中的文本；或者你可以用“,hr”来输入一个正则表达式，这会高亮所有符合这个正则表达式的文本。
+"      mark.vim 给各种 tags 标记不同的颜色 <Leader>h{h,l,x} [[[3
+" (以下取自 http://easwy.com/blog/archives/advanced-vim-skills-syntax-on-colorscheme/ )
+" 当我输入“,hl”时，就会把光标下的单词高亮，在此单词上按“,hh”会清除该单词的高亮。
+" 如果在高亮单词外输入“,hh”，会清除所有的高亮。
+" 你也可以使用virsual模式选中一段文本，然后按“,hl”，会高亮你所选中的文本；或者
+" 你可以用“,hx”来输入一个正则表达式，这会高亮所有符合这个正则表达式的文本。
+"
+" 你可以在高亮文本上使用“,#”或“,*”来上下搜索高亮文本。在使用了“,#”或“,*”后，就
+" 可以直接输入“#”或“*”来继续查找该高亮文本，直到你又用“#”或“*”查找了其它文本。
+" <Leader>* 当前MarkWord的下一个     <Leader># 当前MarkWord的上一个
+" <Leader>/ 所有MarkWords的下一个    <Leader>? 所有MarkWords的上一个
 if neobundle#tap('vim-mark')
-	nmap <silent> <leader>hl <plug>MarkSet
-	vmap <silent> <leader>hl <plug>MarkSet
-	nmap <silent> <leader>hh <plug>MarkClear
-	vmap <silent> <leader>hh <plug>MarkClear
-	nmap <silent> <leader>hr <plug>MarkRegex
-	vmap <silent> <leader>hr <plug>MarkRegex
+	"    */# 时自动居中 [[[4
+	" MarkSearchNext/MarkSearchPrev 映射内部已经包含了 zv，所以无须在后面
+	" 再执行一次 zv
+	augroup MyAutoCmd
+		autocmd VimEnter * nnoremap <silent> * <Plug>MarkSearchNext<Esc>zz
+		autocmd VimEnter * nnoremap <silent> # <Plug>MarkSearchPrev<Esc>zz
+	augroup END
+	" ]]]
+	nmap <silent> <Leader>hl <Plug>MarkSet
+	vmap <silent> <Leader>hl <Plug>MarkSet
+	nmap <silent> <Leader>hh <Plug>MarkClear
+	vmap <silent> <Leader>hh <Plug>MarkClear
+	nmap <silent> <Leader>hx <Plug>MarkRegex
+	vmap <silent> <Leader>hx <Plug>MarkRegex
+	nmap <silent> <Leader>* <Plug>MarkSearchCurrentNext<Esc>zz
+	nmap <silent> <Leader># <Plug>MarkSearchCurrentPrev<Esc>zz
+	nmap <silent> <Leader>/ <Plug>MarkSearchAnyNext<Esc>zz
+	nmap <silent> <Leader>? <Plug>MarkSearchAnyPrev<Esc>zz
 	call neobundle#untap()
 endif
 " ]]]
