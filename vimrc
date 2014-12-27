@@ -1308,7 +1308,7 @@ let use_xhtml = 1
 " ]]]
 "    Ack.vim [[[2
 " Ag 比 Ack 速度要快
-if neobundle#tap('ack.vim') && s:hasAg
+if s:hasAg && neobundle#tap('ack.vim')
 	let g:ackprg = "ag --nogroup --column --hidden --smart-case --nocolor --follow"
 	call neobundle#untap()
 endif
@@ -1340,10 +1340,10 @@ endif
 
 "     let g:AutoPairsFlyMode = 0
 "     let g:AutoPairsShortcutBackInsert = '<M-b>'
-if neobundle#tap('auto-pairs')
-	let g:AutoPairsFlyMode = 1
-	call neobundle#untap()
-endif
+" if neobundle#tap('auto-pairs')
+" 	let g:AutoPairsFlyMode = 1
+" 	call neobundle#untap()
+" endif
 " ]]]
 "    BufExplorer [[[2
 " 快速轻松的在缓存中切换（相当于另一种多个文件间的切换方式）
