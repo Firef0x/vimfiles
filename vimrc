@@ -3075,12 +3075,12 @@ if neobundle#tap('accelerated-jk')
 endif
 " ]]]
 "        使用 n/N/g*/g#/Ctrl-o/Ctrl-i 时自动居中 [[[4
-nnoremap <silent> n nzz
-nnoremap <silent> N Nzz
-nnoremap <silent> g* g*zz
-nnoremap <silent> g# g#zz
-nnoremap <silent> <C-o> <C-o>zz
-nnoremap <silent> <C-i> <C-i>zz
+nnoremap <silent> n nzvzz
+nnoremap <silent> N Nzvzz
+nnoremap <silent> g* g*zvzz
+nnoremap <silent> g# g#zvzz
+nnoremap <silent> <C-o> <C-o>zvzz
+nnoremap <silent> <C-i> <C-i>zvzz
 " ]]]
 "        将 Y 映射为复制到行尾 [[[4
 nnoremap <silent> Y y$
