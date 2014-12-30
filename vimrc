@@ -553,9 +553,12 @@ else
 					\     'unix'    : 'make -f make_unix.mak',
 					\    },
 					\ }
+		" Repeat -- 支持使用"."来重复执行一些插件的命令
 		NeoBundle 'tpope/vim-repeat'
 		" 包含普遍使用的 Vim 的通用配置
 		NeoBundle 'tpope/vim-sensible'
+		" Surround -- 快速添加、替换、清除包围符号、标签
+		" 在 Visual Mode 内原来的 s 与 S（substitute）命令便不再有效
 		NeoBundle 'tpope/vim-surround'
 		NeoBundle 'tpope/vim-dispatch'
 	endif
@@ -599,6 +602,7 @@ else
 					\ 'SplitjoinSplit'
 					\ ]}}
 		NeoBundle 'chrisbra/NrrwRgn'
+		" 给各种 tags 标记不同的颜色，便于观看调试的插件
 		NeoBundle 'dimasg/vim-mark'
 		" tabular 比 Align 更简单，所以替换
 		NeoBundleLazy 'godlygeek/tabular',
@@ -614,16 +618,9 @@ else
 					\ 'SmartPairsA'
 					\ ],
 					\ 'mappings':[
-					\ [ 'n', 'viv' ],
-					\ [ 'n', 'vav' ],
-					\ [ 'n', 'civ' ],
-					\ [ 'n', 'cav' ],
-					\ [ 'n', 'div' ],
-					\ [ 'n', 'dav' ],
-					\ [ 'n', 'yiv' ],
-					\ [ 'n', 'yav' ],
-					\ [ 'v', 'v' ]]
-					\ }}
+					\ ['n', 'viv', 'vav', 'civ', 'cav', 'div', 'dav', 'yiv', 'yav'],
+					\ ['xv', 'v']
+					\ ]}}
 		NeoBundle 'jiangmiao/auto-pairs'
 		" 自动更新 Last Modified 字符串
 		NeoBundle 'jmcantrell/vim-lastmod'
@@ -637,6 +634,7 @@ else
 					\ ]}}
 		" rainbow 是 rainbow_parentheses.vim 的改进版，所以替换
 		" NeoBundle 'kien/rainbow_parentheses.vim'
+		" EasyMotion -- 移动命令增强插件
 		NeoBundle 'Lokaltog/vim-easymotion'
 		NeoBundle 'luochen1990/rainbow'
 		" 连续按 j/k 时加速移动光标
@@ -646,7 +644,7 @@ else
 		" 在 Visual 模式下使用 */# 跳转
 		NeoBundleLazy 'thinca/vim-visualstar',
 					\ {'autoload':{'mappings':[
-					\ ['xv', '*'], ['xv', '#'], ['xv', 'g'], ['xv', 'g*']
+					\ ['xv', '*', '#', 'g*', 'g#']
 					\ ]}}
 		" tcomment_vim 比 nerdcommenter 更智能，所以替换
 		" NeoBundle 'scrooloose/nerdcommenter'
@@ -658,6 +656,7 @@ else
 	" ]]]
 	"  代码缩进 [[[3
 	if count(s:plugin_groups, 'indent')
+		" vim-indent-guides -- 显示缩进线
 		NeoBundle 'nathanaelkane/vim-indent-guides'
 	endif
 	" ]]]
@@ -712,6 +711,7 @@ else
 	" ]]]
 	"  代码检查 [[[3
 	if count(s:plugin_groups, 'lint')
+		" Syntastic -- 包含很多语言的语法与编码风格检查插件
 		NeoBundle 'scrooloose/syntastic'
 		NeoBundle 'syngan/vim-vimlint',
 					\ {'depends':'ynkdir/vim-vimlparser'}
@@ -736,6 +736,7 @@ else
 							\ 'CCTreeLoadXRefDBFromDisk'
 							\ ]}}
 			endif
+			" Tagbar -- 提供单个源代码文件的函数列表之类的功能，强于 Taglist
 			NeoBundleLazy 'majutsushi/tagbar',
 						\ {'autoload':{'commands':[
 						\ 'TagbarClose',
@@ -762,12 +763,13 @@ else
 		if s:hasAck || s:hasAg
 			NeoBundle 'mileszs/ack.vim'
 		endif
+		" NERDTree -- 树形的文件系统浏览器（替代 Netrw)，功能比 Vim 自带的 Netrw 强大
 		NeoBundle 'scrooloose/nerdtree'
 		NeoBundle 'Xuyuanp/nerdtree-git-plugin',
 					\ {'depends':'scrooloose/nerdtree',
 					\ 'external_command':'git'}
 		" 显示尾部多余空格
-		NeoBundle 'git@github.com:Firef0x/ShowTrailingWhitespace'
+		NeoBundle 'git@github.com:Firef0x/ShowTrailingWhitespace.git'
 	endif
 	" ]]]
 	"  PHP [[[3
@@ -811,6 +813,7 @@ else
 	endif
 	"  Unite 插件组 [[[3
 	if count(s:plugin_groups, 'unite')
+		" Unite -- 全能查找插件，查找文件、寄存器、缓冲区、MRU 等
 		NeoBundleLazy 'Shougo/unite.vim',
 					\ {'autoload':{
 					\ 'commands':[{
@@ -858,6 +861,7 @@ else
 					\ 'xml',
 					\ 'xsl'
 					\ ]}}
+		" Emmet -- 用于快速编辑html文件
 		NeoBundleLazy 'mattn/emmet-vim',
 					\ {'autoload':{'filetypes':[
 					\ 'css',
@@ -933,7 +937,7 @@ else
 					\ 'markdown',
 					\ 'mkd'
 					\ ]}}
-		" NeoBundle 'xieyu/vim-assist'
+		" ]]]
 
 		"  主题及配色 [[[4
 		NeoBundle 'crusoexia/vim-monokai'
