@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 30 Dec 2014 14:00 +0800
+"  Last Modified: 30 Dec 2014 17:54 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -3329,8 +3329,8 @@ if neobundle#tap('vim-mark')
 	" MarkSearchNext/MarkSearchPrev 映射内部已经包含了 zv，所以无须在后面
 	" 再执行一次 zv
 	augroup MyAutoCmd
-		autocmd VimEnter * nnoremap <silent> * <Plug>MarkSearchNext<Esc>zz
-		autocmd VimEnter * nnoremap <silent> # <Plug>MarkSearchPrev<Esc>zz
+		autocmd VimEnter * nmap <silent> * <Plug>MarkSearchNext<Esc>zz
+		autocmd VimEnter * nmap <silent> # <Plug>MarkSearchPrev<Esc>zz
 	augroup END
 	" ]]]
 	nmap <silent> <Leader>hl <Plug>MarkSet
