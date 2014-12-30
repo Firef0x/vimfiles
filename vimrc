@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 28 Dec 2014 03:35 +0800
+"  Last Modified: 30 Dec 2014 14:00 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -540,8 +540,11 @@ else
 	if count(s:plugin_groups, 'core')
 		" vim-airline 是更轻巧的 vim-powerline 代替品
 		NeoBundle 'bling/vim-airline'
-		NeoBundleLazy 'matchit.zip',
-					\ {'autoload':{'mappings':['nxo', '%', 'g%']}}
+		" MatchIt -- 扩展%的匹配功能，对%命令进行扩展使得能在嵌套标签和语句之间跳转
+		NeoBundleLazy 'git@github.com:Firef0x/matchit.git',
+					\ {'autoload':{'mappings':[
+					\ ['nxo', '%', 'g%', '[%', ']%']
+					\ ]}}
 		NeoBundle 'Shougo/vimproc.vim',
 					\ {'build' : {
 					\     'windows' : 'tools\\update-dll-mingw',
@@ -751,8 +754,9 @@ else
 		" 在三路合并时的<<< >>> === 代码块之间快速移动
 		NeoBundle 'ConflictMotions',
 					\ {'depends':['ingo-library','CountJump']}
+		" 模糊检索文件, 缓冲区, 最近最多使用, 标签等的 Vim 插件
 		" Unite 比 CtrlP 更强大，所以替换
-		" NeoBundle 'kien/ctrlp.vim'
+		" NeoBundle 'ctrlpvim/ctrlp.vim'
 		NeoBundleLazy 'mbbill/undotree',
 					\ {'autoload':{'commands':'UndotreeToggle'}}
 		if s:hasAck || s:hasAg
@@ -881,17 +885,19 @@ else
 	" ]]]
 	"  杂项 [[[3
 	if count(s:plugin_groups, 'misc')
-		" 使用 VimShell 暂时取代
-		" NeoBundle 'Conque-Shell'
+		" Vim 中文文档计划
 		NeoBundle 'asins/vimcdoc'
-		NeoBundleLazy 'git@github.com:Firef0x/PKGBUILD.vim',
-					\ {'autoload':{'filetypes':['PKGBUILD']}}
-		NeoBundleLazy 'git@github.com:Firef0x/vim-smali',
-					\ {'autoload':{'filetypes':['smali']}}
+		" 在单独的窗口管理缓冲区
+		NeoBundle 'jlanzarotta/bufexplorer'
+		" colorizer -- 提供实时显示颜色的功能
 		NeoBundle 'lilydjwg/colorizer'
+		" 自动识别并设定文件编码
+		NeoBundle 'mbbill/fencview'
 		NeoBundle 'mhinz/vim-startify'
-		NeoBundleLazy 'openvpn',
-					\ {'autoload':{'filetypes':['openvpn']}}
+		" ConqueTerm -- 提供在 Vim 中打开终端的功能，Windows 下应有 PowerShell 支持
+		" 使用 VimShell 暂时取代
+		" NeoBundle 'scottmcginness/Conque-Shell'
+		" VimShell -- Vim 中运行终端，使用该插件必须设置 set noautochdir
 		NeoBundleLazy 'Shougo/vimshell.vim',
 					\ {'autoload':{'commands':[
 					\ {'name':'VimShell',
@@ -902,9 +908,24 @@ else
 					\ 'VimShellPop'
 					\ ],
 					\ 'explorer':1,
-					\ 'mappings':['<Plug>(vimshell_']}}
+					\ 'mappings':['<Plug>(vimshell_']
+					\ }}
+
+		"  语法相关插件 [[[4
 		NeoBundleLazy 'dogrover/vim-pentadactyl',
 					\ {'autoload':{'filetypes':['pentadactyl']}}
+		NeoBundleLazy 'git@github.com:Firef0x/PKGBUILD.vim.git',
+					\ {'autoload':{'filetypes':['PKGBUILD']}}
+		NeoBundleLazy 'git@github.com:Firef0x/vim-smali.git',
+					\ {'autoload':{'filetypes':['smali']}}
+		NeoBundleLazy 'openvpn',
+					\ {'autoload':{'filetypes':['openvpn']}}
+		" PO (Portable Object, gettext)
+		NeoBundleLazy 'po.vim--gray',
+					\ {'autoload':{'filetypes':['po']}}
+		" STL 语法高亮
+		NeoBundleLazy 'STL-improved',
+					\ {'autoload':{'filetypes':['c', 'cpp']}}
 		NeoBundleLazy 'superbrothers/vim-vimperator',
 					\ {'autoload':{'filetypes':['vimperator']}}
 		NeoBundleLazy 'tpope/vim-markdown',
@@ -916,27 +937,18 @@ else
 
 		"  主题及配色 [[[4
 		NeoBundle 'crusoexia/vim-monokai'
-		NeoBundle 'tomasr/molokai'
+		" NeoBundle 'tomasr/molokai'
 		" ]]]
 
-		"  从 vim-scripts 仓库中安装的脚本 [[[4
+		"  其它从 vim-scripts 仓库中安装的脚本 [[[4
 		" 保存时自动创建空文件夹
 		NeoBundle 'auto_mkdir'
-		" 在单独的窗口管理缓冲区
-		NeoBundle 'bufexplorer.zip'
-		" 自动识别并设定文件编码
-		NeoBundle 'mbbill/fencview'
-		" PO (Portable Object, gettext)
-		NeoBundleLazy 'po.vim--gray',
-					\ {'autoload':{'filetypes':['po']}}
 		" 重命名当前文件
 		NeoBundle 'Rename'
-		" STL语法高亮
-		NeoBundleLazy 'STL-improved',
-					\ {'autoload':{'filetypes':['c', 'cpp']}}
 		" Ctrl-V 选择区域，然后按 :B 执行命令，或按 :S 查找匹配字符串
-		NeoBundle 'vis'
-		" Make a column of increasing or decreasing numbers
+		" NeoBundle 'vis'
+		" VisIncr -- 给vim增加生成递增或者递减数列的功能
+		" 支持十进制,十六进制,日期,星期等,功能强大灵活
 		NeoBundle 'VisIncr'
 		" ]]]
 	endif
@@ -1347,7 +1359,7 @@ endif
 " ]]]
 "    BufExplorer [[[2
 " 快速轻松的在缓存中切换（相当于另一种多个文件间的切换方式）
-if neobundle#tap('bufexplorer.zip')
+if neobundle#tap('bufexplorer')
 	let g:bufExplorerDefaultHelp = 0  " 不显示默认帮助信息
 	let g:bufExplorerFindActive = 0
 	let g:bufExplorerSortBy = 'mru' " 使用最近使用的排列方式
@@ -1503,7 +1515,7 @@ if neobundle#tap('vim-mark')
 endif
 " ]]]
 "    MatchIt 对%命令进行扩展使得能在嵌套标签和语句之间跳转 [[[2
-if neobundle#tap('matchit.zip')
+if neobundle#tap('matchit')
 	" (以下取自 https://github.com/Shougo/neobundle.vim/issues/153 )
 	function! neobundle#hooks.on_post_source(bundle)
 		silent! execute 'doautocmd FileType' &filetype
