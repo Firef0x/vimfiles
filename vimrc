@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 30 Dec 2014 17:54 +0800
+"  Last Modified: 31 Dec 2014 23:36 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -2520,9 +2520,6 @@ augroup Filetype_Specific
 	"  Markdown [[[3
 	autocmd FileType markdown setlocal nolist
 	" ]]]
-	"  openSUSE Build Service [[[3
-	autocmd BufNewFile,BufRead _meta,_service setlocal filetype=xml
-	" ]]]
 	"  PHP [[[3
 	" PHP 生成的SQL/HTML代码高亮
 	autocmd FileType php let php_sql_query=1
@@ -2550,9 +2547,20 @@ augroup Filetype_Specific
 	autocmd BufReadPre *.nfo call s:SetFileEncodings('cp437')
 	autocmd BufReadPost *.nfo call s:RestoreFileEncodings()
 	" ]]]
-	"  More ignored extensions [[[3
+	"  其它 [[[3
+	"    自己原创修改 [[[4
+	"      特定文件，非扩展名 [[[5
+	"        openSUSE Build Service [[[6
+	autocmd BufNewFile,BufRead _files,_meta,_packages,_service setlocal filetype=xml
+	" ]]]
+	"        Zoom [[[6
+	autocmd BufNewFile,BufRead .zoomrc setlocal filetype=json
+	" ]]]
+	" ]]]
+	" ]]]
+	"    (以下取自 https://github.com/lilydjwg/dotvim ) [[[4
+	"      More ignored extensions [[[5
 	" (modified from the standard one)
-	" (以下取自 https://github.com/lilydjwg/dotvim )
 	if exists("*fnameescape")
 		autocmd BufNewFile,BufRead ?\+.pacsave,?\+.pacnew
 					\ exe "doau filetypedetect BufRead " . fnameescape(expand("<afile>:r"))
@@ -2580,13 +2588,14 @@ augroup Filetype_Specific
 	autocmd BufNewFile,BufRead hg-editor-*.txt setlocal filetype=hgcommit
 	autocmd BufNewFile,BufRead *openvpn*/*.conf,*.ovpn setlocal filetype=openvpn
 	" ]]]
-	"  Websites [[[3
-	" (以下取自 https://github.com/lilydjwg/dotvim )
+	"      Websites [[[5
 	autocmd BufRead forum.ubuntu.org.cn_*,bbs.archlinuxcn.org_post.php*.txt setlocal ft=bbcode
 	autocmd BufRead *fck_source.html* setlocal ft=html
 	autocmd BufRead *docs.google.com_Doc* setlocal ft=html
 	autocmd BufNewFile,BufRead *postmore/wiki/*.wiki setlocal ft=googlecodewiki
 	autocmd BufNewFile,BufRead *.mw,*wpTextbox*.txt,*wiki__text*.txt setlocal ft=wiki
+	" ]]]
+	" ]]]
 	" ]]]
 augroup END " Filetype_Specific
 " ]]]

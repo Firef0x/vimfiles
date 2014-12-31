@@ -1,7 +1,6 @@
 bundle
 !bundle/neobundle.vim
-.cache
-..cache-backup_asd
+*.cache*
 .flagged
 .netrwhist
 viminfo
