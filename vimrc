@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 31 Dec 2014 23:36 +0800
+"  Last Modified: 04 Jan 2015 01:10 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -1881,6 +1881,9 @@ if neobundle#tap('nerdtree')
 	let NERDTreeBookmarksFile = s:get_cache_dir("NERDTreeBookmarks")
 	" 同时改变当前工作目录
 	let NERDTreeChDirMode = 2
+	" NERDTree 替代 Netrw 插件来浏览本地目录
+	" 由于跟 Startify 可能有些冲突，所以禁用，见 :help startify-faq-08
+	let NERDTreeHijackNetrw = 0
 	" 排除 . .. 文件
 	let NERDTreeIgnore = [
 				\ '__pycache__',
@@ -2043,10 +2046,19 @@ endif
 " ]]]
 "    Startify 起始页 [[[2
 if neobundle#tap('vim-startify')
+	" 打开文件同时转到当前目录
+	let g:startify_change_to_dir = 1
 	" 设置会话文件目录
 	let g:startify_session_dir = s:get_cache_dir("sessions")
-	let g:startify_change_to_vcs_root = 1
 	let g:startify_show_sessions = 1
+	" 设置忽略文件列表
+	let g:startify_skiplist = [
+				\ 'COMMIT_EDITMSG',
+				\ $VIMRUNTIME .'/doc',
+				\ 'bundle/.*/doc',
+				\ '\.DS_Store',
+				\ 'osc_metafile.*\.xml'
+				\ ]
 	call neobundle#untap()
 endif
 " ]]]
@@ -2622,6 +2634,10 @@ augroup MyAutoCmd
 				\ if &l:diff
 				\|    diffupdate
 				\|endif
+	" ]]]
+	"  禁止 NERDTree 在 Startify 页面打开一个分割窗口 [[[3
+	" (以下取自 :help startify-faq-06 )
+	autocmd User Startified setlocal buftype=
 	" ]]]
 augroup END
 " ]]]
