@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 04 Jan 2015 01:10 +0800
+"  Last Modified: 06 Jan 2015 01:15 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -1883,7 +1883,7 @@ if neobundle#tap('nerdtree')
 	let NERDTreeChDirMode = 2
 	" NERDTree 替代 Netrw 插件来浏览本地目录
 	" 由于跟 Startify 可能有些冲突，所以禁用，见 :help startify-faq-08
-	let NERDTreeHijackNetrw = 0
+	" let NERDTreeHijackNetrw = 0
 	" 排除 . .. 文件
 	let NERDTreeIgnore = [
 				\ '__pycache__',
@@ -2048,6 +2048,8 @@ endif
 if neobundle#tap('vim-startify')
 	" 打开文件同时转到当前目录
 	let g:startify_change_to_dir = 1
+	" 列表显示的文件数
+	let g:startify_files_number = 15
 	" 设置会话文件目录
 	let g:startify_session_dir = s:get_cache_dir("sessions")
 	let g:startify_show_sessions = 1
@@ -2057,6 +2059,7 @@ if neobundle#tap('vim-startify')
 				\ $VIMRUNTIME .'/doc',
 				\ 'bundle/.*/doc',
 				\ '\.DS_Store',
+				\ 'osc-commit.*\.diff',
 				\ 'osc_metafile.*\.xml'
 				\ ]
 	call neobundle#untap()
