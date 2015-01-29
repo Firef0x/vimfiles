@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 06 Jan 2015 01:15 +0800
+"  Last Modified: 30 Jan 2015 01:48 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -1873,10 +1873,6 @@ endif
 " ]]]
 "    NERD_tree.vim 文件管理器 [[[2
 if neobundle#tap('nerdtree')
-	" 让Tree把自己给装饰得多姿多彩漂亮点
-	let NERDChristmasTree = 1
-	" 控制当光标移动超过一定距离时，是否自动将焦点调整到屏中心
-	let NERDTreeAutoCenter = 1
 	" 指定书签文件
 	let NERDTreeBookmarksFile = s:get_cache_dir("NERDTreeBookmarks")
 	" 同时改变当前工作目录
@@ -1906,18 +1902,13 @@ if neobundle#tap('nerdtree')
 				\ ]
 	" 指定鼠标模式(1.双击打开 2.单目录双文件 3.单击打开)
 	let NERDTreeMouseMode = 2
+	" 打开文件后关闭树窗口
 	let NERDTreeQuitOnOpen = 1
 	" 是否默认显示书签列表
 	let NERDTreeShowBookmarks = 1
-	" 是否默认显示文件
-	let NERDTreeShowFiles = 1
 	" 是否默认显示隐藏文件
 	let NERDTreeShowHidden = 1
-	" 是否默认显示行号
-	let NERDTreeShowLineNumbers = 0
-	" 窗口位置（'left' or 'right'）
-	let NERDTreeWinPos = 'left'
-	" 窗口宽度
+	" 窗口在加载时的宽度
 	let NERDTreeWinSize = 31
 	call neobundle#untap()
 endif
@@ -2569,7 +2560,7 @@ augroup Filetype_Specific
 	autocmd BufNewFile,BufRead _files,_meta,_packages,_service setlocal filetype=xml
 	" ]]]
 	"        Zoom [[[6
-	autocmd BufNewFile,BufRead .zoomrc setlocal filetype=json
+	autocmd BufNewFile,BufRead .zoominfo,.zoomrc setlocal filetype=json
 	" ]]]
 	" ]]]
 	" ]]]
