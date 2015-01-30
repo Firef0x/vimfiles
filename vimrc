@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 30 Jan 2015 01:48 +0800
+"  Last Modified: 31 Jan 2015 01:57 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -71,6 +71,13 @@ if executable('ctags')
 	let s:hasCTags=1
 else
 	let s:hasCTags=0
+endif
+" ]]]
+"      判定当前是否支持 gvimfullscreen.dll [[[3
+if s:isGUI && has('gui_win32') && has('libcall')
+	let s:hasVFS=1
+else
+	let s:hasVFS=0
 endif
 " ]]]
 "      判定当前是否支持 Lua ，并设置自动完成使用的插件 [[[3
@@ -2779,11 +2786,11 @@ endif
 " 全屏后再隐藏菜单栏、工具栏、滚动条效果更好
 "
 " 映射          描述
-" <Leader>bt    降低窗口透明度
-" <Leader>tm    增加窗口透明度
+" <Leader>ta    增加窗口透明度（[T]ransparency [A]dd）
+" <Leader>tx    降低窗口透明度（与 Ctrl-A 及 Ctrl-X 相呼应）
 " Alt-R         切换Vim是否总在最前面显示
 " Vim 启动的时候自动使用当前颜色的背景色以去除 Vim 的白色边框
-if s:isGUI && has('gui_win32') && has('libcall')
+if s:hasVFS
 	let g:MyVimLib = 'gvimfullscreen.dll'
 	"  切换全屏函数 [[[3
 	function! ToggleFullScreen()
@@ -2820,7 +2827,7 @@ if s:isGUI && has('gui_win32') && has('libcall')
 endif
 " ]]]
 " ]]]
-"  快捷键设置 [[[1
+"  快捷键映射 [[[1
 "    准备工作 [[[2
 "      设置 <Leader> 为逗号 [[[3
 let mapleader=","
@@ -2947,15 +2954,13 @@ endif
 " ]]]
 " ]]]
 "      <Leader> 开头 [[[3
-"        打开BufExplorer <Leader>b{e,s,v} [[[4
+"        打开 BufExplorer <Leader>b{e,s,t,v} [[[4
 " 快速轻松的在缓存中切换（相当于另一种多个文件间的切换方式）
 " 映射          描述
 " <Leader>be    在当前窗口显示缓存列表并打开选定文件
 " <Leader>bs    水平分割窗口显示缓存列表，并在缓存列表窗口中打开选定文件
+" <Leader>bt    在当前窗口启用/禁用 BufExplorer
 " <Leader>bv    垂直分割窗口显示缓存列表，并在缓存列表窗口中打开选定文件
-" ]]]
-"        降低Vim窗体的透明度 <Leader>bt [[[4
-nmap <silent> <Leader>bt :<C-U>call SetAlpha(10)<cr>
 " ]]]
 "        关闭窗口或卸载缓冲区 <Leader>c [[[4
 nmap <silent> <Leader>c :<C-U>call CloseWindowOrKillBuffer()<CR>
@@ -3056,8 +3061,13 @@ if neobundle#tap('splitjoin.vim')
 	call neobundle#untap()
 endif
 " ]]]
-"        增加Vim窗体的透明度 <Leader>tm [[[4
-nmap <silent> <Leader>tm :<C-U>call SetAlpha(-10)<cr>
+"        增加 gVim 窗体的透明度 <Leader>ta [[[4
+if s:hasVFS
+	nmap <silent> <Leader>ta :<C-U>call SetAlpha(-10)<cr>
+" ]]]
+"        降低 gVim 窗体的透明度 <Leader>tx [[[4
+	nmap <silent> <Leader>tx :<C-U>call SetAlpha(10)<cr>
+endif
 " ]]]
 "        ShowTrailingWhitespace 开关显示尾部多余空格 <Leader>tr [[[4
 if neobundle#tap('ShowTrailingWhitespace')
@@ -3096,8 +3106,10 @@ nmap <silent> <Leader>% :call GetHexChar()<CR>
 " nmap <M-m> :CtrlPMRU<CR>
 " nmap <M-n> :CtrlPBuffer<CR>
 " ]]]
-"        切换 Vim 是否在最前面显示 <Alt-R> [[[4
-nmap <silent> <M-r> :<C-U>call SwitchVimTopMostMode()<cr>
+"        切换 gVim 是否在最前面显示 <Alt-R> [[[4
+if s:hasVFS
+	nmap <silent> <M-r> :<C-U>call SwitchVimTopMostMode()<cr>
+endif
 " ]]]
 "        切换左右缓冲区 <Alt-左右方向键> [[[4
 nnoremap <silent> <M-left> :<C-U>call SwitchBuffer(0)<CR>
