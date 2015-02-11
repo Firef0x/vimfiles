@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 31 Jan 2015 01:57 +0800
+"  Last Modified: 12 Feb 2015 03:21 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -939,7 +939,10 @@ else
 					\ {'autoload':{'filetypes':['c', 'cpp']}}
 		NeoBundleLazy 'superbrothers/vim-vimperator',
 					\ {'autoload':{'filetypes':['vimperator']}}
-		NeoBundleLazy 'tpope/vim-markdown',
+		" 0xBADDCAFE 的版本相比原版去除了单下划线的语法错误提示及折叠，符合
+		" GitHub 口味的 Markdown 语法
+		" NeoBundleLazy 'tpope/vim-markdown',
+		NeoBundleLazy '0xBADDCAFE/vim-markdown',
 					\ {'autoload':{'filetypes':[
 					\ 'markdown',
 					\ 'mkd'
