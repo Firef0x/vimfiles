@@ -2342,7 +2342,9 @@ if neobundle#tap('vim-airline')
 		let g:airline_theme = 'light'
 		let g:airline#extensions#tabline#enabled = 1
 		let g:airline#extensions#tabline#tab_nr_type = 1
-		let g:airline#extensions#tabline#buffer_nr_show = 1
+		" let g:airline#extensions#tabline#buffer_nr_show = 1
+		" 在 tabline 上显示序号
+		let g:airline#extensions#tabline#buffer_idx_mode = 1
 		if !exists('g:airline_symbols')
 			let g:airline_symbols = {}
 		endif
@@ -3097,6 +3099,18 @@ nnoremap <silent> <Leader>sp <C-w>s
 " ]]]
 "        切换自动换行 <Leader>wr [[[4
 nnoremap <silent> <Leader>wr :<C-U>call ToggleOption('wrap')<CR>
+" ]]]
+"        切换到 tabline 上该序号的缓冲区 <Leader>{1~9} [[[4
+" (以下取自 https://github.com/bling/dotvim )
+nmap <Leader>1 <Plug>AirlineSelectTab1
+nmap <Leader>2 <Plug>AirlineSelectTab2
+nmap <Leader>3 <Plug>AirlineSelectTab3
+nmap <Leader>4 <Plug>AirlineSelectTab4
+nmap <Leader>5 <Plug>AirlineSelectTab5
+nmap <Leader>6 <Plug>AirlineSelectTab6
+nmap <Leader>7 <Plug>AirlineSelectTab7
+nmap <Leader>8 <Plug>AirlineSelectTab8
+nmap <Leader>9 <Plug>AirlineSelectTab9
 " ]]]
 "        去掉行末空格并调整缩进 <Leader><Space> [[[4
 " (以下取自 https://github.com/bling/dotvim )
