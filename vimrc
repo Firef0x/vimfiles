@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 12 Feb 2015 03:21 +0800
+"  Last Modified: 05 Mar 2015 02:14 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -560,8 +560,11 @@ else
 					\     'unix'    : 'make -f make_unix.mak',
 					\    },
 					\ }
-		" Repeat -- 支持使用"."来重复执行一些插件的命令
+		" Repeat -- 支持普通模式使用"."来重复执行一些插件的命令
 		NeoBundle 'tpope/vim-repeat'
+		" VisualRepeat -- 支持可视模式使用"."来重复执行一些插件的命令
+		NeoBundle 'visualrepeat',
+					\ {'depends':'ingo-library'}
 		" 包含普遍使用的 Vim 的通用配置
 		NeoBundle 'tpope/vim-sensible'
 		" Surround -- 快速添加、替换、清除包围符号、标签
@@ -3285,8 +3288,8 @@ nnoremap <silent> -= :<C-U>call ToggleOption('modified')<CR>
 vnoremap <silent> < <gv
 vnoremap <silent> > >gv
 " ]]]
-"      允许在可视模式下按 . 重复执行操作 [[[3
-vnoremap <silent> . :normal .<CR>
+"      允许在选择模式下按 . 重复执行操作 [[[3
+snoremap <silent> . :normal .<CR>
 " ]]]
 " ]]]
 "    多种映射 map [[[2
