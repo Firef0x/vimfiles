@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 05 Mar 2015 02:14 +0800
+"  Last Modified: 06 Mar 2015 04:19 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -307,6 +307,13 @@ function! ToggleVariable(variable_name)
 		execute 'let' a:variable_name.' = 1'
 	endif
 	echo printf('%s = %s', a:variable_name, eval(a:variable_name))
+endfunction
+" ]]]
+" ]]]
+"    (以下取自 https://github.com/terryma/dotfiles ) [[[2
+"      调整 Quickfix 窗口高度 [[[3
+function! AdjustWindowHeight(minheight, maxheight)
+	execute max([min([line("$"), a:maxheight]), a:minheight]) . "wincmd _"
 endfunction
 " ]]]
 " ]]]
@@ -2615,6 +2622,11 @@ augroup Filetype_Specific
 	autocmd BufRead *docs.google.com_Doc* setlocal ft=html
 	autocmd BufNewFile,BufRead *postmore/wiki/*.wiki setlocal ft=googlecodewiki
 	autocmd BufNewFile,BufRead *.mw,*wpTextbox*.txt,*wiki__text*.txt setlocal ft=wiki
+	" ]]]
+	" ]]]
+	"    (以下取自 https://github.com/terryma/dotfiles ) [[[4
+	"      Quickfix [[[5
+	autocmd FileType qf call AdjustWindowHeight(3, 50)
 	" ]]]
 	" ]]]
 	" ]]]
