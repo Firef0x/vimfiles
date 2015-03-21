@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 06 Mar 2015 04:19 +0800
+"  Last Modified: 21 Mar 2015 08:26 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -168,11 +168,6 @@ function! Preserve(command)
 	" clean up: restore previous search history, and cursor position
 	let @/=_s
 	call cursor(l, c)
-endfunction
-" ]]]
-"      去掉行末空格并调整缩进 [[[3
-function! StripTrailingWhitespace()
-	call Preserve("%s/\\s\\+$//e")
 endfunction
 " ]]]
 "      格式化全文 [[[3
@@ -775,6 +770,8 @@ else
 		" 模糊检索文件, 缓冲区, 最近最多使用, 标签等的 Vim 插件
 		" Unite 比 CtrlP 更强大，所以替换
 		" NeoBundle 'ctrlpvim/ctrlp.vim'
+		" 删除尾部多余空格
+		NeoBundle 'DeleteTrailingWhitespace'
 		NeoBundleLazy 'mbbill/undotree',
 					\ {'autoload':{'commands':'UndotreeToggle'}}
 		if s:hasAck || s:hasAg
@@ -782,11 +779,11 @@ else
 		endif
 		" NERDTree -- 树形的文件系统浏览器（替代 Netrw)，功能比 Vim 自带的 Netrw 强大
 		NeoBundle 'scrooloose/nerdtree'
+		" 显示尾部多余空格
+		NeoBundle 'ShowTrailingWhitespace'
 		NeoBundle 'Xuyuanp/nerdtree-git-plugin',
 					\ {'depends':'scrooloose/nerdtree',
 					\ 'external_command':'git'}
-		" 显示尾部多余空格
-		NeoBundle 'git@github.com:Firef0x/ShowTrailingWhitespace.git'
 	endif
 	" ]]]
 	"  PHP [[[3
@@ -1451,6 +1448,13 @@ endif
 " \ }
 " let g:ctrlp_extensions = ['tag', 'buffertag', 'quickfix', 'dir', 'rtscript', 'mixed']
 
+" ]]]
+"    DeleteTrailingWhitespace 删除尾部多余空格 [[[2
+if neobundle#tap('DeleteTrailingWhitespace')
+	" Turn off the automatic deletion of trailing whitespace
+	let g:DeleteTrailingWhitespace = 0
+	call neobundle#untap()
+endif
 " ]]]
 "    dictfile.vim 自动设置 'dict' 选项 [[[2
 "  设置词典目录
@@ -3124,10 +3128,6 @@ nmap <Leader>7 <Plug>AirlineSelectTab7
 nmap <Leader>8 <Plug>AirlineSelectTab8
 nmap <Leader>9 <Plug>AirlineSelectTab9
 " ]]]
-"        去掉行末空格并调整缩进 <Leader><Space> [[[4
-" (以下取自 https://github.com/bling/dotvim )
-nmap <silent> <Leader><Space> :<C-U>call StripTrailingWhitespace()<CR>
-" ]]]
 "        %xx -> 对应的字符(到消息) <Leader>% [[[4
 " (以下取自 https://github.com/lilydjwg/dotvim )
 nmap <silent> <Leader>% :call GetHexChar()<CR>
@@ -3422,6 +3422,13 @@ if has('clipboard')
 		nnoremap <silent> <MiddleMouse> "*P
 		inoremap <silent> <MiddleMouse> <C-R>*
 	endif
+endif
+" ]]]
+"      去掉行末空格 <Leader><Space> [[[3
+if neobundle#tap('DeleteTrailingWhitespace')
+	nnoremap <silent> <Leader><Space> :<C-U>%DeleteTrailingWhitespace<CR>
+	vnoremap <silent> <Leader><Space> :DeleteTrailingWhitespace<CR>
+	call neobundle#untap()
 endif
 " ]]]
 "      MatchIt 对%命令进行扩展使得能在嵌套标签和语句之间跳转 % g% [% ]% [[[3
