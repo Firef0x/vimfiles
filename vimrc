@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 21 Mar 2015 08:26 +0800
+"  Last Modified: 31 Mar 2015 04:23 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -618,7 +618,8 @@ else
 		NeoBundle 'dimasg/vim-mark'
 		" tabular 比 Align 更简单，所以替换
 		NeoBundleLazy 'godlygeek/tabular',
-					\ {'autoload':{'commands':[
+					\ {'autoload':{
+					\ 'commands':[
 					\ 'Tabularize',
 					\ 'AddTabularPipeline'
 					\ ]}}
@@ -633,13 +634,26 @@ else
 					\ ['n', 'viv', 'vav', 'civ', 'cav', 'div', 'dav', 'yiv', 'yav'],
 					\ ['xv', 'v']
 					\ ]}}
+		" “盘古之白”中文排版自动规范化的 Vim 插件
+		NeoBundleLazy 'hotoo/pangu.vim',
+					\ {'autoload':{
+					\ 'commands':[
+					\ 'Pangu',
+					\ 'PanguEnable',
+					\ 'PanguDisable'
+					\ ],
+					\ 'filetypes':[
+					\ 'markdown',
+					\ 'text'
+					\ ]}}
 		NeoBundle 'jiangmiao/auto-pairs'
 		" 自动更新 Last Modified 字符串
 		NeoBundle 'jmcantrell/vim-lastmod'
 		" TODO vim-sneak 是 vim-easymotion 的代替品，考虑是否替换
 		" NeoBundle 'justinmk/vim-sneak'
 		NeoBundleLazy 'kana/vim-scratch',
-					\ {'autoload':{'commands':[
+					\ {'autoload':{
+					\ 'commands':[
 					\ 'ScratchClose',
 					\ 'ScratchEvaluate',
 					\ 'ScratchOpen'
@@ -684,7 +698,8 @@ else
 		NeoBundleLazy 'pangloss/vim-javascript',
 					\ {'autoload':{'filetypes':['javascript']}}
 		NeoBundleLazy 'othree/javascript-libraries-syntax.vim',
-					\ {'autoload':{'filetypes':[
+					\ {'autoload':{
+					\ 'filetypes':[
 					\ 'javascript',
 					\ 'coffee',
 					\ 'ls',
@@ -692,7 +707,8 @@ else
 					\ ]}}
 		if executable('node') || executable('nodejs')
 			NeoBundleLazy 'maksimr/vim-jsbeautify',
-						\ { 'autoload' : {'commands':[
+						\ {'autoload':{
+						\ 'commands':[
 						\ 'CSSBeautify',
 						\ 'JsBeautify',
 						\ 'HtmlBeautify'
@@ -951,8 +967,7 @@ else
 		" NeoBundleLazy 'tpope/vim-markdown',
 		NeoBundleLazy '0xBADDCAFE/vim-markdown',
 					\ {'autoload':{'filetypes':[
-					\ 'markdown',
-					\ 'mkd'
+					\ 'markdown'
 					\ ]}}
 		" ]]]
 
@@ -2542,15 +2557,16 @@ augroup Filetype_Specific
 	autocmd FileType css vnoremap <Leader>co J:s/\s*\([{:;,]\)\s*/\1/g<CR>:let @/=''<cr>
 	autocmd FileType css nnoremap <Leader>co :s/\s*\([{:;,]\)\s*/\1/g<CR>:let @/=''<cr>
 	" ]]]
+	"  Help/Markdown/Wiki/文本文件 [[[3
+	autocmd BufWritePre *.markdown,*.mdown,*.mkd,*.mkdn,*.mdwn,*.md,*.text,*.txt,*.wiki call PanGuSpacing()
+	autocmd FileType markdown setlocal nolist
+	" ]]]
 	"  Javascript [[[3
 	autocmd FileType javascript setlocal dictionary+=$VIMFILES/dict/node.txt
 	" Javascript Code Modules(Mozilla)
 	autocmd BufNewFile,BufRead *.jsm setlocal filetype=javascript
 	" jQuery syntax
 	autocmd BufNewFile,BufRead jquery.*.js setlocal filetype=javascript syntax=jquery
-	" ]]]
-	"  Markdown [[[3
-	autocmd FileType markdown setlocal nolist
 	" ]]]
 	"  PHP [[[3
 	" PHP 生成的SQL/HTML代码高亮
