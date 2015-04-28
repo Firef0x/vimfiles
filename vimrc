@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 31 Mar 2015 04:23 +0800
+"  Last Modified: 29 Apr 2015 01:53 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -2557,8 +2557,7 @@ augroup Filetype_Specific
 	autocmd FileType css vnoremap <Leader>co J:s/\s*\([{:;,]\)\s*/\1/g<CR>:let @/=''<cr>
 	autocmd FileType css nnoremap <Leader>co :s/\s*\([{:;,]\)\s*/\1/g<CR>:let @/=''<cr>
 	" ]]]
-	"  Help/Markdown/Wiki/文本文件 [[[3
-	autocmd BufWritePre *.markdown,*.mdown,*.mkd,*.mkdn,*.mdwn,*.md,*.text,*.txt,*.wiki call PanGuSpacing()
+	"  Markdown [[[3
 	autocmd FileType markdown setlocal nolist
 	" ]]]
 	"  Javascript [[[3
@@ -2586,6 +2585,9 @@ augroup Filetype_Specific
 	"  VimFiles [[[3
 	autocmd FileType vim noremap <buffer> <F1> <Esc>:help <C-r><C-w><CR>
 	autocmd FileType vim setlocal foldmethod=indent keywordprg=:help
+	" ]]]
+	"  文本文件 [[[3
+	autocmd BufWritePre *.text,*.txt call PanGuSpacing()
 	" ]]]
 	"  文件编码 [[[3
 	" (以下取自 http://wyw.dcweb.cn/vim/_vimrc.html )
