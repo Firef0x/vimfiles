@@ -50,19 +50,25 @@ endif
 "      判定当前是否有 Cscope/Global [[[3
 if has('cscope')
 	let s:hasCscope=1
-	if executable('gtags-cscope')
-		let s:hasGtagsCscopeExe=1
-	else
-		let s:hasGtagsCscopeExe=0
-	endif
 	if executable('cscope')
 		let s:hasCscopeExe=1
 	else
 		let s:hasCscopeExe=0
 	endif
+	if executable('ccglue')
+		let s:hasCCglueExe=1
+	else
+		let s:hasCCglueExe=0
+	endif
+	if executable('gtags-cscope')
+		let s:hasGtagsCscopeExe=1
+	else
+		let s:hasGtagsCscopeExe=0
+	endif
 else
 	let s:hasCscope=0
 	let s:hasCscopeExe=0
+	let s:hasCcglueExe=0
 	let s:hasGtagsCscopeExe=0
 endif
 " ]]]
@@ -758,8 +764,9 @@ else
 			NeoBundle 'bb:abudden/taghighlight'
 			" C Call-Tree Explorer 源码浏览工具
 			if s:hasCscope
-				NeoBundleLazy 'CCTree',
-							\ {'autoload':{'commands':[
+				NeoBundleLazy 'hari-rangarajan/CCTree',
+							\ {'autoload':{
+							\ 'commands':[
 							\ 'CCTreeLoadDB',
 							\ 'CCTreeLoadXRefDBFromDisk'
 							\ ]}}
@@ -792,6 +799,9 @@ else
 					\ {'autoload':{'commands':'UndotreeToggle'}}
 		if s:hasAck || s:hasAg
 			NeoBundle 'mileszs/ack.vim'
+			" 在 NERDTree 中搜索目录
+			NeoBundle 'tyok/nerdtree-ack',
+						\ {'depends':['scrooloose/nerdtree','mileszs/ack.vim']}
 		endif
 		" NERDTree -- 树形的文件系统浏览器（替代 Netrw)，功能比 Vim 自带的 Netrw 强大
 		NeoBundle 'scrooloose/nerdtree'
@@ -2793,7 +2803,9 @@ if s:hasCscope
 			endif
 			silent! execute "Dispatch! cscope -bkq"
 			call Cscope_Add()
-			silent! execute "Dispatch! ccglue -S cscope.out -o cctree.out"
+			if s:hasCCglueExe
+				silent! execute "Dispatch! ccglue -S cscope.out -o cctree.out"
+			endif
 		endfunction
 		" ]]]
 		"  映射 [[[3
