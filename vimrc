@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 14 Oct 2015 23:37 +0800
+"  Last Modified: 15 Oct 2015 00:13 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -520,12 +520,8 @@ call neobundle#begin(expand("$VIMFILES/bundle"))
 " set shellxquote="\""
 " set noshellslash
 " ]]]
-if neobundle#has_cache()
-	"  载入 NeoBundle 缓存 [[[2
-	NeoBundleLoadCache
-	" ]]]
-else
-	"  配置 NeoBundle [[[2
+	"  载入 NeoBundle 缓存或配置 NeoBundle [[[2
+if neobundle#load_cache()
 	"  使 NeoBundle 管理 NeoBundle [[[3
 	" required!
 	NeoBundleFetch 'Shougo/neobundle.vim'
@@ -1009,8 +1005,8 @@ else
 	"  保存 NeoBundle 缓存 [[[3
 	NeoBundleSaveCache
 	" ]]]
-	" ]]]
 endif
+	" ]]]
 "    运行路径添加 bundle 目录 [[[2
 NeoBundleLocal $VIMFILES/bundle
 " ]]]
@@ -2205,7 +2201,7 @@ endif
 " ]]]
 "    UndoTree 撤销树视图 [[[2
 if neobundle#tap('undotree')
-	let g:undotree_SplitLocation = 'botright'
+	let g:undotree_WindowLayout = 2
 	" If undotree is opened, it is likely one wants to interact with it.
 	let g:undotree_SetFocusWhenToggle = 1
 	call neobundle#untap()
