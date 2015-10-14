@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 29 Apr 2015 01:53 +0800
+"  Last Modified: 14 Oct 2015 23:37 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -18,6 +18,13 @@ if has("win32") || has("win95") || has("win64") || has("win16")
 else
 	let s:isWindows=0
 	let $VIMFILES = $HOME."/.vim"
+endif
+if (!s:isWindows
+			\ && (has('mac') || has('macunix') || has('gui_macvim') ||
+			\ (!executable('xdg-open') && system('uname') =~? '^darwin')))
+	let s:isMac=1
+else
+	let s:isMac=0
 endif
 " ]]]
 "      判定当前是否图形界面 [[[3
@@ -254,8 +261,8 @@ function! OpenURL()
 		if s:isWindows
 			" start 不是程序，所以无效。并且，cmd 只能使用双引号
 			" call system("cmd /q /c start \"" . s:url . "\"")
-			call system("E:\\PortableApps\\firefox\\firefox.exe \"" . s:url . "\"")
-		elseif has("mac")
+			call system("E:\\PortableApps\\FirefoxPortable\\firefox\\firefox.exe \"" . s:url . "\"")
+		elseif s:isMac
 			call system("open '" . s:url . "'")
 		else
 			" call system("gnome-open " . s:url)
@@ -738,7 +745,7 @@ else
 		NeoBundle 'chrisbra/SudoEdit.vim'
 		" 在终端下自动开启关闭 paste 选项
 		NeoBundle 'ConradIrwin/vim-bracketed-paste'
-		if s:hasPython
+		if s:hasPython && executable('fcitx')
 			NeoBundle 'fcitx.vim'
 		endif
 	endif
@@ -1098,6 +1105,8 @@ if !exists('g:VimrcIsLoad')
 		" 雅黑 Consolas Powerline 混合字体
 		" 该字体取自 https://github.com/Jackson-soft/Vim/tree/master/user_fonts
 		set guifont=YaHei_Consolas_Hybrid:h12
+	elseif (s:isGUI && s:isMac)
+		set guifont=Inconsolata\ for\ Powerline:h15
 	elseif (s:isGUI || s:isColor)
 		set guifont=Inconsolata\ for\ Powerline\ Medium\ 12
 		" set guifontwide=WenQuanYi\ ZenHei\ Mono\ 12
@@ -1245,7 +1254,7 @@ set noshelltemp
 " 不在 Windows 和 Mac 下使用 Unicode 符号
 " 参见 https://github.com/tpope/vim-sensible/issues/44
 " 和   https://github.com/tpope/vim-sensible/issues/57
-if !s:isWindows && s:isGUI
+if !s:isWindows && !s:isMac && s:isGUI
 	set list
 	" set listchars=tab:▸\ ,extends:❯,precedes:❮,nbsp:␣
 	let &listchars="tab:\u25b8 ,extends:\u276f,precedes:\u276e,nbsp:\u2423"
@@ -1878,7 +1887,7 @@ if neobundle#tap('neosnippet.vim')
 			set conceallevel=2
 			" 'i' is for neosnippet
 			set concealcursor=i
-			if !s:isWindows && s:isGUI
+			if !s:isWindows && !s:isMac && s:isGUI
 				" set listchars+=conceal:Δ
 				let &listchars=&listchars.",conceal:\u0394"
 			endif
@@ -2118,7 +2127,7 @@ endif
 if neobundle#tap('syntastic')
 	" 光标跳转到第一个错误处
 	let g:syntastic_auto_jump = 2
-	if !s:isWindows
+	if !s:isWindows && !s:isMac
 		" let g:syntastic_error_symbol         = '✗'
 		" let g:syntastic_style_error_symbol   = '✠'
 		" let g:syntastic_warning_symbol       = '⚠'
@@ -2226,7 +2235,7 @@ if neobundle#tap('unite.vim')
 					\ 'start_insert': 1,
 					\ 'vertical' : 0,
 					\ }
-		if !s:isWindows
+		if !s:isWindows && !s:isMac
 			" let s:default_context.prompt =  '▸'
 			let s:default_context.prompt =  "\u25b8"
 			" let s:default_context.marked_icon = '✗'
@@ -2512,7 +2521,7 @@ endif
 "    VimShell Vim 下的原生终端 [[[2
 if neobundle#tap('vimshell.vim')
 	function! neobundle#hooks.on_source(bundle)
-		if s:isWindows
+		if s:isWindows || s:isMac
 			let g:vimshell_prompt =  '$'
 		else
 			" let g:vimshell_prompt =  '▸'
