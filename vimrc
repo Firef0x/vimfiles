@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 15 Oct 2015 00:13 +0800
+"  Last Modified: 16 Oct 2015 10:18 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -263,7 +263,7 @@ function! OpenURL()
 			" call system("cmd /q /c start \"" . s:url . "\"")
 			call system("E:\\PortableApps\\FirefoxPortable\\firefox\\firefox.exe \"" . s:url . "\"")
 		elseif s:isMac
-			call system("open '" . s:url . "'")
+			call system("open -a \"/Applications/Google Chrome.app\" '" . s:url . "'")
 		else
 			" call system("gnome-open " . s:url)
 			call system("setsid firefox '" . s:url . "' &")
