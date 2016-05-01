@@ -103,6 +103,13 @@ else
 	let s:autocomplete_method = 'neocomplcache'
 endif
 " ]]]
+"      判定当前是否支持 Node.js [[[3
+if has('node') || has('nodejs') || has('iojs')
+	let s:hasNode=1
+else
+	let s:hasNode=0
+endif
+" ]]]
 "      判定当前是否支持 Python 2或3 [[[3
 if has('python') || has('python3')
 	let s:hasPython=1
@@ -606,6 +613,8 @@ if neobundle#load_cache()
 					\ 'depends': ['Shougo/context_filetype.vim',
 					\ 'Shougo/neosnippet-snippets']}
 		NeoBundle 'honza/vim-snippets'
+		" React 特定的代码片段
+		NeoBundle 'justinj/vim-react-snippets'
 	endif
 	" ]]]
 	"  文本编辑 [[[3
@@ -704,6 +713,14 @@ if neobundle#load_cache()
 		" 			\ { 'autoload' : {'filetypes':['javascript']} }
 		" NeoBundleLazy 'jelera/vim-javascript-syntax',
 		" 			\ {'autoload':{'filetypes':['javascript']}}
+		NeoBundleLazy 'mustache/vim-mustache-handlebars',
+					\ {'autoload':{
+					\ 'filetypes':[
+					\ 'mustache',
+					\ 'handlebars'
+					\ ]}}
+		NeoBundleLazy 'mxw/vim-jsx',
+					\ {'autoload':{'filetypes':['javascript.jsx']}}
 		NeoBundleLazy 'pangloss/vim-javascript',
 					\ {'autoload':{'filetypes':['javascript']}}
 		NeoBundleLazy 'othree/javascript-libraries-syntax.vim',
@@ -714,7 +731,7 @@ if neobundle#load_cache()
 					\ 'ls',
 					\ 'typescript'
 					\ ]}}
-		if executable('node') || executable('nodejs')
+		if s:hasNode
 			NeoBundleLazy 'maksimr/vim-jsbeautify',
 						\ {'autoload':{
 						\ 'commands':[
@@ -731,6 +748,25 @@ if neobundle#load_cache()
 						\ 'less',
 						\ 'mustache'
 						\ ]}}
+			" JavaScript 自动补全引擎
+			NeoBundleLazy 'ternjs/tern_for_vim',
+						\ {'autoload':{
+						\ 'commands':[
+						\ 'TernDef',
+						\ 'TernDoc',
+						\ 'TernType',
+						\ 'TernRefs',
+						\ 'TernRename'
+						\ ],
+						\ 'filetypes':[
+						\ 'javascript'
+						\ ]},
+						\ 'build':{
+						\ 'cygwin'  : 'npm install',
+						\ 'mac'     : 'npm install',
+						\ 'unix'    : 'npm install',
+						\ 'windows' : 'npm install',
+						\ }}
 		endif
 	endif
 	" ]]]
@@ -894,20 +930,36 @@ if neobundle#load_cache()
 					\ 'less'
 					\ ]}}
 		NeoBundleLazy 'ariutta/Css-Pretty',
-					\ {'autoload':{'commands':'Csspretty',
-					\ 'filetypes':['css']}}
+					\ {'autoload':{
+					\ 'commands':'Csspretty',
+					\ 'filetypes':['css']
+					\ }}
+		NeoBundleLazy 'cakebaker/scss-syntax.vim',
+					\ {'autoload':{'filetypes':[
+					\ 'sass',
+					\ 'scss'
+					\ ]}}
 		NeoBundleLazy 'evanmiller/nginx-vim-syntax',
 					\ {'autoload':{'filetypes':['nginx']}}
+		" 避免 CSS3 高亮问题
+		NeoBundleLazy 'hail2u/vim-css3-syntax',
+					\ {'autoload':{'filetypes':[
+					\ 'css',
+					\ 'sass',
+					\ 'scss'
+					\ ]}}
 		NeoBundleLazy 'gregsexton/MatchTag',
 					\ {'autoload':{'filetypes':[
 					\ 'html',
+					\ 'javascript.jsx',
 					\ 'xml',
 					\ 'xsl'
 					\ ]}}
-		" Emmet -- 用于快速编辑html文件
+		" Emmet -- 用于快速编辑 HTML 文件
 		NeoBundleLazy 'mattn/emmet-vim',
 					\ {'autoload':{'filetypes':[
 					\ 'css',
+					\ 'handlebars',
 					\ 'html',
 					\ 'less',
 					\ 'mustache',
@@ -2134,11 +2186,17 @@ if neobundle#tap('syntastic')
 		let g:syntastic_style_warning_symbol = "\u2248"
 	endif
 	let g:syntastic_mode_map = { 'mode': 'passive',
-				\ 'active_filetypes': ['lua', 'php', 'sh'],
+				\ 'active_filetypes': ['javascript', 'lua', 'php', 'sh'],
 				\ 'passive_filetypes': ['puppet'] }
 	"  Checkers for Syntastic [[[3
-	" VimL
+	" JavaScript [[[4
+	if s:hasNode
+		let g:syntastic_javascript_checkers=['eslint']
+	endif
+	" ]]]
+	" VimL [[[4
 	let g:syntastic_vim_checkers=['vimlint']
+	" ]]]
 	" ]]]
 	call neobundle#untap()
 endif
@@ -2459,6 +2517,14 @@ if neobundle#tap('vim-indent-guides')
 		endfunction
 		autocmd MyAutoCmd VimEnter,Colorscheme * call s:indent_set_console_colors()
 	endif
+	call neobundle#untap()
+endif
+" ]]]
+"    Vim-JSX React JSX 语法插件 [[[2
+" (以下取自 http://foocoder.com/2016/04/08/vim环境搭建 )
+if neobundle#tap('vim-jsx')
+	" 使该插件在 .js 扩展名的文件中生效
+	let g:jsx_ext_required = 0
 	call neobundle#untap()
 endif
 " ]]]
