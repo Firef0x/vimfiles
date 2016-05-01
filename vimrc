@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 01 May 2016 19:02 +0800
+"  Last Modified: 01 May 2016 19:24 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -2206,13 +2206,17 @@ if neobundle#tap('syntastic')
 		let g:syntastic_warning_symbol       = "\u26a0"
 		let g:syntastic_style_warning_symbol = "\u2248"
 	endif
-	let g:syntastic_mode_map = { 'mode': 'passive',
-				\ 'active_filetypes': ['javascript', 'lua', 'php', 'sh'],
-				\ 'passive_filetypes': ['puppet'] }
+	let g:syntastic_mode_map = {
+				\ 'mode' : 'passive',
+				\ 'active_filetypes' : ['javascript', 'javascript.jsx',
+				\ 'lua', 'php', 'sh'],
+				\ 'passive_filetypes' : ['puppet']
+				\ }
 	"  Checkers for Syntastic [[[3
 	" JavaScript [[[4
 	if s:hasNode
 		let g:syntastic_javascript_checkers=['eslint']
+		let g:syntastic_javascript.jsx_checkers=['eslint']
 	endif
 	" ]]]
 	" VimL [[[4
