@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 01 May 2016 02:40 +0800
+"  Last Modified: 01 May 2016 19:02 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -2742,6 +2742,7 @@ augroup Filetype_Specific
 	autocmd BufNewFile,BufRead */xorg.conf.d/* setlocal filetype=xf86conf
 	autocmd BufNewFile,BufRead hg-editor-*.txt setlocal filetype=hgcommit
 	autocmd BufNewFile,BufRead *openvpn*/*.conf,*.ovpn setlocal filetype=openvpn
+	autocmd BufNewFile,BufRead *eslintrc setlocal filetype=json
 	" ]]]
 	"      Websites [[[5
 	autocmd BufRead forum.ubuntu.org.cn_*,bbs.archlinuxcn.org_post.php*.txt setlocal ft=bbcode
@@ -3125,10 +3126,18 @@ if neobundle#tap('vim-jsbeautify')
 		autocmd FileType css vnoremap <buffer> <Leader>ff :call RangeCSSBeautify()<CR>
 		autocmd FileType html nnoremap <buffer> <Leader>ff :call HtmlBeautify()<CR>
 		autocmd FileType html vnoremap <buffer> <Leader>ff :call RangeHtmlBeautify()<CR>
-		autocmd FileType javascript,json nnoremap <buffer> <Leader>ff
+		autocmd FileType javascript nnoremap <buffer> <Leader>ff
 					\ :call JsBeautify()<CR>
-		autocmd FileType javascript,json vnoremap <buffer> <Leader>ff
+		autocmd FileType javascript vnoremap <buffer> <Leader>ff
 					\ :call RangeJsBeautify()<CR>
+		autocmd FileType json nnoremap <buffer> <Leader>ff
+					\ :call JsonBeautify()<CR>
+		autocmd FileType json vnoremap <buffer> <Leader>ff
+					\ :call RangeJsonBeautify()<CR>
+		autocmd FileType javascript.jsx,jsx nnoremap <buffer> <Leader>ff
+					\ :call JsxBeautify()<CR>
+		autocmd FileType javascript.jsx,jsx vnoremap <buffer> <Leader>ff
+					\ :call RangeJsxBeautify()<CR>
 	augroup END
 	call neobundle#untap()
 endif
