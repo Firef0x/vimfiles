@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 15 Oct 2015 00:13 +0800
+"  Last Modified: 01 May 2016 02:40 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -122,6 +122,13 @@ if exists('$TMUX')
 	let s:isTmux=1
 else
 	let s:isTmux=0
+endif
+" ]]]
+"      判定当前是否服务器环境 [[[3
+if !s:isWindows && filereadable(expand("$VIMFILES/vimrc.isserver"))
+	let s:isServer=1
+else
+	let s:isServer=0
 endif
 " ]]]
 " ]]]
@@ -538,8 +545,7 @@ if neobundle#load_cache()
 	call add(s:plugin_groups, 'core')
 	call add(s:plugin_groups, 'autocomplete')
 	call add(s:plugin_groups, 'editing')
-	call add(s:plugin_groups, 'indent')
-	call add(s:plugin_groups, 'javascript')
+	call add(s:plugin_groups, 'lint')
 	if !s:isWindows
 		call add(s:plugin_groups, 'linux')
 		" FIXME Windows 下的 GitGutter 似乎有点问题
@@ -550,21 +556,28 @@ if neobundle#load_cache()
 	else
 		call add(s:plugin_groups, 'windows')
 	endif
-	call add(s:plugin_groups, 'lint')
-	if s:hasLua
-		call add(s:plugin_groups, 'lua')
-	endif
 	call add(s:plugin_groups, 'misc')
 	call add(s:plugin_groups, 'navigation')
-	call add(s:plugin_groups, 'php')
 	call add(s:plugin_groups, 'unite')
-	call add(s:plugin_groups, 'web')
+	" 仅在非生产环境下载入开发插件
+	if !s:isServer
+		call add(s:plugin_groups, 'indent')
+		call add(s:plugin_groups, 'javascript')
+		if s:hasLua
+			call add(s:plugin_groups, 'lua')
+		endif
+		call add(s:plugin_groups, 'php')
+		call add(s:plugin_groups, 'web')
+	endif
 	" ]]]
 	" My bundles here:
 	"  核心 [[[3
 	if count(s:plugin_groups, 'core')
-		" vim-airline 是更轻巧的 vim-powerline 代替品
-		NeoBundle 'bling/vim-airline'
+		if !s:isServer
+			" vim-airline 是更轻巧的 vim-powerline 代替品
+			NeoBundle 'vim-airline/vim-airline'
+			NeoBundle 'vim-airline/vim-airline-themes'
+		endif
 		" MatchIt -- 扩展%的匹配功能，对%命令进行扩展使得能在嵌套标签和语句之间跳转
 		NeoBundleLazy 'git@github.com:Firef0x/matchit.git',
 					\ {'autoload':{'mappings':[
@@ -770,6 +783,14 @@ if neobundle#load_cache()
 		endif
 	endif
 	" ]]]
+	"  代码检查 [[[3
+	if count(s:plugin_groups, 'lint')
+		" Syntastic -- 包含很多语言的语法与编码风格检查插件
+		NeoBundle 'scrooloose/syntastic'
+		NeoBundle 'syngan/vim-vimlint',
+					\ {'depends':'ynkdir/vim-vimlparser'}
+	endif
+	" ]]]
 	"  Linux [[[3
 	if count(s:plugin_groups, 'linux')
 		" 以 root 权限打开文件，以 SudoEdit.vim 代替 sudo.vim
@@ -780,14 +801,6 @@ if neobundle#load_cache()
 		if s:hasPython && executable('fcitx')
 			NeoBundle 'fcitx.vim'
 		endif
-	endif
-	" ]]]
-	"  代码检查 [[[3
-	if count(s:plugin_groups, 'lint')
-		" Syntastic -- 包含很多语言的语法与编码风格检查插件
-		NeoBundle 'scrooloose/syntastic'
-		NeoBundle 'syngan/vim-vimlint',
-					\ {'depends':'ynkdir/vim-vimlparser'}
 	endif
 	" ]]]
 	"  Lua [[[3
@@ -992,23 +1005,25 @@ if neobundle#load_cache()
 		NeoBundle 'lilydjwg/colorizer'
 		" 自动识别并设定文件编码
 		NeoBundle 'mbbill/fencview'
-		NeoBundle 'mhinz/vim-startify'
-		" ConqueTerm -- 提供在 Vim 中打开终端的功能，Windows 下应有 PowerShell 支持
-		" 使用 VimShell 暂时取代
-		" NeoBundle 'scottmcginness/Conque-Shell'
-		" VimShell -- Vim 中运行终端，使用该插件必须设置 set noautochdir
-		NeoBundleLazy 'Shougo/vimshell.vim',
-					\ {'autoload':{'commands':[
-					\ {'name':'VimShell',
-					\ 'complete':'customlist,vimshell#complete'},
-					\ 'VimShellExecute',
-					\ 'VimShellInteractive',
-					\ 'VimShellTerminal',
-					\ 'VimShellPop'
-					\ ],
-					\ 'explorer':1,
-					\ 'mappings':['<Plug>(vimshell_']
-					\ }}
+		if !s:isServer
+			NeoBundle 'mhinz/vim-startify'
+			" ConqueTerm -- 提供在 Vim 中打开终端的功能，Windows 下应有 PowerShell 支持
+			" 使用 VimShell 暂时取代
+			" NeoBundle 'scottmcginness/Conque-Shell'
+			" VimShell -- Vim 中运行终端，使用该插件必须设置 set noautochdir
+			NeoBundleLazy 'Shougo/vimshell.vim',
+						\ {'autoload':{'commands':[
+						\ {'name':'VimShell',
+						\ 'complete':'customlist,vimshell#complete'},
+						\ 'VimShellExecute',
+						\ 'VimShellInteractive',
+						\ 'VimShellTerminal',
+						\ 'VimShellPop'
+						\ ],
+						\ 'explorer':1,
+						\ 'mappings':['<Plug>(vimshell_']
+						\ }}
+		endif
 
 		"  语法相关插件 [[[4
 		NeoBundleLazy 'dogrover/vim-pentadactyl',
@@ -1019,6 +1034,14 @@ if neobundle#load_cache()
 					\ {'autoload':{'filetypes':['smali']}}
 		NeoBundleLazy 'openvpn',
 					\ {'autoload':{'filetypes':['openvpn']}}
+		" Ansible Playbook 语法高亮
+		NeoBundleLazy 'pearofducks/ansible-vim',
+					\ {'autoload':{
+					\ 'filetypes':[
+					\ 'ansible',
+					\ 'ansible_hosts',
+					\ 'ansible_template'
+					\ ]}}
 		" PO (Portable Object, gettext)
 		NeoBundleLazy 'po.vim--gray',
 					\ {'autoload':{'filetypes':['po']}}
@@ -1046,9 +1069,7 @@ if neobundle#load_cache()
 		NeoBundle 'auto_mkdir'
 		" 重命名当前文件
 		NeoBundle 'Rename'
-		" Ctrl-V 选择区域，然后按 :B 执行命令，或按 :S 查找匹配字符串
-		" NeoBundle 'vis'
-		" VisIncr -- 给vim增加生成递增或者递减数列的功能
+		" VisIncr -- 给 Vim 增加生成递增或者递减数列的功能
 		" 支持十进制,十六进制,日期,星期等,功能强大灵活
 		NeoBundle 'VisIncr'
 		" ]]]
@@ -2663,6 +2684,9 @@ augroup Filetype_Specific
 	" Python 文件的一般设置，比如不要 tab 等
 	autocmd FileType python setlocal tabstop=4 shiftwidth=4 expandtab foldmethod=indent
 	" ]]]
+	"  Shell [[[3
+	autocmd FileType sh setlocal tabstop=8 shiftwidth=8 expandtab
+	" ]]]
 	"  VimFiles [[[3
 	autocmd FileType vim noremap <buffer> <F1> <Esc>:help <C-r><C-w><CR>
 	autocmd FileType vim setlocal foldmethod=indent keywordprg=:help
@@ -3089,6 +3113,9 @@ endif
 " ]]]
 "        关闭窗口或卸载缓冲区 <Leader>c [[[4
 nmap <silent> <Leader>c :<C-U>call CloseWindowOrKillBuffer()<CR>
+" ]]]
+"        Syntastic 打开错误及警告窗口 <Leader>er [[[4
+nmap <silent> <Leader>er :Errors<CR>
 " ]]]
 "        Vim-JSBeautify 格式化 CSS,HTML,JavaScript <Leader>ff [[[4
 if neobundle#tap('vim-jsbeautify')
