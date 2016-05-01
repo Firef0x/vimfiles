@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 01 May 2016 19:24 +0800
+"  Last Modified: 01 May 2016 19:40 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -277,7 +277,7 @@ function! OpenURL()
 			" call system("cmd /q /c start \"" . s:url . "\"")
 			call system("E:\\PortableApps\\FirefoxPortable\\firefox\\firefox.exe \"" . s:url . "\"")
 		elseif s:isMac
-			call system("open '" . s:url . "'")
+			call system("open -a \"/Applications/Google Chrome.app\" '" . s:url . "'")
 		else
 			" call system("gnome-open " . s:url)
 			call system("setsid firefox '" . s:url . "' &")
@@ -2874,7 +2874,12 @@ if s:hasCscope
 
 		" add any database in current directory
 		function! Cscope_Add()
-			cd %:h
+			try
+				cd %:h
+			catch /.*/
+				return
+			endtry
+
 			try
 				for [filename, prgname] in s:tags_files
 					let db = findfile(filename, '.;')
@@ -2891,15 +2896,20 @@ if s:hasCscope
 			endtry
 		endfunction
 
-		autocmd MyAutoCmd BufRead *.c,*.cpp,*.h,*.java,*.cs call Cscope_Add()
+		autocmd MyAutoCmd BufRead *.c,*.cpp,*.h,*.cc,*.java,*.cs call Cscope_Add()
 
 		"  调用这个函数就可以用 Cscope 生成数据库，并添加到 Vim 中
 		function! Cscope_DoTag()
-			lcd %:p:h
+			try
+				lcd %:p:h
+			catch /.*/
+				return
+			endtry
+
 			if s:isWindows
-				silent! execute "Dispatch! dir /b *.c,*.cpp,*.h,*.java,*.cs >> cscope.files"
+				silent! execute "Dispatch! dir /b *.c,*.cpp,*.h,*.cc,*.java,*.cs >> cscope.files"
 			else
-				silent! execute "Dispatch! find . -name '*.h' -o -name '*.c' -o -name '*.cpp' -o -name '*.java' -o -name '*.cs' >> cscope.files"
+				silent! execute "Dispatch! find . -name '*.h' -o -name '*.c' -o -name '*.cpp' -o -name '*.cc' -o -name '*.java' -o -name '*.cs' >> cscope.files"
 			endif
 			silent! execute "Dispatch! cscope -bkq"
 			call Cscope_Add()
