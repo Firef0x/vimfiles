@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 01 May 2016 19:40 +0800
+"  Last Modified: 07 May 2016 16:26 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -1045,6 +1045,8 @@ if neobundle#load_cache()
 		" PO (Portable Object, gettext)
 		NeoBundleLazy 'po.vim--gray',
 					\ {'autoload':{'filetypes':['po']}}
+		NeoBundleLazy 'robbles/logstash.vim',
+					\ {'autoload':{'filetypes':['logstash']}}
 		" STL 语法高亮
 		NeoBundleLazy 'STL-improved',
 					\ {'autoload':{'filetypes':['c', 'cpp']}}
@@ -2709,6 +2711,9 @@ augroup Filetype_Specific
 	"  其它 [[[3
 	"    自己原创修改 [[[4
 	"      特定文件，非扩展名 [[[5
+	"        MySQL 慢查询日志 [[[6
+	autocmd BufRead *mysql-slow*.log* setlocal filetype=mysql
+	" ]]]
 	"        openSUSE Build Service [[[6
 	autocmd BufNewFile,BufRead _files,_meta,_packages,_service setlocal filetype=xml
 	" ]]]
