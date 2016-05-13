@@ -917,18 +917,13 @@ if neobundle#load_cache()
 		NeoBundleLazy 'Shougo/neomru.vim',
 					\ {'autoload':{
 					\ 'filetypes':'all',
-					\ 'unite_sources':[
-					\ 'neomru/file',
-					\ 'neomru/directory',
-					\ 'file_mru',
-					\ 'directory_mru'
-					\ ]}}
+					\ 'on_source':'unite.vim'}}
 		NeoBundleLazy 'Shougo/unite-help',
-					\ {'autoload':{'unite_sources':'help'}}
+					\ {'autoload':{'on_source':'unite.vim'}}
 		NeoBundleLazy 'Shougo/unite-outline',
-					\ {'autoload':{'unite_sources':'outline'}}
+					\ {'autoload':{'on_source':'unite.vim'}}
 		NeoBundleLazy 'tsukkee/unite-tag',
-					\ {'autoload':{'unite_sources':['tag', 'tag/file']}}
+					\ {'autoload':{'on_source':'unite.vim'}}
 	endif
 	" ]]]
 	"  Web 开发 [[[3
