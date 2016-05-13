@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 07 May 2016 16:26 +0800
+"  Last Modified: 14 May 2016 02:08 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -866,6 +866,13 @@ if neobundle#load_cache()
 	" ]]]
 	"  PHP [[[3
 	if count(s:plugin_groups, 'php')
+		NeoBundleLazy '2072/PHP-Indenting-for-VIm',
+					\ {'autoload':{'filetypes':['php']}}
+		" 高亮与光标下变量相同名字的变量
+		NeoBundleLazy 'alexander-alzate/vawa.vim',
+					\ {'autoload':{'filetypes':['php']}}
+		NeoBundleLazy 'php_localvarcheck.vim',
+					\ {'autoload':{'filetypes':['php']}}
 		"press K on a function for full php manual
 		NeoBundleLazy 'spf13/PIV',
 					\ {'autoload':{'filetypes':['blade', 'php']}}
@@ -2045,6 +2052,12 @@ if executable("curl")
 endif
 " 隐藏文件的模式列表
 let g:netrw_list_hide = '^\.[^.].*'
+" ]]]
+"    php_localvarcheck [[[2
+if neobundle#tap('php_localvarcheck.vim')
+	let g:php_localvarcheck_enable=1
+	call neobundle#untap()
+endif
 " ]]]
 "    PIV [[[2
 if neobundle#tap('PIV')
