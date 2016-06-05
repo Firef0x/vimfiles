@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 14 May 2016 02:08 +0800
+"  Last Modified: 05 Jun 2016 11:45 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -606,6 +606,9 @@ if neobundle#load_cache()
 	" ]]]
 	"  自动完成 [[[3
 	if count(s:plugin_groups, 'autocomplete')
+		" 解决插入模式下自动补全会定住的问题
+		" 以下取自 https://github.com/bling/dotvim/pull/30
+		NeoBundle 'Konfekt/FastFold'
 		if s:autocomplete_method == 'neocomplcache'
 			NeoBundleLazy 'Shougo/neocomplcache.vim',
 						\ {'autoload':{'insert':1}}
@@ -1587,6 +1590,12 @@ if neobundle#tap('emmet-vim')
 		let g:user_emmet_settings = {'lang': "zh-cn"}
 	endfunction
 	call neobundle#untap()
+endif
+" ]]]
+"    FastFold 自动折叠代码 [[[2
+if neobundle#tap('FastFold')
+	let g:fastfold_savehook = 1
+	let g:fastfold_fold_command_suffixes = []
 endif
 " ]]]
 "    Fugitive Vim 内快捷 Git 命令操作 [[[2
