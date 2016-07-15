@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 05 Jun 2016 11:45 +0800
+"  Last Modified: 15 Jul 2016 23:57 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -729,6 +729,17 @@ if neobundle#load_cache()
 		" 			\ { 'autoload' : {'filetypes':['javascript']} }
 		" NeoBundleLazy 'jelera/vim-javascript-syntax',
 		" 			\ {'autoload':{'filetypes':['javascript']}}
+		" Require.js 快速定位模块
+		NeoBundleLazy 'nyanhan/requirejs.vim',
+					\ {'autoload':{
+					\ 'filetypes':[
+					\ 'javascript'
+					\ ]}}
+		NeoBundleLazy 'ohle/underscore-templates.vim',
+					\ {'autoload':{
+					\ 'filetypes':[
+					\ 'underscore_template'
+					\ ]}}
 		NeoBundleLazy 'mustache/vim-mustache-handlebars',
 					\ {'autoload':{
 					\ 'filetypes':[
@@ -2736,6 +2747,9 @@ augroup Filetype_Specific
 	" ]]]
 	"        Zoom [[[6
 	autocmd BufNewFile,BufRead .zoominfo,.zoomrc setlocal filetype=json
+	" ]]]
+	"        Underscore.js syntax [[[6
+	autocmd BufNewFile,BufRead */modules/**/tpl/*.html setlocal filetype=html syntax=underscore_template
 	" ]]]
 	" ]]]
 	" ]]]
