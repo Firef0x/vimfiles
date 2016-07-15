@@ -4,3 +4,4 @@ bundle
 .flagged
 .netrwhist
 viminfo
+.DS_Store
