@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 15 Jul 2016 23:57 +0800
+"  Last Modified: 04 Jul 2017 21:30 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -125,7 +125,7 @@ else
 endif
 " ]]]
 "      判定当前是否服务器环境 [[[3
-if !s:isWindows && filereadable(expand("$VIMFILES/vimrc.isserver"))
+if filereadable(expand("$VIMFILES/vimrc.isserver"))
 	let s:isServer=1
 else
 	let s:isServer=0
@@ -668,18 +668,18 @@ if neobundle#load_cache()
 					\ ['n', 'viv', 'vav', 'civ', 'cav', 'div', 'dav', 'yiv', 'yav'],
 					\ ['xv', 'v']
 					\ ]}}
-		" “盘古之白”中文排版自动规范化的 Vim 插件
-		NeoBundleLazy 'hotoo/pangu.vim',
-					\ {'autoload':{
-					\ 'commands':[
-					\ 'Pangu',
-					\ 'PanguEnable',
-					\ 'PanguDisable'
-					\ ],
-					\ 'filetypes':[
-					\ 'markdown',
-					\ 'text'
-					\ ]}}
+		" “盘古之白”中文排版自动规范化的 Vim 插件(弃用，副作用太大)
+		" NeoBundleLazy 'hotoo/pangu.vim',
+		" 			\ {'autoload':{
+		" 			\ 'commands':[
+		" 			\ 'Pangu',
+		" 			\ 'PanguEnable',
+		" 			\ 'PanguDisable'
+		" 			\ ],
+		" 			\ 'filetypes':[
+		" 			\ 'markdown',
+		" 			\ 'text'
+		" 			\ ]}}
 		NeoBundle 'jiangmiao/auto-pairs'
 		" 自动更新 Last Modified 字符串
 		NeoBundle 'jmcantrell/vim-lastmod'
@@ -729,12 +729,12 @@ if neobundle#load_cache()
 		" 			\ { 'autoload' : {'filetypes':['javascript']} }
 		" NeoBundleLazy 'jelera/vim-javascript-syntax',
 		" 			\ {'autoload':{'filetypes':['javascript']}}
-		" Require.js 快速定位模块
-		NeoBundleLazy 'nyanhan/requirejs.vim',
-					\ {'autoload':{
-					\ 'filetypes':[
-					\ 'javascript'
-					\ ]}}
+		" Require.js 快速定位模块(似乎没有作用)
+		" NeoBundleLazy 'nyanhan/requirejs.vim',
+		" 			\ {'autoload':{
+		" 			\ 'filetypes':[
+		" 			\ 'javascript'
+		" 			\ ]}}
 		NeoBundleLazy 'ohle/underscore-templates.vim',
 					\ {'autoload':{
 					\ 'filetypes':[
@@ -2726,7 +2726,7 @@ augroup Filetype_Specific
 	autocmd FileType vim setlocal foldmethod=indent keywordprg=:help
 	" ]]]
 	"  文本文件 [[[3
-	autocmd BufWritePre *.text,*.txt call PanGuSpacing()
+	" autocmd BufWritePre *.text,*.txt call PanGuSpacing()
 	" ]]]
 	"  文件编码 [[[3
 	" (以下取自 http://wyw.dcweb.cn/vim/_vimrc.html )
