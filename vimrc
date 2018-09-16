@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 04 Jul 2017 21:30 +0800
+"  Last Modified: 17 Sep 2018 01:50 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -750,12 +750,19 @@ if neobundle#load_cache()
 					\ {'autoload':{'filetypes':['javascript.jsx']}}
 		NeoBundleLazy 'pangloss/vim-javascript',
 					\ {'autoload':{'filetypes':['javascript']}}
+		NeoBundleLazy 'posva/vim-vue',
+					\ {'autoload':{'filetypes':['vue']}}
 		NeoBundleLazy 'othree/javascript-libraries-syntax.vim',
 					\ {'autoload':{
 					\ 'filetypes':[
 					\ 'javascript',
 					\ 'coffee',
 					\ 'ls',
+					\ 'typescript'
+					\ ]}}
+		NeoBundleLazy 'leafgarland/typescript-vim',
+					\ {'autoload':{
+					\ 'filetypes':[
 					\ 'typescript'
 					\ ]}}
 		if s:hasNode
@@ -1048,6 +1055,9 @@ if neobundle#load_cache()
 					\ {'autoload':{'filetypes':['PKGBUILD']}}
 		NeoBundleLazy 'git@github.com:Firef0x/vim-smali.git',
 					\ {'autoload':{'filetypes':['smali']}}
+		" RESTful API Modeling Language 语法高亮
+		NeoBundleLazy 'IN3D/vim-raml',
+					\ {'autoload':{'filetypes':['raml']}}
 		NeoBundleLazy 'openvpn',
 					\ {'autoload':{'filetypes':['openvpn']}}
 		" Ansible Playbook 语法高亮
@@ -2664,6 +2674,12 @@ endif
 "    [Disabled]Vim-Sneak [[[2
 " let g:sneak#streak = 1
 " ]]]
+"    Vim-Vue Vue 语法插件 [[[2
+if neobundle#tap('vim-vue')
+	let g:vue_disable_pre_processors=1
+	call neobundle#untap()
+endif
+" ]]]
 "    xml.vim 使所有的标签都关闭[[[2
 " (以下取自 https://github.com/lilydjwg/dotvim )
 if neobundle#tap('xml.vim')
@@ -3190,6 +3206,15 @@ if neobundle#tap('vim-jsbeautify')
 					\ :call RangeJsxBeautify()<CR>
 	augroup END
 	call neobundle#untap()
+endif
+" ]]]
+"        XMLLint 格式化 XML / XSLT <Leader>ff [[[4
+if executable('xmllint')
+	let $XMLLINT_INDENT = "    "
+	augroup Filetype_Specific
+		" for XML, XSLT
+		autocmd FileType xml,xslt nnoremap <buffer> <Leader>ff :%!xmllint --format --recover -<CR>
+	augroup END
 endif
 " ]]]
 "        格式化全文 <Leader>ff [[[4
