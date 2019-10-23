@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 23 Oct 2019 15:54 +0800
+"  Last Modified: 23 Oct 2019 16:10 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -668,18 +668,6 @@ if neobundle#load_cache()
 					\ ['n', 'viv', 'vav', 'civ', 'cav', 'div', 'dav', 'yiv', 'yav'],
 					\ ['xv', 'v']
 					\ ]}}
-		" “盘古之白”中文排版自动规范化的 Vim 插件(弃用，副作用太大)
-		" NeoBundleLazy 'hotoo/pangu.vim',
-		" 			\ {'autoload':{
-		" 			\ 'commands':[
-		" 			\ 'Pangu',
-		" 			\ 'PanguEnable',
-		" 			\ 'PanguDisable'
-		" 			\ ],
-		" 			\ 'filetypes':[
-		" 			\ 'markdown',
-		" 			\ 'text'
-		" 			\ ]}}
 		NeoBundle 'jiangmiao/auto-pairs'
 		" 自动更新 Last Modified 字符串
 		NeoBundle 'jmcantrell/vim-lastmod'
@@ -729,12 +717,6 @@ if neobundle#load_cache()
 		" 			\ { 'autoload' : {'filetypes':['javascript']} }
 		" NeoBundleLazy 'jelera/vim-javascript-syntax',
 		" 			\ {'autoload':{'filetypes':['javascript']}}
-		" Require.js 快速定位模块(似乎没有作用)
-		" NeoBundleLazy 'nyanhan/requirejs.vim',
-		" 			\ {'autoload':{
-		" 			\ 'filetypes':[
-		" 			\ 'javascript'
-		" 			\ ]}}
 		NeoBundleLazy 'ohle/underscore-templates.vim',
 					\ {'autoload':{
 					\ 'filetypes':[
@@ -1053,13 +1035,9 @@ if neobundle#load_cache()
 					\ {'autoload':{'filetypes':['pentadactyl']}}
 		NeoBundleLazy 'git@github.com:Firef0x/PKGBUILD.vim.git',
 					\ {'autoload':{'filetypes':['PKGBUILD']}}
-		NeoBundleLazy 'git@github.com:Firef0x/vim-smali.git',
-					\ {'autoload':{'filetypes':['smali']}}
 		" RESTful API Modeling Language 语法高亮
 		NeoBundleLazy 'IN3D/vim-raml',
 					\ {'autoload':{'filetypes':['raml']}}
-		NeoBundleLazy 'openvpn',
-					\ {'autoload':{'filetypes':['openvpn']}}
 		" Ansible Playbook 语法高亮
 		NeoBundleLazy 'pearofducks/ansible-vim',
 					\ {'autoload':{
@@ -2741,9 +2719,6 @@ augroup Filetype_Specific
 	autocmd FileType vim noremap <buffer> <F1> <Esc>:help <C-r><C-w><CR>
 	autocmd FileType vim setlocal foldmethod=indent keywordprg=:help
 	" ]]]
-	"  文本文件 [[[3
-	" autocmd BufWritePre *.text,*.txt call PanGuSpacing()
-	" ]]]
 	"  文件编码 [[[3
 	" (以下取自 http://wyw.dcweb.cn/vim/_vimrc.html )
 	autocmd BufReadPre *.gb call s:SetFileEncodings('cp936')
@@ -2797,7 +2772,6 @@ augroup Filetype_Specific
 	autocmd BufNewFile,BufRead ejabberd.cfg* setlocal filetype=erlang
 	autocmd BufNewFile,BufRead */xorg.conf.d/* setlocal filetype=xf86conf
 	autocmd BufNewFile,BufRead hg-editor-*.txt setlocal filetype=hgcommit
-	autocmd BufNewFile,BufRead *openvpn*/*.conf,*.ovpn setlocal filetype=openvpn
 	autocmd BufNewFile,BufRead *eslintrc setlocal filetype=json
 	" ]]]
 	"      Websites [[[5
