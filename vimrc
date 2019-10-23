@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 17 Sep 2018 01:50 +0800
+"  Last Modified: 23 Oct 2019 15:54 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -956,7 +956,7 @@ if neobundle#load_cache()
 	" ]]]
 	"  Web 开发 [[[3
 	if count(s:plugin_groups, 'web')
-		NeoBundleLazy 'amirh/HTML-AutoCloseTag',
+		NeoBundleLazy 'heracek/HTML-AutoCloseTag',
 					\ {'autoload':{'filetypes':['html', 'xml']}}
 		NeoBundleLazy 'ap/vim-css-color',
 					\ {'autoload':{'filetypes':[
@@ -975,7 +975,7 @@ if neobundle#load_cache()
 					\ 'sass',
 					\ 'scss'
 					\ ]}}
-		NeoBundleLazy 'evanmiller/nginx-vim-syntax',
+		NeoBundleLazy 'chr4/nginx.vim',
 					\ {'autoload':{'filetypes':['nginx']}}
 		" 避免 CSS3 高亮问题
 		NeoBundleLazy 'hail2u/vim-css3-syntax',
