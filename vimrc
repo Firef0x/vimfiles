@@ -1,5 +1,5 @@
 scriptencoding utf-8
-"  Last Modified: 23 Oct 2019 16:10 +0800
+"  Last Modified: 28 Oct 2019 09:56 +0800
 "  其他文件 [[[1
 "    引用 Example 设置 [[[2
 if !exists("g:VimrcIsLoad")
@@ -730,10 +730,16 @@ if neobundle#load_cache()
 					\ ]}}
 		NeoBundleLazy 'mxw/vim-jsx',
 					\ {'autoload':{'filetypes':['javascript.jsx']}}
-		NeoBundleLazy 'pangloss/vim-javascript',
+		" NeoBundleLazy 'pangloss/vim-javascript',
+		" 			\ {'autoload':{'filetypes':['javascript']}}
+		" NeoBundleLazy 'posva/vim-vue',
+		" 			\ {'autoload':{'filetypes':['vue']}}
+		NeoBundleLazy 'HerringtonDarkholme/yats.vim',
+					\ {'autoload':{'filetypes':['typescript']}}
+		NeoBundleLazy 'othree/yajs.vim',
 					\ {'autoload':{'filetypes':['javascript']}}
-		NeoBundleLazy 'posva/vim-vue',
-					\ {'autoload':{'filetypes':['vue']}}
+		NeoBundleLazy 'othree/es.next.syntax.vim',
+					\ {'autoload':{'filetypes':['javascript', 'typescript']}}
 		NeoBundleLazy 'othree/javascript-libraries-syntax.vim',
 					\ {'autoload':{
 					\ 'filetypes':[
